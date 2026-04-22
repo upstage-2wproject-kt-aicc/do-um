@@ -1,0 +1,19 @@
+[project]
+name = "vad-comparison"
+version = "0.1.0"
+description = "VAD library comparison for AICC project"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0.0",
+    "torchaudio",
+    "pydub>=0.25.1",
+    "silero-vad",
+    "numpy",
+    "webrtcvad-wheels",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ipykernel",
+]
