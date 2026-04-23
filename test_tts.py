@@ -1,50 +1,67 @@
 import asyncio
-from src.tts.service import TTSService, AzureTTSService
+import time
+from src.tts.service import TTSService, AzureTTSService, NaverTTSService, GoogleTTSService
 from src.common.schemas import LLMResponse
 from src.common.logger import get_logger
 
 logger = get_logger()
 
-class ChatbotManager:
-    """
-    DI(의존성 주입)가 적용된 예시 클래스입니다.
-    TTSService 인터페이스에만 의존하며, 구체적인 구현체(Azure, Google 등)를 외부에서 주입받습니다.
-    """
-    def __init__(self, tts_service: TTSService):
-        self.tts_service = tts_service
-
-    async def speak(self, text: str):
-        logger.info("ChatbotManager: 텍스트 음성 변환 요청 시작")
-        resp = LLMResponse(session_id="test_session", provider="test", text=text, latency_ms=0)
+async def compare_tts_models(text: str):
+    logger.info("=== TTS 모델 성능 비교 시작 ===")
+    
+    # 1. 테스트할 모델 리스트 준비 (DI 패턴 활용)
+    services = {
+        "Azure": AzureTTSService(),
+        "Naver": NaverTTSService(),
+        "Google": GoogleTTSService()
+    }
+    
+    results = []
+    
+    for name, service in services.items():
+        logger.info(f"[{name}] 테스트 시작...")
+        resp = LLMResponse(session_id="compare_session", provider="test", text=text, latency_ms=0)
         
+        start_time = time.perf_counter()
         chunks = []
-        async for chunk in self.tts_service.stream(resp):
-            chunks.append(chunk)
-            logger.debug("청크 수신: {} bytes, is_last={}", len(chunk.audio_bytes), chunk.is_last)
+        try:
+            async for chunk in service.stream(resp):
+                chunks.append(chunk)
+            
+            end_time = time.perf_counter()
+            latency = (end_time - start_time) * 1000 # ms
+            
+            audio_size = sum(len(c.audio_bytes) for c in chunks)
+            
+            results.append({
+                "model": name,
+                "latency_ms": latency,
+                "audio_size": audio_size,
+                "success": audio_size > 0
+            })
+            
+            if audio_size > 0:
+                logger.success(f"[{name}] 완료 - Latency: {latency:.2f}ms, Size: {audio_size} bytes")
+                # 파일 저장 (확인용)
+                with open(f"test_audio_{name.lower()}.mp3", "wb") as f:
+                    f.write(chunks[0].audio_bytes)
+            else:
+                logger.warning(f"[{name}] 응답이 비어있습니다. (자격 증명 확인 필요)")
+                
+        except Exception as e:
+            logger.error(f"[{name}] 오류 발생: {e}")
+            results.append({"model": name, "success": False, "error": str(e)})
 
-        if len(chunks) > 0 and len(chunks[0].audio_bytes) > 0:
-            logger.success("오디오 스트림 생성 성공! 총 {}개의 청크를 받았습니다.", len(chunks))
-            with open("test_audio.mp3", "wb") as f:
-                f.write(chunks[0].audio_bytes)
-            logger.info("파일 저장 완료: test_audio.mp3")
-        else:
-            logger.warning("Fallback 오디오(또는 빈 오디오)가 반환되었습니다.")
+    # 2. 결과 요약 출력
+    logger.info("=== 비교 결과 요약 ===")
+    for res in results:
+        status = "✅ 성공" if res.get("success") else "❌ 실패"
+        l_str = f"{res['latency_ms']:.2f}ms" if "latency_ms" in res else "N/A"
+        logger.info(f"{res['model']}: {status} | Latency: {l_str}")
 
 async def main():
-    logger.info("=== TTS 파이프라인 리팩토링 검증 ===")
-    
-    # 1. 의존성 객체 생성 (실무에서는 DI Container나 팩토리 사용)
-    azure_tts = AzureTTSService()
-    
-    # 2. 의존성 주입 (Dependency Injection)
-    # ChatbotManager는 주입된 객체가 Azure인지 Google인지 모른 채 인터페이스만 보고 동작합니다.
-    manager = ChatbotManager(tts_service=azure_tts)
-    
-    # 3. 서비스 실행
-    text = "테스트입니다. 결제 금액은 ₩12,500 이며, 결제일은 2026-04-23 입니다."
-    await manager.speak(text)
-    
-    logger.info("=== 검증 종료 ===")
+    test_text = "안녕하세요. 금융 챗봇 TTS 성능 비교 테스트를 위한 문장입니다."
+    await compare_tts_models(test_text)
 
 if __name__ == "__main__":
     asyncio.run(main())

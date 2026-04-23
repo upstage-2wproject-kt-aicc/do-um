@@ -6,7 +6,9 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import AsyncIterator
 
+import requests
 import azure.cognitiveservices.speech as speechsdk
+from google.cloud import texttospeech
 from cachetools import LRUCache
 
 from src.common.schemas import LLMResponse, TTSChunk
@@ -162,4 +164,97 @@ class AzureTTSService(TTSService):
                 audio_bytes=self.fallback_audio_bytes,
                 is_last=True
             )
+
+
+class NaverTTSService(TTSService):
+    """Naver Clova TTS를 활용한 음성 합성 서비스 구현체입니다."""
+
+    def __init__(self):
+        self.client_id = os.environ.get("NAVER_CLIENT_ID", "")
+        self.client_secret = os.environ.get("NAVER_CLIENT_SECRET", "")
+        self.url = "https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts"
+        self.speaker = "nara"
+        
+        if self.client_id and self.client_secret:
+            logger.info("Naver TTS 설정이 성공적으로 로드되었습니다.")
+        else:
+            logger.warning("Naver TTS 환경 변수(ID 또는 SECRET)가 누락되었습니다.")
+
+    async def stream(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
+        """Naver API를 통해 음성을 합성합니다."""
+        if not self.client_id or not self.client_secret:
+            logger.error("Naver TTS 자격 증명이 없습니다.")
+            return
+
+        headers = {
+            "X-NCP-APIGW-API-KEY-ID": self.client_id,
+            "X-NCP-APIGW-API-KEY": self.client_secret,
+        }
+        data = {
+            "speaker": self.speaker,
+            "speed": "0",
+            "text": response.text,
+            "format": "mp3"
+        }
+
+        def _call_api():
+            return requests.post(self.url, headers=headers, data=data)
+
+        logger.debug("Naver TTS 합성을 시작합니다. [Text: {}]", response.text[:20] + "...")
+        res = await asyncio.to_thread(_call_api)
+
+        if res.status_code == 200:
+            logger.info("Naver TTS 합성이 완료되었습니다. [Audio Size: {} bytes]", len(res.content))
+            yield TTSChunk(
+                session_id=response.session_id, 
+                chunk_id=0, 
+                audio_bytes=res.content, 
+                is_last=True
+            )
+        else:
+            logger.error("Naver TTS API 호출 실패 [Status: {}, Msg: {}]", res.status_code, res.text)
+
+
+class GoogleTTSService(TTSService):
+    """Google Cloud TTS를 활용한 음성 합성 서비스 구현체입니다."""
+
+    def __init__(self):
+        try:
+            self.client = texttospeech.TextToSpeechClient()
+            self.voice = texttospeech.VoiceSelectionParams(
+                language_code="ko-KR", name="ko-KR-Wavenet-A"
+            )
+            self.audio_config = texttospeech.AudioConfig(
+                audio_encoding=texttospeech.AudioEncoding.MP3
+            )
+            logger.info("Google TTS 클라이언트가 초기화되었습니다.")
+        except Exception as e:
+            logger.error("Google TTS 초기화 실패: {}", str(e))
+            self.client = None
+
+    async def stream(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
+        """Google API를 통해 음성을 합성합니다."""
+        if not self.client:
+            logger.error("Google TTS 클라이언트가 유효하지 않습니다.")
+            return
+
+        synthesis_input = texttospeech.SynthesisInput(text=response.text)
+        
+        def _call_api():
+            return self.client.synthesize_speech(
+                input=synthesis_input, voice=self.voice, audio_config=self.audio_config
+            )
+
+        logger.debug("Google TTS 합성을 시작합니다. [Text: {}]", response.text[:20] + "...")
+        try:
+            res = await asyncio.to_thread(_call_api)
+            logger.info("Google TTS 합성이 완료되었습니다. [Audio Size: {} bytes]", len(res.audio_content))
+            yield TTSChunk(
+                session_id=response.session_id, 
+                chunk_id=0, 
+                audio_bytes=res.audio_content, 
+                is_last=True
+            )
+        except Exception as e:
+            logger.error("Google TTS API 호출 중 오류 발생: {}", str(e))
 
