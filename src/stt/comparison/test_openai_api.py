@@ -8,7 +8,7 @@ from openai import OpenAI
 from pydub import AudioSegment
 import webrtcvad
 
-# .env 로드 (OPENAI_API_KEY 확인)
+# .env 로드 (LLM_GPT_API_KEY 확인)
 load_dotenv()
 
 # --- 1. 최적화된 전처리 파이프라인 (FFmpeg -> webrtcvad) ---
@@ -64,9 +64,9 @@ def apply_optimal_preprocessing(input_path, temp_dir):
 
 # --- 2. OpenAI STT API 호출 ---
 async def transcribe_openai_optimal(file_path):
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("LLM_GPT_API_KEY")
     if not api_key:
-        return "❌ OPENAI_API_KEY가 설정되지 않았습니다.", 0
+        return "❌ LLM_GPT_API_KEY가 설정되지 않았습니다.", 0
         
     client = OpenAI(api_key=api_key)
     start_t = time.time()

@@ -31,7 +31,7 @@
 #### `src/nlu/aicc_core_klue.py`
 - 현재 NLU 모듈의 **메인 실행/연동 파일**
 - 주요 기능:
-  - `.env` 로드 및 `UPSTAGE_API_KEY` 검증
+  - `.env` 로드 및 `LLM_SOLAR_API_KEY` 검증
   - 로컬 KLUE 분류 모델 로드 (`my_aicc_nlu_model_klue:roberta-base`)
   - FAQ CSV(`RAG_FAQ.csv`)를 `Document`로 변환
   - BM25 인덱스 생성 + Chroma 벡터 저장소 적재
@@ -125,7 +125,7 @@
 
 1. 저장소 루트에서 `.env` 준비  
    - `cp .env.example .env`
-   - `UPSTAGE_API_KEY=...` 입력
+   - `LLM_SOLAR_API_KEY=...` 입력
 2. 의존성 설치  
    - `pip install -r requirements.txt`
 3. 로컬 모델 폴더 준비  
@@ -143,4 +143,3 @@
 - 로컬 산출물(모델/DB)은 계속 `.gitignore` 유지
 - NLU 출력 스키마(`status`, `intent`, `metadata`, `timings_sec`)는 워크플로우와 계약이므로 변경 시 공유 필수
 - 의도 라벨 순서(`intent_map`)는 학습 체크포인트 라벨 인덱스와 항상 동기화
-

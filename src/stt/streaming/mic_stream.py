@@ -12,7 +12,7 @@
     - Google Cloud 인증: gcloud auth application-default login
 
 사전 요건 (OpenAI):
-    - .env에 OPENAI_API_KEY 설정
+    - .env에 LLM_GPT_API_KEY 설정
 """
 
 import os
@@ -38,8 +38,8 @@ def run():
             return
         pipeline = StreamingPipeline(google_project_id=project_id, stt_provider="google")
     elif provider == "openai":
-        if not os.getenv("OPENAI_API_KEY"):
-            print("❌ OPENAI_API_KEY 환경변수가 없습니다.")
+        if not os.getenv("LLM_GPT_API_KEY"):
+            print("❌ LLM_GPT_API_KEY 환경변수가 없습니다.")
             return
         pipeline = StreamingPipeline(stt_provider="openai")
     else:

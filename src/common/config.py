@@ -10,7 +10,7 @@ load_dotenv()
 
 class OpenAITTSConfig(BaseModel):
     """OpenAI TTS 설정"""
-    api_key: str = Field(default_factory=lambda: os.environ.get("OPENAI_API_KEY", ""))
+    api_key: str = Field(default_factory=lambda: os.environ.get("LLM_GPT_API_KEY", ""))
     voice: str = Field("alloy", description="OpenAI 음성 모델")
     model: str = Field("tts-1", description="OpenAI TTS 모델 (tts-1, tts-1-hd)")
 

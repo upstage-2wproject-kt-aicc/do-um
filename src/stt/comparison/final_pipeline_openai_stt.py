@@ -73,8 +73,8 @@ def apply_optimal_preprocessing(input_path, temp_dir):
 
 # --- 2. OpenAI STT API 호출 ---
 async def transcribe_openai_optimal(file_path):
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key: return "OPENAI_API_KEY missing", 0
+    api_key = os.getenv("LLM_GPT_API_KEY")
+    if not api_key: return "LLM_GPT_API_KEY missing", 0
         
     client = OpenAI(api_key=api_key)
     start_t = time.time()
