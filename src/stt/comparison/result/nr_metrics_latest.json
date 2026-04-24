@@ -1,0 +1,26 @@
+{
+  "timestamp": "20260423_095459",
+  "files_processed": 1,
+  "results": [
+    {
+      "source_file": "06_07_014041_210927_SN.wav",
+      "metrics": [
+        {
+          "engine": "FFmpeg",
+          "latency": 0.3995,
+          "resource": 50
+        },
+        {
+          "engine": "SoX",
+          "latency": 2.422,
+          "resource": 30
+        },
+        {
+          "engine": "Noisereduce",
+          "latency": 16.8635,
+          "resource": 120
+        }
+      ]
+    }
+  ]
+}

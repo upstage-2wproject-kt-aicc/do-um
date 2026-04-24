@@ -1,6 +1,6 @@
 """Evaluation interface skeleton for response quality scoring."""
 
-from src.common.schemas import EvalInput, EvalResult
+from common.schemas import EvalInput, EvalResult
 
 
 class EvaluationService:
