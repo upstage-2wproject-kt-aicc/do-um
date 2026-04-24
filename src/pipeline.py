@@ -12,8 +12,8 @@ class VoiceAIPipeline:
     """최상위 비동기 파이프라인 인터페이스를 정의합니다."""
 
     def __init__(self):
-        # 팩토리를 통해 TTS 서비스를 동적으로 주입합니다.
-        self.tts_service = TTSFactory.get_service("azure")
+        # 팩토리를 통해 TTS 서비스를 동적으로 주입합니다. (기본값: openai)
+        self.tts_service = TTSFactory.get_service("openai")
 
     async def run_workflow_to_tts(self, payload: WorkflowRoutingInput) -> AsyncIterator[TTSChunk]:
         """
