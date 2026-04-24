@@ -7,6 +7,7 @@ from common.schemas import LLMResponse, WorkflowRoutingInput
 from common.exceptions import ValidationException
 from fastapi.responses import StreamingResponse
 from llm.mock import mock_llm_stream, sentence_chunker
+from src.stt.streaming.websocket_stream import router as stt_router
 
 app = FastAPI(title="금융 챗봇 TTS API")
 
@@ -15,6 +16,9 @@ app.add_middleware(LoggingMiddleware)
 
 # 2. 전역 에러 처리기 등록 (일관된 에러 응답 보장)
 register_error_handlers(app)
+
+# 3. STT -> NLU WebSocket 라우터 등록
+app.include_router(stt_router)
 
 @app.get("/")
 async def root():
