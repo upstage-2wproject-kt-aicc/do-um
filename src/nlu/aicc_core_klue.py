@@ -1,195 +1,243 @@
+"""NLU + RAG 라우터: 의도·검색·캐시 결과를 dict로 반환해 워크플로우 단계에서 재사용합니다."""
+
+from __future__ import annotations
+
 import os
 import time
+from pathlib import Path
+from typing import Any
+
+from dotenv import load_dotenv
 import numpy as np
 import pandas as pd
-from pathlib import Path
-
-# 딥러닝 라이브러리
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-
-from langchain_core.documents import Document
-from langchain_upstage import UpstageEmbeddings
 from langchain_chroma import Chroma
 from langchain_community.retrievers import BM25Retriever
+from langchain_core.documents import Document
+from langchain_upstage import UpstageEmbeddings
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-# ---------------------------------------------------------
-# ⚙️ 0. 환경 설정 및 시스템 초기화
-# ---------------------------------------------------------
 _SCRIPT_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = _SCRIPT_DIR.parent.parent
 faq_csv = _SCRIPT_DIR / "RAG_FAQ.csv"
 persist_dir = str(_SCRIPT_DIR / "aicc_chroma_db")
 
-# 🚨 본인의 Upstage API 키로 변경하세요
-os.environ["UPSTAGE_API_KEY"] = "up_o80maPpk95UkGrqxxd2ldfORTQVWB"
+# 프로젝트 루트의 .env (이미 설정된 환경 변수는 덮어쓰지 않음)
+load_dotenv(_REPO_ROOT / ".env")
 
-class AICCPipelineKLUE:
-    def __init__(self):
-        print("\n🚀 [System Init] AICC 파이프라인 (KLUE 모델 버전) 부팅 중...")
-        init_start = time.perf_counter()
-        
-        # 1. 학습된 로컬 NLU 모델 로드
+# 시맨틱 캐시 적중 임계값 (코사인 유사도)
+_CACHE_SIM_THRESHOLD = 0.75
+
+
+class AICC_NLU_Router:
+    """KLUE 기반 의도분류 + BM25/Chroma RAG + 시맨틱 캐시."""
+
+    def __init__(self) -> None:
+        if not os.environ.get("UPSTAGE_API_KEY"):
+            raise RuntimeError(
+                "UPSTAGE_API_KEY가 없습니다. 저장소 루트에 .env를 두고 "
+                "UPSTAGE_API_KEY=... 를 설정하거나, .env.example을 복사해 채워 넣으세요."
+            )
+
+        boot_t0 = time.perf_counter()
+        print("\n🚀 [NLU Router] KLUE 로컬 모델 부팅 중...")
         self.model_path = _SCRIPT_DIR / "my_aicc_nlu_model_klue:roberta-base"
-        
-        # Apple Silicon (MacBook) MPS 가속기 설정
         self.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-        print(f"  🖥️ [System] NLU 모델 가속기: {self.device} 모드로 작동합니다.")
-        
+        print(f"  🖥️ NLU 가속기: {self.device}")
+
+        t0 = time.perf_counter()
         try:
             self.nlu_tokenizer = AutoTokenizer.from_pretrained(self.model_path)
             self.nlu_model = AutoModelForSequenceClassification.from_pretrained(self.model_path)
             self.nlu_model.to(self.device)
-            self.nlu_model.eval() # 추론 모드 전환
+            self.nlu_model.eval()
             self.use_real_nlu = True
-            print("  ✅ [System] 로컬 KLUE 모델 로드 성공!")
-            
-            # 🌟 [완벽 교정됨] 모델이 학습한 실제 번호표에 맞게 맵핑!
-            self.intent_map = {0: "절차형", 1: "민원형", 2: "조회형"} 
-            
+            t_nlu_load = time.perf_counter() - t0
+            print(f"  ✅ KLUE 모델 로드 성공 (⏱️ {t_nlu_load:.3f}s)")
+            self.intent_map = {0: "절차형", 1: "민원형", 2: "조회형"}
         except Exception as e:
-            print(f"  ⚠️ [System] 모델을 찾을 수 없어 임시 모드로 작동합니다.\n     (원인: {e})")
+            t_nlu_load = time.perf_counter() - t0
+            print(f"  ⚠️ 모델 로드 실패, 임시 모드 (⏱️ {t_nlu_load:.3f}s): {e}")
             self.use_real_nlu = False
+            self.nlu_tokenizer = None
+            self.nlu_model = None
+            self.intent_map = {}
 
-        # 2. 임베딩 모델 및 캐시 저장소 초기화
+        t0 = time.perf_counter()
         self.embeddings = UpstageEmbeddings(model="solar-embedding-1-large")
-        self.semantic_cache = []
-        
+        t_emb_factory = time.perf_counter() - t0
+        print(f"  📎 Upstage Embeddings 준비 (⏱️ {t_emb_factory:.3f}s)")
+
+        self.semantic_cache: list[dict[str, Any]] = []
+
         self._prepare_datasets()
         self._warm_up_cache()
-        
-        print(f"✅ [System Init] 서버 구동 완료 (총 초기화 시간: {time.perf_counter() - init_start:.3f}초)\n")
 
-    def _prepare_datasets(self):
+        print(
+            f"✅ [NLU Router] 부팅 완료 — 총 소요 ⏱️ {time.perf_counter() - boot_t0:.3f}s\n"
+        )
+
+    def _prepare_datasets(self) -> None:
         if not faq_csv.is_file():
-            raise FileNotFoundError(f"🚨 에러: '{faq_csv.name}' 파일이 없습니다.")
-        
+            raise FileNotFoundError(f"FAQ CSV가 없습니다: {faq_csv}")
+
+        t0 = time.perf_counter()
         df = pd.read_csv(faq_csv).fillna("")
-        self.docs = []
+        self.docs: list[Document] = []
         for _, row in df.iterrows():
-            if str(row['embedding_text']).strip():
+            if str(row["embedding_text"]).strip():
                 metadata = {
-                    "faq_id": str(row['faq_id']),
-                    "domain": str(row['domain']),
-                    "subdomain": str(row['subdomain']),
-                    "intent_type": str(row['intent_type']),
-                    "risk_level": str(row['risk_level']),
-                    "handoff_required": str(row['handoff_required'])
+                    "faq_id": str(row["faq_id"]),
+                    "domain": str(row["domain"]),
+                    "subdomain": str(row["subdomain"]),
+                    "intent_type": str(row["intent_type"]),
+                    "risk_level": str(row["risk_level"]),
+                    "handoff_required": str(row["handoff_required"]),
                 }
-                self.docs.append(Document(page_content=str(row['embedding_text']), metadata=metadata))
-        
+                self.docs.append(
+                    Document(page_content=str(row["embedding_text"]), metadata=metadata)
+                )
+        t_csv = time.perf_counter() - t0
+        print(f"   ↳ FAQ CSV 로드: 문서 {len(self.docs)}건 (⏱️ {t_csv:.3f}s)")
+
+        t0 = time.perf_counter()
         self.bm25 = BM25Retriever.from_documents(self.docs)
         self.bm25.k = 2
-        print("   ↳ Vector DB에 FAQ 데이터를 적재합니다...")
-        self.vector_db = Chroma.from_documents(documents=self.docs, embedding=self.embeddings, persist_directory=persist_dir)
+        t_bm25 = time.perf_counter() - t0
+        print(f"   ↳ BM25 인덱스 구축 (⏱️ {t_bm25:.3f}s)")
 
-    def _warm_up_cache(self):
-        hot_queries = [("비대면 통장 개설", "비대면 계좌 개설은 당행 모바일 앱을 통해 24시간 언제든 가능합니다.")]
-        for q, a in hot_queries:
-            vec = self.embeddings.embed_query(q)
-            self.semantic_cache.append({"vector": vec, "answer": a})
+        t0 = time.perf_counter()
+        print("   ↳ Chroma Vector DB 적재 중...")
+        self.vector_db = Chroma.from_documents(
+            documents=self.docs,
+            embedding=self.embeddings,
+            persist_directory=persist_dir,
+        )
+        t_chroma = time.perf_counter() - t0
+        print(f"   ↳ Chroma 적재 완료 (⏱️ {t_chroma:.3f}s)")
 
-    def cosine_similarity(self, v1, v2):
-        return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    def _warm_up_cache(self) -> None:
+        t0 = time.perf_counter()
+        q = "비대면 통장 개설"
+        a = "비대면 계좌 개설은 당행 모바일 앱을 통해 24시간 언제든 가능합니다."
+        self.semantic_cache.append({"vector": self.embeddings.embed_query(q), "answer": a})
+        t_warm = time.perf_counter() - t0
+        print(f"   ↳ 시맨틱 캐시 워밍 1건 (⏱️ {t_warm:.3f}s)")
 
-    # 🌟 진짜 딥러닝 추론 함수
-    def predict_intent(self, text):
-        if not self.use_real_nlu:
-            time.sleep(0.05)
-            return "절차형" 
-            
-        inputs = self.nlu_tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
+    def cosine_similarity(self, v1: Any, v2: Any) -> float:
+        a = np.asarray(v1, dtype=np.float64)
+        b = np.asarray(v2, dtype=np.float64)
+        denom = np.linalg.norm(a) * np.linalg.norm(b)
+        if denom == 0:
+            return 0.0
+        return float(np.dot(a, b) / denom)
+
+    def predict_intent(self, text: str) -> str:
+        if not self.use_real_nlu or self.nlu_model is None or self.nlu_tokenizer is None:
+            return "절차형"
+
+        inputs = self.nlu_tokenizer(
+            text, return_tensors="pt", truncation=True, padding=True, max_length=128
+        )
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        
         with torch.no_grad():
             outputs = self.nlu_model(**inputs)
-            predicted_id = outputs.logits.argmax(dim=-1).item()
-            
+            predicted_id = int(outputs.logits.argmax(dim=-1).item())
         return self.intent_map.get(predicted_id, "분류불가")
 
-    # ---------------------------------------------------------
-    # 🔄 코어 파이프라인
-    # ---------------------------------------------------------
-    def run_pipeline(self, stt_text):
-        total_start = time.perf_counter()
-        print("\n" + "="*80)
-        print(f"🎙️ [1단계: STT 수신] 고객 발화: '{stt_text}'")
+    def process_query(self, stt_text: str) -> dict[str, Any]:
+        """STT 텍스트 → 의도·RAG·캐시 상태를 담은 dict. 워크플로우에서 분기용."""
+        total_t0 = time.perf_counter()
+        timings: dict[str, float | None] = {
+            "intent_sec": 0.0,
+            "embedding_sec": 0.0,
+            "cache_check_sec": 0.0,
+            "rag_search_sec": None,
+            "total_sec": 0.0,
+        }
 
-        # [2단계] NLU 및 임베딩
-        step2_start = time.perf_counter()
-        
-        intent = self.predict_intent(stt_text) 
+        print("\n" + "=" * 72)
+        print(f"📥 [process_query] 고객 발화: {stt_text!r}")
+
+        t0 = time.perf_counter()
+        intent = self.predict_intent(stt_text)
+        timings["intent_sec"] = time.perf_counter() - t0
+        print(f"  🧠 [1] NLU 의도: {intent!r} (⏱️ {timings['intent_sec']:.3f}s)")
+
+        t0 = time.perf_counter()
         query_vector = self.embeddings.embed_query(stt_text)
-        
-        print(f"  🧠 [2단계: NLU/임베딩] 완료 (추출 의도: '{intent}' / 소요시간: {time.perf_counter()-step2_start:.3f}초)")
-        
-        # 캐시 검사
-        cache_start = time.perf_counter()
+        timings["embedding_sec"] = time.perf_counter() - t0
+        print(f"  📐 [2] 질의 임베딩 완료 (⏱️ {timings['embedding_sec']:.3f}s)")
+
+        t0 = time.perf_counter()
         max_sim = 0.0
-        
-        for item in self.semantic_cache:
+        for i, item in enumerate(self.semantic_cache):
             sim = self.cosine_similarity(query_vector, item["vector"])
-            if sim > max_sim: max_sim = sim
-            
-            if sim >= 0.75:
-                print(f"  🔥 [2단계: 캐시 적중!] 의미 유사도 {sim:.2f} (소요시간: {time.perf_counter()-cache_start:.3f}초)")
-                print(f"  ⏭️ [3단계 스킵] 과거 답변을 즉시 반환합니다.")
-                final_answer = item["answer"]
-                print(f"\n  🔊 [4단계: TTS 송출] >> {final_answer}")
-                print(f"  ⏱️  [총 응답 Latency] {time.perf_counter() - total_start:.3f}초 (비용 절감!)")
-                print("="*80)
-                return final_answer
-        
-        print(f"  ❄️ [2단계: 캐시 실패] 유사 질문 없음. (최고 유사도: {max_sim:.2f} < 0.75)")
+            if sim > max_sim:
+                max_sim = sim
+            print(f"     · 캐시[{i}] 유사도: {sim:.4f} (기준 ≥ {_CACHE_SIM_THRESHOLD})")
+            if sim >= _CACHE_SIM_THRESHOLD:
+                timings["cache_check_sec"] = time.perf_counter() - t0
+                timings["total_sec"] = time.perf_counter() - total_t0
+                print(f"  🔥 [3] 시맨틱 캐시 적중 (⏱️ 캐시 검사 {timings['cache_check_sec']:.3f}s)")
+                print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (캐시 응답)")
+                print("=" * 72)
+                return {
+                    "status": "CACHED",
+                    "intent": intent,
+                    "final_answer": item["answer"],
+                    "cache_similarity": sim,
+                    "timings_sec": timings,
+                }
 
-        # [3단계] 워크플로우
-        step3_start = time.perf_counter()
-        print(f"\n  ⚙️ [3단계: 워크플로우 진입] (수신 데이터: '{intent}' 의도 및 메타데이터)")
+        timings["cache_check_sec"] = time.perf_counter() - t0
+        print(
+            f"  ❄️ [3] 캐시 미적중 — 최고 유사도 {max_sim:.4f} < {_CACHE_SIM_THRESHOLD} "
+            f"(⏱️ 캐시 검사 {timings['cache_check_sec']:.3f}s)"
+        )
 
-        rag_start = time.perf_counter()
+        t0 = time.perf_counter()
         vector_res = self.vector_db.similarity_search_by_vector(query_vector, k=1)
-        print(f"  🔎 [RAG 검색 완료] (소요시간: {time.perf_counter() - rag_start:.3f}초)")
-        
+        timings["rag_search_sec"] = time.perf_counter() - t0
+        print(f"  🔎 [4] Chroma 벡터 검색 (⏱️ {timings['rag_search_sec']:.3f}s)")
+
+        retrieved_context = ""
+        metadata: dict[str, Any] = {}
         if vector_res:
             res_doc = vector_res[0]
-            m = res_doc.metadata
-            print(f"\n      [📥 참고 문서 메타데이터 수신]")
-            print(f"      • 도메인/의도: {m.get('domain')} > {m.get('subdomain')} ({m.get('intent_type')})")
-            print(f"      • 위험도 수준: {m.get('risk_level')}")
-            print(f"      • 이관 필요성: {m.get('handoff_required')}")
-            
-            if m.get('risk_level') == '높음' or m.get('handoff_required') == 'Y':
-                print(f"      ⚠️ [시스템 경고] 이관 필수 문서 감지. 상담사 연결 대본을 생성합니다.")
-        
-        llm_start = time.perf_counter()
-        time.sleep(1.5) # 가짜 LLM 로직
-        final_answer = "(GPT-4o 생성 답변) 조회된 데이터를 기반으로 안내해 드립니다."
-        print(f"\n  🤖 [LLM 생성 완료] (소요시간: {time.perf_counter() - llm_start:.3f}초)")
+            retrieved_context = res_doc.page_content
+            metadata = dict(res_doc.metadata)
+            print("  📋 [5] 검색 문서 메타데이터:")
+            print(f"      • faq_id: {metadata.get('faq_id')}")
+            print(f"      • domain > subdomain: {metadata.get('domain')} > {metadata.get('subdomain')}")
+            print(f"      • intent_type: {metadata.get('intent_type')}")
+            print(f"      • risk_level / handoff: {metadata.get('risk_level')} / {metadata.get('handoff_required')}")
+            preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
+            print(f"      • 본문 미리보기: {preview!r}")
+        else:
+            print("  📋 [5] 벡터 검색 결과 없음")
 
-        self.semantic_cache.append({"vector": query_vector, "answer": final_answer})
+        timings["total_sec"] = time.perf_counter() - total_t0
+        print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 단계로 전달)")
+        print("=" * 72)
 
-        print(f"\n  🔊 [4단계: TTS 송출] >> {final_answer}")
-        print(f"  ⏱️  [총 응답 Latency] {time.perf_counter() - total_start:.3f}초")
-        print("="*80)
-        
-        return final_answer
+        return {
+            "status": "REQUIRE_LLM",
+            "intent": intent,
+            "query_vector": list(map(float, query_vector)),
+            "retrieved_context": retrieved_context,
+            "metadata": metadata,
+            "cache_max_similarity": max_sim,
+            "timings_sec": timings,
+        }
+
 
 if __name__ == "__main__":
-    app = AICCPipelineKLUE()
-    
-    print("\n" + "★"*80)
-    print("🤖 AICC 실시간 파이프라인 테스트 (KLUE NLU 탑재) 시작")
-    print("   (테스트를 종료하시려면 'q'를 입력하세요)")
-    print("★"*80)
-
-    while True:
-        try:
-            user_input = input("\n🧑‍🦰 고객 질문 입력: ")
-            if user_input.strip().lower() in ['q', 'quit', 'exit']:
-                break
-            if not user_input.strip():
-                continue
-            app.run_pipeline(user_input)
-        except KeyboardInterrupt:
-            break
-        except Exception as e:
-            print(f"🚨 오류 발생: {e}")
+    router = AICC_NLU_Router()
+    demo = router.process_query("햇살론 비대면 신청되나요?")
+    print("\n📦 [반환 dict 요약]")
+    for k, v in demo.items():
+        if k == "query_vector":
+            print(f"  • {k}: <벡터 길이 {len(v)}>")
+        else:
+            print(f"  • {k}: {v!r}")
