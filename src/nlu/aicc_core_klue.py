@@ -43,7 +43,7 @@ class AICC_NLU_Router:
 
         boot_t0 = time.perf_counter()
         print("\n🚀 [NLU Router] KLUE 로컬 모델 부팅 중...")
-        self.model_path = _SCRIPT_DIR / "my_aicc_nlu_model_klue:roberta-base"
+        self.model_path = _SCRIPT_DIR / "my_aicc_nlu_model_klue"
         self.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
         print(f"  🖥️ NLU 가속기: {self.device}")
 

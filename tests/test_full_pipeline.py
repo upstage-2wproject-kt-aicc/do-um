@@ -28,16 +28,28 @@ async def send_audio_to_stt_nlu(audio_file_path):
     # 2. WebSocket 연결 및 전송
     try:
         async with websockets.connect(WS_URL) as websocket:
-            print("  [WebSocket 연결 성공] 오디오 전송 중...")
+            print("  [WebSocket 연결 성공] 오디오 청크 전송 중...")
             
-            # 오디오 바이트 전송
-            await websocket.send(audio_data)
+            # 오디오 데이터를 작은 조각(Chunk)으로 나누어 전송 (메시지 크기 제한 방지)
+            chunk_size = 4096 # 조절
+            for i in range(0, len(audio_data), chunk_size):
+                chunk = audio_data[i:i + chunk_size]
+                await websocket.send(chunk)
+                # 너무 빠르면 서버가 처리 못할 수 있으므로 아주 짧은 지연 추가
+                await asyncio.sleep(0.005) 
             
-            # STT 종료 신호 전송
-            await websocket.send(json.dumps({"type": "end_of_stream"}))
+            print("  [전송 완료] 서버에서 분석 결과가 나올 때까지 대기합니다...")
             
-            # 결과 대기
-            response = await websocket.recv()
+            # 결과 대기 (서버의 StreamingPipeline이 VAD 등을 통해 종료를 감지하면 결과를 보냄)
+            try:
+                # 최대 30초 대기
+                response = await asyncio.wait_for(websocket.recv(), timeout=30.0)
+                result = json.loads(response)
+            except asyncio.TimeoutError:
+                print("  ❌ 타임아웃: 서버가 응답을 보내지 않았습니다.")
+                return None
+
+
             result = json.loads(response)
             
             if "error" in result:
@@ -106,9 +118,9 @@ async def main():
     print("=" * 60)
     
     # 테스트에 사용할 로컬 오디오 파일 (16kHz Mono WAV 권장)
-    # 임의로 src/stt/data/evaluation/subway/06_07_014041_210927_SN.wav 를 사용
-    test_audio = "src/stt/data/evaluation/subway/06_07_014041_210927_SN.wav"
+    test_audio = "src/stt/data/evaluation/grandma/노인남성_노인077_F_김XX_62_대구_오디오_84699.WAV"
     output_audio = "tests/test_response.mp3"
+
     
     # 1단계 실행
     nlu_result = await send_audio_to_stt_nlu(test_audio)
