@@ -17,6 +17,14 @@ class RouteType(str, Enum):
     SECURITY = "security"
 
 
+class ClientInfo(BaseModel):
+    """Carries caller identity and device metadata from an inbound call."""
+
+    caller_number: str = Field(..., description="Caller's phone number.")
+    device_type: str | None = Field(None, description="Device type (mobile, landline, etc.).")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional caller/device info.")
+
+
 class ProviderErrorCode(str, Enum):
     """Defines standardized provider failure codes."""
 
@@ -47,10 +55,11 @@ class Transcript(BaseModel):
     """Represents STT output text and metadata."""
 
     session_id: str = Field(..., description="Unique conversation/session ID.")
-    text: str = Field(..., description="Recognized text.")
+    text: str = Field(..., description="Recognized text (user_query for downstream modules).")
     language: str = Field(..., description="Language code.")
     confidence: float = Field(..., ge=0.0, le=1.0, description="ASR confidence.")
     is_final: bool = Field(..., description="Whether transcript is finalized.")
+    timestamp_ms: int = Field(..., ge=0, description="Transcription completion timestamp in ms.")
 
 
 class RagContext(BaseModel):

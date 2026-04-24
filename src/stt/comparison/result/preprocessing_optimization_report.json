@@ -1,0 +1,7260 @@
+{
+  "summary": [
+    {
+      "combination": "ffmpeg + webrtcvad",
+      "avg_trim_rate": 25.26,
+      "avg_latency": 0.3821,
+      "optimization_score": 60.72
+    },
+    {
+      "combination": "noisereduce + webrtcvad",
+      "avg_trim_rate": 33.16,
+      "avg_latency": 1.4861,
+      "optimization_score": 59.15
+    },
+    {
+      "combination": "noisereduce + pydub",
+      "avg_trim_rate": 42.99,
+      "avg_latency": 2.5354,
+      "optimization_score": 58.82
+    },
+    {
+      "combination": "sox + webrtcvad",
+      "avg_trim_rate": 25.45,
+      "avg_latency": 1.2934,
+      "optimization_score": 56.26
+    },
+    {
+      "combination": "ffmpeg + pydub",
+      "avg_trim_rate": 26.56,
+      "avg_latency": 1.4657,
+      "optimization_score": 55.95
+    },
+    {
+      "combination": "ffmpeg + silero",
+      "avg_trim_rate": 23.21,
+      "avg_latency": 1.231,
+      "optimization_score": 55.45
+    },
+    {
+      "combination": "sox + pydub",
+      "avg_trim_rate": 28.15,
+      "avg_latency": 2.3753,
+      "optimization_score": 52.2
+    },
+    {
+      "combination": "noisereduce + silero",
+      "avg_trim_rate": 25.17,
+      "avg_latency": 2.3688,
+      "optimization_score": 50.74
+    },
+    {
+      "combination": "sox + silero",
+      "avg_trim_rate": 22.84,
+      "avg_latency": 2.3143,
+      "optimization_score": 49.85
+    }
+  ],
+  "raw_data": [
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 9.68,
+      "total_latency": 0.6353
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 14.25,
+      "total_latency": 0.2253
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 8.12,
+      "total_latency": 0.6319
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 5.81,
+      "total_latency": 0.588
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 12.45,
+      "total_latency": 0.1851
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 7.0,
+      "total_latency": 0.5002
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 5.81,
+      "total_latency": 1.5586
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 12.45,
+      "total_latency": 1.1664
+    },
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 7.0,
+      "total_latency": 1.4916
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 17.91,
+      "total_latency": 0.6015
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 18.39,
+      "total_latency": 0.2208
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 12.16,
+      "total_latency": 0.5315
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 15.76,
+      "total_latency": 0.5474
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.41,
+      "total_latency": 0.173
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.65,
+      "total_latency": 0.5066
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 15.76,
+      "total_latency": 0.5821
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.41,
+      "total_latency": 0.204
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.65,
+      "total_latency": 0.5055
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 24.32,
+      "total_latency": 0.6613
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 24.45,
+      "total_latency": 0.2392
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 17.7,
+      "total_latency": 0.5662
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 23.55,
+      "total_latency": 0.5993
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.07,
+      "total_latency": 0.1849
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 17.37,
+      "total_latency": 0.5351
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 23.55,
+      "total_latency": 0.6481
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.07,
+      "total_latency": 0.2316
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 17.37,
+      "total_latency": 0.5724
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 20.8,
+      "total_latency": 0.6636
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.27,
+      "total_latency": 0.2381
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 13.58,
+      "total_latency": 0.5824
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 17.96,
+      "total_latency": 0.6288
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.4,
+      "total_latency": 0.1902
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 12.01,
+      "total_latency": 0.5421
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 17.96,
+      "total_latency": 0.6705
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.4,
+      "total_latency": 0.2698
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 12.01,
+      "total_latency": 0.5795
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 23.86,
+      "total_latency": 0.6471
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.67,
+      "total_latency": 0.2367
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 16.02,
+      "total_latency": 0.5914
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 20.27,
+      "total_latency": 0.5988
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.47,
+      "total_latency": 0.1929
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 14.46,
+      "total_latency": 0.5239
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 20.27,
+      "total_latency": 0.6279
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.47,
+      "total_latency": 0.2213
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 14.46,
+      "total_latency": 0.5474
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 20.89,
+      "total_latency": 0.6035
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.84,
+      "total_latency": 0.2209
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 12.27,
+      "total_latency": 0.5791
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 16.61,
+      "total_latency": 0.548
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.67,
+      "total_latency": 0.1778
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.6,
+      "total_latency": 0.4893
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 16.61,
+      "total_latency": 0.5671
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.67,
+      "total_latency": 0.2075
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.6,
+      "total_latency": 0.5487
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 19.6,
+      "total_latency": 1.4306
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 18.1,
+      "total_latency": 0.4044
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 12.39,
+      "total_latency": 1.9369
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 19.01,
+      "total_latency": 1.3773
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.29,
+      "total_latency": 0.2724
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.88,
+      "total_latency": 1.1913
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 19.01,
+      "total_latency": 2.4526
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.29,
+      "total_latency": 0.4616
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.88,
+      "total_latency": 1.303
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 16.18,
+      "total_latency": 1.432
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.12,
+      "total_latency": 0.3122
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 8.97,
+      "total_latency": 1.3245
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 15.52,
+      "total_latency": 1.4119
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 13.08,
+      "total_latency": 0.2852
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 8.24,
+      "total_latency": 1.2587
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 15.52,
+      "total_latency": 2.7708
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 13.08,
+      "total_latency": 0.4339
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 8.24,
+      "total_latency": 1.3579
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 35.25,
+      "total_latency": 1.0777
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.91,
+      "total_latency": 0.2419
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 9.78,
+      "total_latency": 0.9999
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 20.63,
+      "total_latency": 1.2479
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 14.42,
+      "total_latency": 0.2992
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 8.97,
+      "total_latency": 0.9616
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 20.63,
+      "total_latency": 1.1157
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 14.42,
+      "total_latency": 0.3213
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 8.97,
+      "total_latency": 1.0393
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 12.99,
+      "total_latency": 1.3618
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.21,
+      "total_latency": 0.2937
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 8.18,
+      "total_latency": 0.7231
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 9.37,
+      "total_latency": 0.5974
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.26,
+      "total_latency": 0.1942
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 7.91,
+      "total_latency": 0.5009
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 9.37,
+      "total_latency": 0.6183
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.26,
+      "total_latency": 0.2203
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 7.91,
+      "total_latency": 0.5352
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 59.13,
+      "total_latency": 0.1199
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 52.6,
+      "total_latency": 0.0639
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 50.59,
+      "total_latency": 0.1047
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 49.66,
+      "total_latency": 0.1308
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.31,
+      "total_latency": 0.074
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 51.63,
+      "total_latency": 0.114
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 74.69,
+      "total_latency": 0.1211
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 55.47,
+      "total_latency": 0.0608
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 51.1,
+      "total_latency": 0.1028
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 49.98,
+      "total_latency": 0.1108
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 49.53,
+      "total_latency": 0.0595
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 46.74,
+      "total_latency": 0.1112
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 49.41,
+      "total_latency": 0.1344
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.13,
+      "total_latency": 0.0777
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 45.68,
+      "total_latency": 0.1181
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 51.06,
+      "total_latency": 0.121
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 50.48,
+      "total_latency": 0.062
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 46.23,
+      "total_latency": 0.1064
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 48.85,
+      "total_latency": 0.1343
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 48.63,
+      "total_latency": 0.0591
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 39.71,
+      "total_latency": 0.1167
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 45.32,
+      "total_latency": 0.1677
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 40.15,
+      "total_latency": 0.0902
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 38.5,
+      "total_latency": 0.1473
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 68.71,
+      "total_latency": 0.1545
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 54.22,
+      "total_latency": 0.0742
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 38.96,
+      "total_latency": 0.1302
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 46.57,
+      "total_latency": 0.142
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.28,
+      "total_latency": 0.0619
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 37.86,
+      "total_latency": 0.1213
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 44.99,
+      "total_latency": 0.1765
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 38.92,
+      "total_latency": 0.0885
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 36.71,
+      "total_latency": 0.1497
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 75.39,
+      "total_latency": 0.1664
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 53.2,
+      "total_latency": 0.0764
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 40.32,
+      "total_latency": 0.148
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 46.6,
+      "total_latency": 0.1443
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 40.54,
+      "total_latency": 0.0625
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 32.13,
+      "total_latency": 0.127
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 35.18,
+      "total_latency": 0.1792
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.59,
+      "total_latency": 0.0885
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 31.32,
+      "total_latency": 0.1523
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 64.87,
+      "total_latency": 0.1736
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 48.94,
+      "total_latency": 0.0789
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 33.9,
+      "total_latency": 0.1416
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 39.72,
+      "total_latency": 0.132
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 44.23,
+      "total_latency": 0.0577
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 41.82,
+      "total_latency": 0.1103
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 39.24,
+      "total_latency": 0.1696
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 39.75,
+      "total_latency": 0.0897
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 38.97,
+      "total_latency": 0.1436
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 47.31,
+      "total_latency": 0.1614
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 48.24,
+      "total_latency": 0.0775
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 41.43,
+      "total_latency": 0.1296
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 48.22,
+      "total_latency": 0.126
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 47.59,
+      "total_latency": 0.0624
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 47.06,
+      "total_latency": 0.1075
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 47.59,
+      "total_latency": 0.1483
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 43.95,
+      "total_latency": 0.0797
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 46.56,
+      "total_latency": 0.1237
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 60.44,
+      "total_latency": 0.139
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 52.48,
+      "total_latency": 0.069
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 48.01,
+      "total_latency": 0.1167
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 48.9,
+      "total_latency": 0.127
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 49.66,
+      "total_latency": 0.0559
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 45.41,
+      "total_latency": 0.1039
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 48.32,
+      "total_latency": 0.1484
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 44.23,
+      "total_latency": 0.0793
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 44.41,
+      "total_latency": 0.1251
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 49.29,
+      "total_latency": 0.1329
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 50.55,
+      "total_latency": 0.0676
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 44.94,
+      "total_latency": 0.1129
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 52.41,
+      "total_latency": 0.1544
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 48.89,
+      "total_latency": 0.0745
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 47.77,
+      "total_latency": 0.137
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 51.89,
+      "total_latency": 0.1861
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 45.87,
+      "total_latency": 0.0925
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 45.98,
+      "total_latency": 0.157
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 54.36,
+      "total_latency": 0.1795
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 51.2,
+      "total_latency": 0.0785
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 48.12,
+      "total_latency": 0.1377
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 48.15,
+      "total_latency": 0.1457
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.11,
+      "total_latency": 0.0667
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 41.84,
+      "total_latency": 0.1244
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 47.29,
+      "total_latency": 0.1618
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 41.63,
+      "total_latency": 0.0811
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 40.99,
+      "total_latency": 0.135
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 60.79,
+      "total_latency": 0.1414
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 52.35,
+      "total_latency": 0.0646
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 43.84,
+      "total_latency": 0.1182
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 17.7,
+      "total_latency": 0.816
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.22,
+      "total_latency": 0.3126
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 13.06,
+      "total_latency": 0.7095
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 16.15,
+      "total_latency": 0.7511
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.52,
+      "total_latency": 0.2158
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.91,
+      "total_latency": 0.6148
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 16.15,
+      "total_latency": 0.747
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.52,
+      "total_latency": 0.2496
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.91,
+      "total_latency": 0.6569
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 43.39,
+      "total_latency": 0.698
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 35.63,
+      "total_latency": 0.2468
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 29.65,
+      "total_latency": 0.5975
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 41.42,
+      "total_latency": 0.6151
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 32.36,
+      "total_latency": 0.1831
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 29.16,
+      "total_latency": 0.5677
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 41.42,
+      "total_latency": 0.6672
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 32.36,
+      "total_latency": 0.2291
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 29.16,
+      "total_latency": 0.5868
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 42.99,
+      "total_latency": 0.7331
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.92,
+      "total_latency": 0.2632
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 31.1,
+      "total_latency": 0.6443
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 41.1,
+      "total_latency": 0.6586
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 32.85,
+      "total_latency": 0.1973
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 29.84,
+      "total_latency": 0.5753
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 41.1,
+      "total_latency": 0.6967
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 32.85,
+      "total_latency": 0.244
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 29.84,
+      "total_latency": 0.6295
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 37.27,
+      "total_latency": 0.8069
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 31.75,
+      "total_latency": 0.2771
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 26.98,
+      "total_latency": 0.699
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 35.93,
+      "total_latency": 0.7123
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.41,
+      "total_latency": 0.2089
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 26.04,
+      "total_latency": 0.627
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 35.93,
+      "total_latency": 0.7562
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.41,
+      "total_latency": 0.2493
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 26.04,
+      "total_latency": 0.6552
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 32.59,
+      "total_latency": 0.7063
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.21,
+      "total_latency": 0.2684
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 24.94,
+      "total_latency": 0.6068
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 31.66,
+      "total_latency": 0.6053
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 26.81,
+      "total_latency": 0.1915
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 24.69,
+      "total_latency": 0.5203
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 31.66,
+      "total_latency": 0.6397
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 26.81,
+      "total_latency": 0.2255
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 24.69,
+      "total_latency": 0.5527
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 37.19,
+      "total_latency": 0.6721
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.78,
+      "total_latency": 0.2466
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 24.93,
+      "total_latency": 0.5832
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 35.88,
+      "total_latency": 0.6411
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.01,
+      "total_latency": 0.1945
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 24.61,
+      "total_latency": 0.5345
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 35.88,
+      "total_latency": 0.652
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.01,
+      "total_latency": 0.2295
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 24.61,
+      "total_latency": 0.5744
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 35.44,
+      "total_latency": 0.7206
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.91,
+      "total_latency": 0.2645
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 23.19,
+      "total_latency": 0.6301
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 33.24,
+      "total_latency": 0.6385
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.76,
+      "total_latency": 0.1973
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 22.47,
+      "total_latency": 0.5419
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 33.24,
+      "total_latency": 0.7034
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.76,
+      "total_latency": 0.2452
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 22.47,
+      "total_latency": 0.5929
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 30.37,
+      "total_latency": 0.7137
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 24.89,
+      "total_latency": 0.2587
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.63,
+      "total_latency": 0.6441
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 29.11,
+      "total_latency": 0.6535
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.47,
+      "total_latency": 0.1993
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 19.22,
+      "total_latency": 0.5682
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 29.11,
+      "total_latency": 0.707
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.47,
+      "total_latency": 0.2398
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 19.22,
+      "total_latency": 0.6022
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 28.96,
+      "total_latency": 0.8257
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.87,
+      "total_latency": 0.3205
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 18.88,
+      "total_latency": 0.726
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 27.98,
+      "total_latency": 0.724
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.21,
+      "total_latency": 0.2066
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 18.3,
+      "total_latency": 0.6195
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 27.98,
+      "total_latency": 0.7665
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.21,
+      "total_latency": 0.2579
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 18.3,
+      "total_latency": 0.6638
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 29.33,
+      "total_latency": 0.7405
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.22,
+      "total_latency": 0.2633
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 17.82,
+      "total_latency": 0.6317
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 27.08,
+      "total_latency": 0.6635
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.25,
+      "total_latency": 0.1972
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 16.84,
+      "total_latency": 0.5696
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 27.08,
+      "total_latency": 0.6889
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.25,
+      "total_latency": 0.23
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 16.84,
+      "total_latency": 0.606
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 40.55,
+      "total_latency": 2.1189
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.71,
+      "total_latency": 0.4859
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 32.64,
+      "total_latency": 1.8434
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 39.5,
+      "total_latency": 1.8953
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 33.62,
+      "total_latency": 0.2879
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 31.58,
+      "total_latency": 1.587
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 39.5,
+      "total_latency": 1.8776
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 33.62,
+      "total_latency": 0.2698
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 31.58,
+      "total_latency": 1.5417
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 39.97,
+      "total_latency": 3.8367
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.21,
+      "total_latency": 0.8363
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 28.46,
+      "total_latency": 3.1989
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 36.96,
+      "total_latency": 3.3365
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.74,
+      "total_latency": 0.4537
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 26.56,
+      "total_latency": 2.7388
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 36.96,
+      "total_latency": 3.3315
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.74,
+      "total_latency": 0.4422
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 26.56,
+      "total_latency": 2.797
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 44.65,
+      "total_latency": 2.1634
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 39.84,
+      "total_latency": 0.4893
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 34.34,
+      "total_latency": 1.8274
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 41.15,
+      "total_latency": 2.2449
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 35.86,
+      "total_latency": 0.3627
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 32.73,
+      "total_latency": 1.9848
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 41.15,
+      "total_latency": 2.0714
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 35.86,
+      "total_latency": 0.3378
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 32.73,
+      "total_latency": 1.7992
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 67.82,
+      "total_latency": 4.0095
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 43.69,
+      "total_latency": 1.1097
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 35.61,
+      "total_latency": 3.7208
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 58.51,
+      "total_latency": 3.5536
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 40.65,
+      "total_latency": 0.6068
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 34.68,
+      "total_latency": 3.0332
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 58.51,
+      "total_latency": 3.4115
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 40.65,
+      "total_latency": 0.5888
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 34.68,
+      "total_latency": 3.0392
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 44.69,
+      "total_latency": 3.9054
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 39.59,
+      "total_latency": 0.9595
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 33.01,
+      "total_latency": 3.4795
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 42.66,
+      "total_latency": 3.4622
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.77,
+      "total_latency": 0.5881
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 32.14,
+      "total_latency": 3.0723
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 42.66,
+      "total_latency": 3.4416
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.77,
+      "total_latency": 0.6324
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 32.14,
+      "total_latency": 3.1136
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 53.5,
+      "total_latency": 3.9198
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 39.94,
+      "total_latency": 0.9764
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 34.5,
+      "total_latency": 3.4052
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 47.56,
+      "total_latency": 3.4401
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 38.73,
+      "total_latency": 0.6512
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 33.7,
+      "total_latency": 3.1001
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 47.56,
+      "total_latency": 3.4716
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 38.73,
+      "total_latency": 0.5661
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 33.7,
+      "total_latency": 3.0429
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 43.41,
+      "total_latency": 3.7989
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 38.66,
+      "total_latency": 0.8428
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 34.04,
+      "total_latency": 3.3419
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 41.2,
+      "total_latency": 3.3355
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.7,
+      "total_latency": 0.4811
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 32.76,
+      "total_latency": 2.9389
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 41.2,
+      "total_latency": 3.3338
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.7,
+      "total_latency": 0.4612
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 32.76,
+      "total_latency": 2.9138
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 48.14,
+      "total_latency": 3.8969
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.9,
+      "total_latency": 1.0085
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 33.15,
+      "total_latency": 3.4546
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 45.56,
+      "total_latency": 3.4002
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.5,
+      "total_latency": 0.5895
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 32.59,
+      "total_latency": 2.9635
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 45.56,
+      "total_latency": 3.4007
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.5,
+      "total_latency": 0.5639
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 32.59,
+      "total_latency": 2.9262
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 37.55,
+      "total_latency": 1.2179
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 33.87,
+      "total_latency": 0.3001
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 30.38,
+      "total_latency": 1.1011
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 35.11,
+      "total_latency": 1.1153
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.32,
+      "total_latency": 0.2154
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 28.68,
+      "total_latency": 0.9888
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 35.11,
+      "total_latency": 1.0889
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.32,
+      "total_latency": 0.2097
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 28.68,
+      "total_latency": 0.9631
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 32.21,
+      "total_latency": 0.8197
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 31.68,
+      "total_latency": 0.2163
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 26.86,
+      "total_latency": 0.7659
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 30.99,
+      "total_latency": 0.7771
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.03,
+      "total_latency": 0.1809
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 26.04,
+      "total_latency": 0.6891
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 30.99,
+      "total_latency": 0.7869
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.03,
+      "total_latency": 0.1597
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 26.04,
+      "total_latency": 0.6779
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 3.19,
+      "total_latency": 3.3987
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.24,
+      "total_latency": 0.8349
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 35.31,
+      "total_latency": 2.9362
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 33.63,
+      "total_latency": 7.1369
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.93,
+      "total_latency": 4.6313
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 59.33,
+      "total_latency": 6.7367
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 92.8,
+      "total_latency": 8.4193
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 67.03,
+      "total_latency": 5.8891
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 54.66,
+      "total_latency": 7.991
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 21.27,
+      "total_latency": 3.3134
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.79,
+      "total_latency": 0.8601
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 48.36,
+      "total_latency": 2.8999
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 21.4,
+      "total_latency": 7.2512
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 41.08,
+      "total_latency": 4.7192
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 41.93,
+      "total_latency": 7.0364
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 94.68,
+      "total_latency": 8.3669
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 71.44,
+      "total_latency": 5.8452
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 70.13,
+      "total_latency": 7.977
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 10.72,
+      "total_latency": 3.502
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.14,
+      "total_latency": 0.8141
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.77,
+      "total_latency": 3.1378
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 30.4,
+      "total_latency": 7.4011
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.44,
+      "total_latency": 4.7721
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 25.11,
+      "total_latency": 7.038
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 69.09,
+      "total_latency": 8.5455
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 45.17,
+      "total_latency": 5.9793
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 28.67,
+      "total_latency": 8.182
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 15.24,
+      "total_latency": 3.3805
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.11,
+      "total_latency": 0.8114
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 21.14,
+      "total_latency": 3.0259
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 32.36,
+      "total_latency": 7.301
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 33.38,
+      "total_latency": 4.6796
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 24.26,
+      "total_latency": 6.8616
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 66.02,
+      "total_latency": 8.1994
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 45.02,
+      "total_latency": 5.5743
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 29.03,
+      "total_latency": 7.7964
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 9.74,
+      "total_latency": 3.3553
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.76,
+      "total_latency": 0.7863
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 20.83,
+      "total_latency": 2.9729
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 8.85,
+      "total_latency": 7.1515
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.21,
+      "total_latency": 4.5699
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 21.22,
+      "total_latency": 6.7167
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 74.31,
+      "total_latency": 8.1871
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.34,
+      "total_latency": 5.6231
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 33.32,
+      "total_latency": 7.8034
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 1.09,
+      "total_latency": 3.3994
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 7.04,
+      "total_latency": 0.8011
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 7.4,
+      "total_latency": 2.9828
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 9.7,
+      "total_latency": 7.2396
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 8.82,
+      "total_latency": 4.7013
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 8.7,
+      "total_latency": 6.8612
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 50.73,
+      "total_latency": 8.2805
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 26.66,
+      "total_latency": 5.7065
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 13.5,
+      "total_latency": 7.9261
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 1.0,
+      "total_latency": 3.4781
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 7.45,
+      "total_latency": 0.8403
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 11.25,
+      "total_latency": 3.0964
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 19.84,
+      "total_latency": 7.4528
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.99,
+      "total_latency": 4.8813
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 16.24,
+      "total_latency": 7.0613
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 59.87,
+      "total_latency": 8.2573
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 37.03,
+      "total_latency": 5.6692
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 19.51,
+      "total_latency": 13.1436
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 1.65,
+      "total_latency": 11.7584
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 6.49,
+      "total_latency": 0.8269
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 10.3,
+      "total_latency": 3.0175
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 11.23,
+      "total_latency": 7.4268
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 8.88,
+      "total_latency": 4.849
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.22,
+      "total_latency": 7.0992
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 63.93,
+      "total_latency": 8.6443
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 33.29,
+      "total_latency": 5.8221
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 16.67,
+      "total_latency": 8.0763
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 9.39,
+      "total_latency": 3.6765
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.25,
+      "total_latency": 0.8721
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 20.92,
+      "total_latency": 3.2658
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 22.4,
+      "total_latency": 8.4647
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 20.46,
+      "total_latency": 5.2535
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 21.01,
+      "total_latency": 7.6917
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 75.82,
+      "total_latency": 8.8651
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 52.99,
+      "total_latency": 6.1256
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 37.76,
+      "total_latency": 8.4691
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 5.6,
+      "total_latency": 3.3183
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.78,
+      "total_latency": 0.7867
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 39.01,
+      "total_latency": 2.9766
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 13.6,
+      "total_latency": 7.0327
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 24.82,
+      "total_latency": 4.55
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 27.09,
+      "total_latency": 6.6109
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 82.0,
+      "total_latency": 8.1074
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 59.55,
+      "total_latency": 5.6037
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 49.4,
+      "total_latency": 7.7509
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 48.7,
+      "total_latency": 0.2476
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 40.5,
+      "total_latency": 0.0887
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 36.08,
+      "total_latency": 0.1636
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 49.47,
+      "total_latency": 0.2928
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 37.53,
+      "total_latency": 0.193
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 35.59,
+      "total_latency": 0.2641
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 59.01,
+      "total_latency": 0.2954
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 43.32,
+      "total_latency": 0.1872
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 37.75,
+      "total_latency": 0.2649
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 23.86,
+      "total_latency": 0.1649
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 24.47,
+      "total_latency": 0.0851
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 20.33,
+      "total_latency": 0.1511
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 24.04,
+      "total_latency": 0.2662
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.2,
+      "total_latency": 0.1762
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 20.11,
+      "total_latency": 0.2424
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 38.28,
+      "total_latency": 0.255
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.71,
+      "total_latency": 0.1719
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 21.46,
+      "total_latency": 0.2418
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 34.55,
+      "total_latency": 0.1736
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.06,
+      "total_latency": 0.0851
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 31.24,
+      "total_latency": 0.1491
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 34.9,
+      "total_latency": 0.2669
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 35.2,
+      "total_latency": 0.1811
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 31.06,
+      "total_latency": 0.2532
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 36.34,
+      "total_latency": 0.2543
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 39.17,
+      "total_latency": 0.1746
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 32.03,
+      "total_latency": 0.2395
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 18.81,
+      "total_latency": 0.2514
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.8,
+      "total_latency": 0.1098
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.27,
+      "total_latency": 0.1759
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 19.02,
+      "total_latency": 0.262
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.88,
+      "total_latency": 0.1824
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 19.42,
+      "total_latency": 0.2502
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 27.0,
+      "total_latency": 0.2648
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 26.54,
+      "total_latency": 0.1808
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 20.37,
+      "total_latency": 0.2507
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 19.52,
+      "total_latency": 0.1666
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.15,
+      "total_latency": 0.0851
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.64,
+      "total_latency": 0.1523
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 19.62,
+      "total_latency": 0.2621
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.95,
+      "total_latency": 0.1733
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 19.79,
+      "total_latency": 0.2388
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 38.61,
+      "total_latency": 0.2515
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.54,
+      "total_latency": 0.1673
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 21.44,
+      "total_latency": 0.2361
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 30.56,
+      "total_latency": 0.207
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.61,
+      "total_latency": 0.0814
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 26.92,
+      "total_latency": 0.2258
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 30.75,
+      "total_latency": 0.2764
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.42,
+      "total_latency": 0.1859
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 27.09,
+      "total_latency": 0.2607
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 34.18,
+      "total_latency": 0.2549
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.11,
+      "total_latency": 0.1675
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 28.04,
+      "total_latency": 0.2317
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 40.65,
+      "total_latency": 0.2218
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 37.61,
+      "total_latency": 0.0837
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 35.8,
+      "total_latency": 0.1497
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 40.67,
+      "total_latency": 0.2762
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 34.79,
+      "total_latency": 0.1899
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 34.92,
+      "total_latency": 0.2596
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 44.16,
+      "total_latency": 0.2726
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 42.92,
+      "total_latency": 0.1876
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 35.8,
+      "total_latency": 0.2595
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 0.1704
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 11.02,
+      "total_latency": 0.0932
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 7.77,
+      "total_latency": 0.16
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 0.2768
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 8.06,
+      "total_latency": 0.1809
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 6.76,
+      "total_latency": 0.2455
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 0.2416
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 13.41,
+      "total_latency": 0.165
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 9.23,
+      "total_latency": 0.2317
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 7.93,
+      "total_latency": 0.2427
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 12.47,
+      "total_latency": 0.105
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 10.15,
+      "total_latency": 0.2223
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 4.56,
+      "total_latency": 0.4542
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 12.34,
+      "total_latency": 0.3031
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 10.02,
+      "total_latency": 0.4236
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 17.1,
+      "total_latency": 0.6349
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 15.27,
+      "total_latency": 0.4918
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.37,
+      "total_latency": 0.6079
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 38.02,
+      "total_latency": 0.3654
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 31.0,
+      "total_latency": 0.1409
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 29.51,
+      "total_latency": 0.3155
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 35.96,
+      "total_latency": 0.6404
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.49,
+      "total_latency": 0.428
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 29.16,
+      "total_latency": 0.5965
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 42.99,
+      "total_latency": 0.7113
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.22,
+      "total_latency": 0.508
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 31.58,
+      "total_latency": 0.6752
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 33.3,
+      "total_latency": 0.288
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 25.94,
+      "total_latency": 0.111
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 24.77,
+      "total_latency": 0.2555
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 33.3,
+      "total_latency": 0.5824
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 26.75,
+      "total_latency": 0.3945
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 24.69,
+      "total_latency": 0.5426
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 67.1,
+      "total_latency": 0.6942
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 41.95,
+      "total_latency": 0.5101
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 32.33,
+      "total_latency": 0.6625
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 29.81,
+      "total_latency": 0.2699
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.99,
+      "total_latency": 0.1156
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 22.72,
+      "total_latency": 0.249
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 30.0,
+      "total_latency": 0.5265
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.71,
+      "total_latency": 0.3533
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 22.99,
+      "total_latency": 0.4795
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 43.32,
+      "total_latency": 0.6739
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 35.47,
+      "total_latency": 0.5128
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 23.46,
+      "total_latency": 0.6372
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 22.83,
+      "total_latency": 0.3074
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.34,
+      "total_latency": 0.1208
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.55,
+      "total_latency": 0.2629
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 22.92,
+      "total_latency": 0.5665
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.63,
+      "total_latency": 0.3854
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 19.46,
+      "total_latency": 0.5644
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 61.63,
+      "total_latency": 0.6885
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 44.55,
+      "total_latency": 0.5155
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 24.17,
+      "total_latency": 0.6631
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 34.43,
+      "total_latency": 0.27
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.91,
+      "total_latency": 0.1106
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 24.65,
+      "total_latency": 0.2322
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 34.82,
+      "total_latency": 0.5647
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 31.0,
+      "total_latency": 0.344
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 25.54,
+      "total_latency": 0.4644
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 42.9,
+      "total_latency": 0.6454
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 37.68,
+      "total_latency": 0.501
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 26.23,
+      "total_latency": 0.6236
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 30.29,
+      "total_latency": 0.2541
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 32.31,
+      "total_latency": 0.1003
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 26.24,
+      "total_latency": 0.2256
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 30.04,
+      "total_latency": 0.5258
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.67,
+      "total_latency": 0.3611
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 27.47,
+      "total_latency": 0.502
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 64.32,
+      "total_latency": 0.6772
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 42.45,
+      "total_latency": 0.5175
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 27.36,
+      "total_latency": 0.6466
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 16.73,
+      "total_latency": 0.3159
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.44,
+      "total_latency": 0.121
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 12.6,
+      "total_latency": 0.316
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 16.76,
+      "total_latency": 0.6567
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.62,
+      "total_latency": 0.4419
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 13.76,
+      "total_latency": 0.6165
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 62.86,
+      "total_latency": 0.7332
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.14,
+      "total_latency": 0.5249
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 13.69,
+      "total_latency": 0.6956
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 26.24,
+      "total_latency": 0.2671
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.86,
+      "total_latency": 0.103
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.2,
+      "total_latency": 0.2263
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 26.31,
+      "total_latency": 0.522
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.05,
+      "total_latency": 0.3574
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 20.03,
+      "total_latency": 0.4847
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 72.05,
+      "total_latency": 0.6569
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 42.68,
+      "total_latency": 0.4983
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 20.7,
+      "total_latency": 0.6256
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 20.09,
+      "total_latency": 0.2507
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.67,
+      "total_latency": 0.1015
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 18.59,
+      "total_latency": 0.2186
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 20.04,
+      "total_latency": 0.5286
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.39,
+      "total_latency": 0.3448
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 19.44,
+      "total_latency": 0.4632
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 73.23,
+      "total_latency": 0.6349
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 44.2,
+      "total_latency": 0.4828
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 22.06,
+      "total_latency": 0.6067
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 33.81,
+      "total_latency": 0.2855
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.82,
+      "total_latency": 0.1142
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 24.18,
+      "total_latency": 0.2547
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 33.92,
+      "total_latency": 0.5754
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 28.42,
+      "total_latency": 0.3813
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 23.76,
+      "total_latency": 0.5305
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 62.69,
+      "total_latency": 0.6759
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 42.71,
+      "total_latency": 0.5042
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 25.66,
+      "total_latency": 0.6464
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 26.88,
+      "total_latency": 0.3021
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.51,
+      "total_latency": 0.1359
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 23.69,
+      "total_latency": 0.2746
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 27.68,
+      "total_latency": 0.5393
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.74,
+      "total_latency": 0.3699
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 23.06,
+      "total_latency": 0.5141
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 67.75,
+      "total_latency": 0.6877
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.8,
+      "total_latency": 0.5168
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 26.09,
+      "total_latency": 0.6491
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 41.14,
+      "total_latency": 0.8006
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.11,
+      "total_latency": 0.3251
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 16.32,
+      "total_latency": 0.7775
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 21.0,
+      "total_latency": 0.6841
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 20.34,
+      "total_latency": 0.2064
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 15.45,
+      "total_latency": 0.6013
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 21.0,
+      "total_latency": 0.734
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 20.34,
+      "total_latency": 0.2786
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 15.45,
+      "total_latency": 0.7225
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 20.99,
+      "total_latency": 0.7843
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.61,
+      "total_latency": 0.3082
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 15.62,
+      "total_latency": 0.7124
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 19.49,
+      "total_latency": 0.6817
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.95,
+      "total_latency": 0.2168
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 14.79,
+      "total_latency": 0.6103
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 19.49,
+      "total_latency": 0.7118
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.95,
+      "total_latency": 0.2731
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 14.79,
+      "total_latency": 0.645
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 22.88,
+      "total_latency": 0.7973
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.33,
+      "total_latency": 0.311
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 14.49,
+      "total_latency": 0.7368
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 21.38,
+      "total_latency": 0.6876
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.98,
+      "total_latency": 0.2083
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 13.86,
+      "total_latency": 0.6282
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 21.38,
+      "total_latency": 0.7368
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.98,
+      "total_latency": 0.262
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 13.86,
+      "total_latency": 0.6774
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 20.41,
+      "total_latency": 0.701
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 20.33,
+      "total_latency": 0.2869
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 10.52,
+      "total_latency": 0.6529
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 12.99,
+      "total_latency": 0.628
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.28,
+      "total_latency": 0.2099
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 10.06,
+      "total_latency": 0.5631
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 12.99,
+      "total_latency": 0.6526
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.28,
+      "total_latency": 0.2459
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 10.06,
+      "total_latency": 0.5932
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 32.0,
+      "total_latency": 0.6698
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 26.37,
+      "total_latency": 0.2668
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.18,
+      "total_latency": 0.6111
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 25.42,
+      "total_latency": 0.5854
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.42,
+      "total_latency": 0.2002
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 18.12,
+      "total_latency": 0.5383
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 25.42,
+      "total_latency": 0.6325
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.42,
+      "total_latency": 0.2267
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 18.12,
+      "total_latency": 0.5742
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 31.05,
+      "total_latency": 0.7948
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.65,
+      "total_latency": 0.3123
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 11.65,
+      "total_latency": 0.7329
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 19.6,
+      "total_latency": 0.6838
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.05,
+      "total_latency": 0.2057
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.12,
+      "total_latency": 0.6146
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 19.6,
+      "total_latency": 0.7505
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.05,
+      "total_latency": 0.2542
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.12,
+      "total_latency": 0.6575
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 26.22,
+      "total_latency": 0.7005
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.59,
+      "total_latency": 0.277
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 10.49,
+      "total_latency": 0.6418
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 13.51,
+      "total_latency": 0.6236
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.82,
+      "total_latency": 0.2101
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 8.82,
+      "total_latency": 0.5794
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 13.51,
+      "total_latency": 0.647
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 16.82,
+      "total_latency": 0.2625
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 8.82,
+      "total_latency": 0.5885
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 24.63,
+      "total_latency": 0.7713
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.53,
+      "total_latency": 0.3002
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 12.4,
+      "total_latency": 0.7247
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 18.7,
+      "total_latency": 0.6616
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.1,
+      "total_latency": 0.2252
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 11.92,
+      "total_latency": 0.6373
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 18.7,
+      "total_latency": 0.8381
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.1,
+      "total_latency": 0.2654
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 11.92,
+      "total_latency": 0.6772
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 17.23,
+      "total_latency": 0.8414
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.11,
+      "total_latency": 0.3424
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 10.48,
+      "total_latency": 0.785
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 15.08,
+      "total_latency": 0.7061
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 14.43,
+      "total_latency": 0.2106
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 9.86,
+      "total_latency": 0.6306
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 15.08,
+      "total_latency": 0.7763
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 14.43,
+      "total_latency": 0.2617
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 9.86,
+      "total_latency": 0.709
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 28.59,
+      "total_latency": 0.7593
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.25,
+      "total_latency": 0.3052
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 14.04,
+      "total_latency": 0.7033
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 22.9,
+      "total_latency": 0.6509
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 18.54,
+      "total_latency": 0.2043
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 13.17,
+      "total_latency": 0.5989
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 22.9,
+      "total_latency": 0.7082
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 18.54,
+      "total_latency": 0.2491
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 13.17,
+      "total_latency": 0.6425
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.6903
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 1.11,
+      "total_latency": 0.8435
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 13.62,
+      "total_latency": 3.1495
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 20.58,
+      "total_latency": 7.7399
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.24,
+      "total_latency": 4.9708
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 13.32,
+      "total_latency": 7.4472
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 59.99,
+      "total_latency": 8.5813
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 36.38,
+      "total_latency": 5.838
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 16.32,
+      "total_latency": 8.1018
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.7285
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 0.58,
+      "total_latency": 0.8989
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 17.53,
+      "total_latency": 3.3469
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 27.56,
+      "total_latency": 8.1043
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.03,
+      "total_latency": 5.1583
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 18.5,
+      "total_latency": 7.664
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 57.94,
+      "total_latency": 9.2595
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 38.51,
+      "total_latency": 6.3197
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 20.74,
+      "total_latency": 8.9294
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.4959
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 0.8,
+      "total_latency": 0.8506
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 17.09,
+      "total_latency": 3.1165
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 24.45,
+      "total_latency": 7.4303
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.32,
+      "total_latency": 4.8274
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 15.51,
+      "total_latency": 7.0606
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 62.44,
+      "total_latency": 8.5288
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 38.66,
+      "total_latency": 5.8599
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 20.32,
+      "total_latency": 8.1352
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.0983
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 0.41,
+      "total_latency": 0.7606
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 18.0,
+      "total_latency": 2.7854
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 23.93,
+      "total_latency": 13.1468
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.98,
+      "total_latency": 9.1377
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 17.19,
+      "total_latency": 11.5454
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 49.02,
+      "total_latency": 7.5803
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 33.59,
+      "total_latency": 5.1992
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 20.68,
+      "total_latency": 7.2909
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.2368
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 0.35,
+      "total_latency": 0.7674
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 15.02,
+      "total_latency": 2.8166
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 21.05,
+      "total_latency": 6.8636
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.86,
+      "total_latency": 4.504
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 15.66,
+      "total_latency": 6.5398
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 47.75,
+      "total_latency": 7.4692
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 31.08,
+      "total_latency": 5.1186
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 18.58,
+      "total_latency": 7.0952
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.3416
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 11.63,
+      "total_latency": 0.7966
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 10.94,
+      "total_latency": 3.0332
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 12.39,
+      "total_latency": 7.4823
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 12.47,
+      "total_latency": 4.9186
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 9.09,
+      "total_latency": 7.1289
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 61.11,
+      "total_latency": 8.1226
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 41.43,
+      "total_latency": 5.5619
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 16.34,
+      "total_latency": 7.6895
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.7527
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 13.89,
+      "total_latency": 0.8903
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 16.56,
+      "total_latency": 3.4285
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 21.51,
+      "total_latency": 8.3687
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.22,
+      "total_latency": 5.5575
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 13.07,
+      "total_latency": 8.0167
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 68.62,
+      "total_latency": 14.1007
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 46.25,
+      "total_latency": 6.7803
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 17.5,
+      "total_latency": 9.3432
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.6929
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 11.53,
+      "total_latency": 0.8761
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 20.47,
+      "total_latency": 3.3252
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 30.84,
+      "total_latency": 18.4934
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 30.7,
+      "total_latency": 11.554
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 20.07,
+      "total_latency": 14.3204
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 77.97,
+      "total_latency": 8.8099
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 53.28,
+      "total_latency": 6.0718
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 66.09,
+      "total_latency": 8.5178
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.9622
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 0.67,
+      "total_latency": 0.9277
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 16.88,
+      "total_latency": 3.4984
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 27.49,
+      "total_latency": 12.5771
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 11.18,
+      "total_latency": 6.2776
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 15.18,
+      "total_latency": 26.4916
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 72.93,
+      "total_latency": 9.6134
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 43.48,
+      "total_latency": 6.6359
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 21.16,
+      "total_latency": 9.1906
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 0.0,
+      "total_latency": 3.574
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 1.19,
+      "total_latency": 0.8374
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.07,
+      "total_latency": 3.1336
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 32.17,
+      "total_latency": 7.9066
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 17.26,
+      "total_latency": 5.1969
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 18.07,
+      "total_latency": 7.6751
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 74.0,
+      "total_latency": 16.2836
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 42.81,
+      "total_latency": 13.5036
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 22.04,
+      "total_latency": 15.8216
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 22.95,
+      "total_latency": 0.859
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.4,
+      "total_latency": 0.341
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.56,
+      "total_latency": 0.799
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 22.75,
+      "total_latency": 0.7468
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.47,
+      "total_latency": 0.2197
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 19.2,
+      "total_latency": 0.6721
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 22.75,
+      "total_latency": 0.796
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.47,
+      "total_latency": 0.3195
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 19.2,
+      "total_latency": 0.7075
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 23.4,
+      "total_latency": 0.7686
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.96,
+      "total_latency": 0.301
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 19.27,
+      "total_latency": 0.7025
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 22.01,
+      "total_latency": 0.6834
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.89,
+      "total_latency": 0.2156
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 18.51,
+      "total_latency": 0.596
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 22.01,
+      "total_latency": 0.7204
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 19.89,
+      "total_latency": 0.2605
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 18.51,
+      "total_latency": 0.6441
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 25.04,
+      "total_latency": 0.8968
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 22.1,
+      "total_latency": 0.3631
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 21.64,
+      "total_latency": 0.8424
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 24.74,
+      "total_latency": 0.7474
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.02,
+      "total_latency": 0.2227
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 21.17,
+      "total_latency": 0.6952
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 24.74,
+      "total_latency": 0.7867
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.02,
+      "total_latency": 0.2788
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 21.17,
+      "total_latency": 0.7207
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 26.88,
+      "total_latency": 0.9213
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 18.63,
+      "total_latency": 0.3472
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 22.29,
+      "total_latency": 0.8219
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 20.61,
+      "total_latency": 0.7567
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.61,
+      "total_latency": 0.2292
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 22.29,
+      "total_latency": 0.6871
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 20.61,
+      "total_latency": 0.8215
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.61,
+      "total_latency": 0.2901
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 22.29,
+      "total_latency": 0.736
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 36.16,
+      "total_latency": 0.8158
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.66,
+      "total_latency": 0.3165
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 26.51,
+      "total_latency": 0.7299
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 34.73,
+      "total_latency": 0.681
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.77,
+      "total_latency": 0.2195
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 25.65,
+      "total_latency": 0.5988
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 34.73,
+      "total_latency": 0.7252
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.77,
+      "total_latency": 0.2673
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 25.65,
+      "total_latency": 0.6569
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 36.7,
+      "total_latency": 0.7893
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 29.69,
+      "total_latency": 0.3076
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 27.22,
+      "total_latency": 0.7252
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 35.31,
+      "total_latency": 0.7656
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.96,
+      "total_latency": 0.2203
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 26.77,
+      "total_latency": 0.635
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 35.31,
+      "total_latency": 0.7756
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.96,
+      "total_latency": 0.2668
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 26.77,
+      "total_latency": 0.6732
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 32.96,
+      "total_latency": 0.8641
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.37,
+      "total_latency": 0.3276
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 25.39,
+      "total_latency": 0.7687
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 32.57,
+      "total_latency": 0.7599
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 25.72,
+      "total_latency": 0.2457
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 24.72,
+      "total_latency": 0.6854
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 32.57,
+      "total_latency": 0.7965
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 25.72,
+      "total_latency": 0.2817
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 24.72,
+      "total_latency": 0.7309
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 34.97,
+      "total_latency": 0.8461
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 27.14,
+      "total_latency": 0.3266
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 24.02,
+      "total_latency": 0.762
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 32.45,
+      "total_latency": 0.7336
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 25.66,
+      "total_latency": 0.2207
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 23.44,
+      "total_latency": 0.6845
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 32.45,
+      "total_latency": 0.8078
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 25.66,
+      "total_latency": 0.2812
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 23.44,
+      "total_latency": 0.6953
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 30.34,
+      "total_latency": 0.5636
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 24.65,
+      "total_latency": 0.2327
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 22.33,
+      "total_latency": 0.5142
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 29.84,
+      "total_latency": 0.499
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.8,
+      "total_latency": 0.1817
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 21.84,
+      "total_latency": 0.4721
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 29.84,
+      "total_latency": 0.5333
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 23.8,
+      "total_latency": 0.2038
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 21.84,
+      "total_latency": 0.52
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "ffmpeg + pydub",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "pydub",
+      "trim_rate": 28.11,
+      "total_latency": 0.8768
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "ffmpeg + webrtcvad",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 25.25,
+      "total_latency": 0.3345
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "ffmpeg + silero",
+      "nr_engine": "ffmpeg",
+      "vad_engine": "silero",
+      "trim_rate": 21.59,
+      "total_latency": 0.7847
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "sox + pydub",
+      "nr_engine": "sox",
+      "vad_engine": "pydub",
+      "trim_rate": 27.72,
+      "total_latency": 0.7633
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "sox + webrtcvad",
+      "nr_engine": "sox",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.81,
+      "total_latency": 0.2249
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "sox + silero",
+      "nr_engine": "sox",
+      "vad_engine": "silero",
+      "trim_rate": 20.78,
+      "total_latency": 0.6875
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "noisereduce + pydub",
+      "nr_engine": "noisereduce",
+      "vad_engine": "pydub",
+      "trim_rate": 27.72,
+      "total_latency": 0.8232
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "noisereduce + webrtcvad",
+      "nr_engine": "noisereduce",
+      "vad_engine": "webrtcvad",
+      "trim_rate": 21.81,
+      "total_latency": 0.2914
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "combination": "noisereduce + silero",
+      "nr_engine": "noisereduce",
+      "vad_engine": "silero",
+      "trim_rate": 20.78,
+      "total_latency": 0.7265
+    }
+  ]
+}

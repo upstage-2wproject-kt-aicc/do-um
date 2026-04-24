@@ -1,5 +1,11 @@
 __pycache__/
 *.py[cod]
+
 .env
+
+# ---------------STT
+/src/stt/*.m4a
+/src/stt/data/evaluation/
+
 logs/
 data/

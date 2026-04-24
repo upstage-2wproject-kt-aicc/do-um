@@ -1,14 +1,28 @@
 [project]
-name = "aicc-tts-app"
+name = "do-um"
 version = "0.1.0"
-description = "A Streamlit-based TTS Comparison App"
+description = "AICC Modular Monolith"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    # STT
+    "torch>=2.0.0",
+    "torchaudio",
+    "pydub>=0.25.1",
+    "silero-vad",
+    "numpy",
+    "webrtcvad-wheels",
+    "noisereduce>=3.0.3",
+    "soundfile>=0.13.1",
+    "google-cloud-speech>=2.38.0",
+    "pandas>=2.3.3",
+    "jiwer>=4.0.0",
+    "sounddevice>=0.5.1",
+    # TTS / 공통
     "streamlit>=1.30.0",
-    "openai>=1.0.0",
+    "openai>=2.32.0",
     "requests>=2.31.0",
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.2.2",
     "azure-cognitiveservices-speech>=1.49.1",
     "pydantic>=2.13.3",
     "cachetools>=7.0.6",
@@ -21,12 +35,15 @@ dependencies = [
 [tool.uv]
 managed = true
 
+[dependency-groups]
+dev = ["ipykernel"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/common", "src/tts", "src/middleware", "src/llm", "src/main.py"]
+packages = ["src/common", "src/stt", "src/tts", "src/middleware", "src/llm", "src/main.py"]
 
 [tool.pyright]
 venvPath = "."

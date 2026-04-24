@@ -1,0 +1,3222 @@
+{
+  "timestamp": "2026-04-23 10:51:03",
+  "summary": [
+    {
+      "engine": "webrtcvad",
+      "average_score": 68.11,
+      "processed_files": 100
+    },
+    {
+      "engine": "Pydub",
+      "average_score": 39.75,
+      "processed_files": 100
+    },
+    {
+      "engine": "Silero VAD",
+      "average_score": 34.63,
+      "processed_files": 100
+    }
+  ],
+  "details": [
+    {
+      "file": "[수정]20210202 134445.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 11.62,
+            "latency": 1.23,
+            "stability": 100
+          },
+          "final_score": 25.14
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 24.9,
+            "latency": 100.0,
+            "stability": 60
+          },
+          "final_score": 61.96
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 14.0,
+            "latency": 1.05,
+            "stability": 100
+          },
+          "final_score": 26.02
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210202 140720.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 31.52,
+            "latency": 1.26,
+            "stability": 100
+          },
+          "final_score": 33.11
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 30.82,
+            "latency": 100.0,
+            "stability": 70
+          },
+          "final_score": 66.33
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 23.3,
+            "latency": 1.36,
+            "stability": 100
+          },
+          "final_score": 29.86
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210202 213255.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 47.1,
+            "latency": 1.15,
+            "stability": 100
+          },
+          "final_score": 39.3
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 44.14,
+            "latency": 100.0,
+            "stability": 25
+          },
+          "final_score": 62.66
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 34.74,
+            "latency": 1.09,
+            "stability": 100
+          },
+          "final_score": 34.33
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210205 104732.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 35.92,
+            "latency": 1.65,
+            "stability": 100
+          },
+          "final_score": 35.03
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 32.8,
+            "latency": 100.0,
+            "stability": 55
+          },
+          "final_score": 64.12
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 24.02,
+            "latency": 0.89,
+            "stability": 100
+          },
+          "final_score": 29.96
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210205 105910.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 40.54,
+            "latency": 1.02,
+            "stability": 100
+          },
+          "final_score": 36.62
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 38.94,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 75.58
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 28.92,
+            "latency": 1.0,
+            "stability": 100
+          },
+          "final_score": 31.97
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210205 110653.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 33.22,
+            "latency": 1.0,
+            "stability": 100
+          },
+          "final_score": 33.69
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 33.34,
+            "latency": 100.0,
+            "stability": 85
+          },
+          "final_score": 70.34
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 23.2,
+            "latency": 1.06,
+            "stability": 100
+          },
+          "final_score": 29.71
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210205 154141.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 38.02,
+            "latency": 0.95,
+            "stability": 100
+          },
+          "final_score": 35.59
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 30.58,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 72.23
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 23.76,
+            "latency": 0.69,
+            "stability": 100
+          },
+          "final_score": 29.78
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210205 154232.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 31.04,
+            "latency": 0.98,
+            "stability": 100
+          },
+          "final_score": 32.81
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 26.16,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 70.46
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 16.48,
+            "latency": 0.93,
+            "stability": 100
+          },
+          "final_score": 26.97
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210206 223950.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 41.26,
+            "latency": 0.96,
+            "stability": 100
+          },
+          "final_score": 36.89
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 28.84,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 71.54
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 17.94,
+            "latency": 0.95,
+            "stability": 100
+          },
+          "final_score": 27.56
+        }
+      ]
+    },
+    {
+      "file": "[수정]천곡동 79.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 18.74,
+            "latency": 1.31,
+            "stability": 100
+          },
+          "final_score": 28.02
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 30.52,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 52.21
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 15.82,
+            "latency": 1.39,
+            "stability": 100
+          },
+          "final_score": 26.88
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84699.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 100,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 100.0
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 93.72,
+            "latency": 0,
+            "stability": 100
+          },
+          "final_score": 57.49
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 100,
+            "latency": 52.7,
+            "stability": 100
+          },
+          "final_score": 81.08
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_62_제주_실내_84933.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 99.86,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 99.94
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 95.26,
+            "latency": 0,
+            "stability": 100
+          },
+          "final_score": 58.1
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 92.46,
+            "latency": 50.55,
+            "stability": 100
+          },
+          "final_score": 77.21
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84325.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 91.08,
+            "latency": 1.54,
+            "stability": 100
+          },
+          "final_score": 57.05
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 82.58,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 93.03
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 76.44,
+            "latency": 0.99,
+            "stability": 100
+          },
+          "final_score": 50.97
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_84962.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 90.64,
+            "latency": 1.31,
+            "stability": 100
+          },
+          "final_score": 56.78
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 80.68,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 92.27
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 74.32,
+            "latency": 0.93,
+            "stability": 100
+          },
+          "final_score": 50.1
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_김XX_69_수도권_실내_85042.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 71.2,
+            "latency": 1.22,
+            "stability": 100
+          },
+          "final_score": 48.97
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 70.08,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 88.03
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 63.58,
+            "latency": 0.83,
+            "stability": 100
+          },
+          "final_score": 45.76
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84193.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 79.3,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 91.72
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 80.44,
+            "latency": 0,
+            "stability": 100
+          },
+          "final_score": 52.18
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 82.08,
+            "latency": 58.34,
+            "stability": 100
+          },
+          "final_score": 76.17
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84428.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 96.08,
+            "latency": 1.8,
+            "stability": 100
+          },
+          "final_score": 59.15
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 89.86,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 95.94
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 93.18,
+            "latency": 0.97,
+            "stability": 100
+          },
+          "final_score": 57.66
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84472.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 97.5,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 99.0
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 90.4,
+            "latency": 0,
+            "stability": 100
+          },
+          "final_score": 56.16
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 89.88,
+            "latency": 56.97,
+            "stability": 100
+          },
+          "final_score": 78.74
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84842.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 100,
+            "latency": 1.27,
+            "stability": 100
+          },
+          "final_score": 60.51
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 92.5,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 97.0
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 94.14,
+            "latency": 0.87,
+            "stability": 100
+          },
+          "final_score": 58.01
+        }
+      ]
+    },
+    {
+      "file": "노인남여_노인대화77_F_배XX_61_수도권_실내_84861.WAV",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 95.06,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 98.02
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 85.64,
+            "latency": 0,
+            "stability": 100
+          },
+          "final_score": 54.26
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 82.9,
+            "latency": 64.44,
+            "stability": 100
+          },
+          "final_score": 78.94
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210127 205059.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 32.3,
+            "latency": 0.99,
+            "stability": 100
+          },
+          "final_score": 33.32
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 33.04,
+            "latency": 100.0,
+            "stability": 30
+          },
+          "final_score": 59.22
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 23.82,
+            "latency": 1.1,
+            "stability": 100
+          },
+          "final_score": 29.97
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210127 223206.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 82.84,
+            "latency": 1.11,
+            "stability": 100
+          },
+          "final_score": 53.58
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 64.72,
+            "latency": 100.0,
+            "stability": 65
+          },
+          "final_score": 78.89
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 58.32,
+            "latency": 1.22,
+            "stability": 100
+          },
+          "final_score": 43.81
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210127 223709.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 82.2,
+            "latency": 0.84,
+            "stability": 100
+          },
+          "final_score": 53.22
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 65.7,
+            "latency": 100.0,
+            "stability": 90
+          },
+          "final_score": 84.28
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 59.68,
+            "latency": 0.94,
+            "stability": 100
+          },
+          "final_score": 44.25
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210127 224536.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 71.86,
+            "latency": 1.12,
+            "stability": 100
+          },
+          "final_score": 49.19
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 56.82,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 82.73
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 52.08,
+            "latency": 1.3,
+            "stability": 100
+          },
+          "final_score": 41.35
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210127 230148.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 63.32,
+            "latency": 0.95,
+            "stability": 100
+          },
+          "final_score": 45.71
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 53.62,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 81.45
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 49.38,
+            "latency": 0.98,
+            "stability": 100
+          },
+          "final_score": 40.14
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210129 115108.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 71.76,
+            "latency": 1.14,
+            "stability": 100
+          },
+          "final_score": 49.16
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 56.02,
+            "latency": 100.0,
+            "stability": 60
+          },
+          "final_score": 74.41
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 49.22,
+            "latency": 1.23,
+            "stability": 100
+          },
+          "final_score": 40.18
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210201 101020.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 66.48,
+            "latency": 1.32,
+            "stability": 100
+          },
+          "final_score": 47.12
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 55.52,
+            "latency": 100.0,
+            "stability": 85
+          },
+          "final_score": 79.21
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 44.94,
+            "latency": 1.45,
+            "stability": 100
+          },
+          "final_score": 38.56
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210201 103941.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 58.22,
+            "latency": 0.99,
+            "stability": 100
+          },
+          "final_score": 43.68
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 44.94,
+            "latency": 100.0,
+            "stability": 75
+          },
+          "final_score": 72.98
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 38.44,
+            "latency": 1.09,
+            "stability": 100
+          },
+          "final_score": 35.81
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210201 105826.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 55.96,
+            "latency": 0.82,
+            "stability": 100
+          },
+          "final_score": 42.71
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 42.42,
+            "latency": 100.0,
+            "stability": 70
+          },
+          "final_score": 70.97
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 36.6,
+            "latency": 0.95,
+            "stability": 100
+          },
+          "final_score": 35.02
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210201 110645.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 54.16,
+            "latency": 1.22,
+            "stability": 100
+          },
+          "final_score": 42.15
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 38.5,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 75.4
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 33.68,
+            "latency": 1.28,
+            "stability": 100
+          },
+          "final_score": 33.99
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_1311.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 79.0,
+            "latency": 1.13,
+            "stability": 0
+          },
+          "final_score": 32.05
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 67.24,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 66.9
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 63.16,
+            "latency": 1.43,
+            "stability": 0
+          },
+          "final_score": 25.84
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_2429.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 73.92,
+            "latency": 0.53,
+            "stability": 0
+          },
+          "final_score": 29.78
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 59.48,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 63.79
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 53.12,
+            "latency": 0.94,
+            "stability": 0
+          },
+          "final_score": 21.63
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_3057.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 82.3,
+            "latency": 0.85,
+            "stability": 0
+          },
+          "final_score": 33.26
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 71.72,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 68.69
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 65.46,
+            "latency": 0.76,
+            "stability": 0
+          },
+          "final_score": 26.49
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_3074.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 100,
+            "latency": 1.01,
+            "stability": 0
+          },
+          "final_score": 40.41
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 81.3,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 72.52
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 69.36,
+            "latency": 1.21,
+            "stability": 0
+          },
+          "final_score": 28.23
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_3117.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 85.32,
+            "latency": 1.07,
+            "stability": 0
+          },
+          "final_score": 34.56
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 73.54,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 69.42
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 64.28,
+            "latency": 1.35,
+            "stability": 0
+          },
+          "final_score": 26.25
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_3141.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 95.12,
+            "latency": 1.07,
+            "stability": 0
+          },
+          "final_score": 38.47
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 77.46,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 70.98
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 67.4,
+            "latency": 1.21,
+            "stability": 0
+          },
+          "final_score": 27.44
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_3559.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 82.4,
+            "latency": 1.11,
+            "stability": 0
+          },
+          "final_score": 33.41
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 69.4,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 67.76
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 65.52,
+            "latency": 0.69,
+            "stability": 0
+          },
+          "final_score": 26.48
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_508.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 91.12,
+            "latency": 0.23,
+            "stability": 0
+          },
+          "final_score": 36.54
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 69.0,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 67.6
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 65.18,
+            "latency": 0.38,
+            "stability": 0
+          },
+          "final_score": 26.22
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_638.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 70.22,
+            "latency": 0.41,
+            "stability": 100
+          },
+          "final_score": 48.25
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 58.64,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 63.46
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 57.36,
+            "latency": 0.26,
+            "stability": 100
+          },
+          "final_score": 43.05
+        }
+      ]
+    },
+    {
+      "file": "쇼핑_642.m4a",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 61.98,
+            "latency": 0.64,
+            "stability": 100
+          },
+          "final_score": 45.05
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 56.06,
+            "latency": 100.0,
+            "stability": 50
+          },
+          "final_score": 72.42
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 52.08,
+            "latency": 0.67,
+            "stability": 100
+          },
+          "final_score": 41.1
+        }
+      ]
+    },
+    {
+      "file": "06_07_014041_210927_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.44,
+            "latency": 3.55,
+            "stability": 100
+          },
+          "final_score": 21.6
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 19.5,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 47.8
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 100,
+            "latency": 1.13,
+            "stability": 0
+          },
+          "final_score": 40.45
+        }
+      ]
+    },
+    {
+      "file": "06_07_020986_211006_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 27.02,
+            "latency": 1.05,
+            "stability": 100
+          },
+          "final_score": 31.23
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 69.4,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 67.76
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 100,
+            "latency": 1.31,
+            "stability": 0
+          },
+          "final_score": 40.52
+        }
+      ]
+    },
+    {
+      "file": "06_07_023457_211011_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 13.78,
+            "latency": 1.11,
+            "stability": 100
+          },
+          "final_score": 25.96
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 30.34,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 52.14
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 43.94,
+            "latency": 1.37,
+            "stability": 0
+          },
+          "final_score": 18.12
+        }
+      ]
+    },
+    {
+      "file": "06_07_023469_211011_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 18.02,
+            "latency": 1.15,
+            "stability": 75
+          },
+          "final_score": 22.67
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 37.44,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 54.98
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 46.98,
+            "latency": 1.42,
+            "stability": 0
+          },
+          "final_score": 19.36
+        }
+      ]
+    },
+    {
+      "file": "06_07_023483_211011_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 10.52,
+            "latency": 1.04,
+            "stability": 100
+          },
+          "final_score": 24.62
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 36.58,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 54.63
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 47.2,
+            "latency": 0.85,
+            "stability": 0
+          },
+          "final_score": 19.22
+        }
+      ]
+    },
+    {
+      "file": "06_08_007837_210821_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.16,
+            "stability": 100
+          },
+          "final_score": 20.06
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 15.1,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 46.04
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 16.82,
+            "latency": 1.3,
+            "stability": 0
+          },
+          "final_score": 7.25
+        }
+      ]
+    },
+    {
+      "file": "06_08_007962_210909_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 1.07,
+            "stability": 100
+          },
+          "final_score": 20.43
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 16.9,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 46.76
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 28.44,
+            "latency": 1.31,
+            "stability": 0
+          },
+          "final_score": 11.9
+        }
+      ]
+    },
+    {
+      "file": "06_08_007969_210909_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 1.1,
+            "stability": 100
+          },
+          "final_score": 20.44
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 12.14,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 44.86
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 22.92,
+            "latency": 0.64,
+            "stability": 0
+          },
+          "final_score": 9.43
+        }
+      ]
+    },
+    {
+      "file": "06_08_014110_210927_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 7.08,
+            "latency": 0.72,
+            "stability": 100
+          },
+          "final_score": 23.12
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 45.64,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 58.26
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 50.6,
+            "latency": 1.43,
+            "stability": 0
+          },
+          "final_score": 20.81
+        }
+      ]
+    },
+    {
+      "file": "06_08_016767_210930_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 3.1,
+            "latency": 2.24,
+            "stability": 100
+          },
+          "final_score": 22.14
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 26.08,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 50.43
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 86.02,
+            "latency": 0.69,
+            "stability": 0
+          },
+          "final_score": 34.69
+        }
+      ]
+    },
+    {
+      "file": "A-A2-A-028-0081.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 92.2,
+            "latency": 0.55,
+            "stability": 100
+          },
+          "final_score": 57.1
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 73.48,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 89.39
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 72.16,
+            "latency": 0.39,
+            "stability": 100
+          },
+          "final_score": 49.02
+        }
+      ]
+    },
+    {
+      "file": "A-A2-A-028-0083.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 47.3,
+            "latency": 0.81,
+            "stability": 100
+          },
+          "final_score": 39.24
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 43.3,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 77.32
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 39.16,
+            "latency": 0.56,
+            "stability": 100
+          },
+          "final_score": 35.89
+        }
+      ]
+    },
+    {
+      "file": "A-A2-A-028-0085.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 68.96,
+            "latency": 0.78,
+            "stability": 100
+          },
+          "final_score": 47.9
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 69.36,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 87.74
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 63.22,
+            "latency": 0.56,
+            "stability": 100
+          },
+          "final_score": 45.51
+        }
+      ]
+    },
+    {
+      "file": "A-A2-A-028-0086.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 37.44,
+            "latency": 0.59,
+            "stability": 100
+          },
+          "final_score": 35.21
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 40.74,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 76.3
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 35.52,
+            "latency": 0.4,
+            "stability": 100
+          },
+          "final_score": 34.37
+        }
+      ]
+    },
+    {
+      "file": "A-A2-A-028-0097.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 38.76,
+            "latency": 0.6,
+            "stability": 100
+          },
+          "final_score": 35.74
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 44.94,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 77.98
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 40.72,
+            "latency": 0.44,
+            "stability": 100
+          },
+          "final_score": 36.46
+        }
+      ]
+    },
+    {
+      "file": "A-A2-A-028-0100.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 60.44,
+            "latency": 0.83,
+            "stability": 100
+          },
+          "final_score": 44.51
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 59.12,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 83.65
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 53.84,
+            "latency": 0.56,
+            "stability": 100
+          },
+          "final_score": 41.76
+        }
+      ]
+    },
+    {
+      "file": "A-S2-A-028-0057.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 80.28,
+            "latency": 0.77,
+            "stability": 100
+          },
+          "final_score": 52.42
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 65.26,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 86.1
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 70.18,
+            "latency": 0.56,
+            "stability": 100
+          },
+          "final_score": 48.3
+        }
+      ]
+    },
+    {
+      "file": "D-A3-E-055-0059.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.56,
+            "stability": 100
+          },
+          "final_score": 20.23
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 12.5,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 65.0
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 13.28,
+            "latency": 0.41,
+            "stability": 100
+          },
+          "final_score": 25.48
+        }
+      ]
+    },
+    {
+      "file": "D-A3-E-055-0087.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 8.92,
+            "latency": 0.75,
+            "stability": 100
+          },
+          "final_score": 23.87
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 23.44,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 69.38
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 16.66,
+            "latency": 0.61,
+            "stability": 100
+          },
+          "final_score": 26.91
+        }
+      ]
+    },
+    {
+      "file": "D-S3-E-055-0088.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 70.46,
+            "latency": 0.62,
+            "stability": 100
+          },
+          "final_score": 48.43
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 54.18,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 81.67
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 54.34,
+            "latency": 0.57,
+            "stability": 100
+          },
+          "final_score": 41.96
+        }
+      ]
+    },
+    {
+      "file": "10_12_3415_220907_0319.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 59.74,
+            "latency": 0.57,
+            "stability": 100
+          },
+          "final_score": 44.12
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 50.38,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 80.15
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 48.26,
+            "latency": 0.52,
+            "stability": 100
+          },
+          "final_score": 39.51
+        }
+      ]
+    },
+    {
+      "file": "10_12_3548_220910_0307.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 56.84,
+            "latency": 0.61,
+            "stability": 100
+          },
+          "final_score": 42.98
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 49.02,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 79.61
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 44.34,
+            "latency": 0.59,
+            "stability": 100
+          },
+          "final_score": 37.97
+        }
+      ]
+    },
+    {
+      "file": "10_12_3807_220922_0318.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 44.22,
+            "latency": 0.6,
+            "stability": 100
+          },
+          "final_score": 37.93
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 38.54,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 75.42
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 35.8,
+            "latency": 0.5,
+            "stability": 100
+          },
+          "final_score": 34.52
+        }
+      ]
+    },
+    {
+      "file": "10_12_3821_220923_0212.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 57.7,
+            "latency": 0.66,
+            "stability": 100
+          },
+          "final_score": 43.34
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 55.62,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 82.25
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 46.96,
+            "latency": 0.55,
+            "stability": 100
+          },
+          "final_score": 39.01
+        }
+      ]
+    },
+    {
+      "file": "10_12_3863_220922_0303.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 58.96,
+            "latency": 0.57,
+            "stability": 100
+          },
+          "final_score": 43.81
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 66.0,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 86.4
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 51.38,
+            "latency": 0.51,
+            "stability": 100
+          },
+          "final_score": 40.75
+        }
+      ]
+    },
+    {
+      "file": "20_24_3015_220904_0414.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 31.96,
+            "latency": 0.63,
+            "stability": 100
+          },
+          "final_score": 33.03
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 29.38,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 71.75
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 23.52,
+            "latency": 0.59,
+            "stability": 100
+          },
+          "final_score": 29.64
+        }
+      ]
+    },
+    {
+      "file": "20_24_3757_220921_0321.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 51.74,
+            "latency": 0.87,
+            "stability": 100
+          },
+          "final_score": 41.04
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 41.26,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 76.5
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 33.82,
+            "latency": 0.77,
+            "stability": 100
+          },
+          "final_score": 33.84
+        }
+      ]
+    },
+    {
+      "file": "20_24_3757_220921_0417.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 39.98,
+            "latency": 0.61,
+            "stability": 100
+          },
+          "final_score": 36.24
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 43.2,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 77.28
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 32.06,
+            "latency": 0.58,
+            "stability": 100
+          },
+          "final_score": 33.05
+        }
+      ]
+    },
+    {
+      "file": "20_24_3876_220923_0325.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 65.6,
+            "latency": 0.74,
+            "stability": 100
+          },
+          "final_score": 46.54
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 52.7,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 81.08
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 47.36,
+            "latency": 0.68,
+            "stability": 100
+          },
+          "final_score": 39.22
+        }
+      ]
+    },
+    {
+      "file": "20_24_3876_220923_0416.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 52.9,
+            "latency": 0.63,
+            "stability": 100
+          },
+          "final_score": 41.41
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 53.42,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 81.37
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 43.52,
+            "latency": 0.55,
+            "stability": 100
+          },
+          "final_score": 37.63
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210130 160950.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 42.0,
+            "latency": 0.83,
+            "stability": 100
+          },
+          "final_score": 37.13
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 40.68,
+            "latency": 100.0,
+            "stability": 55
+          },
+          "final_score": 67.27
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 30.9,
+            "latency": 0.7,
+            "stability": 100
+          },
+          "final_score": 32.64
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210130 170003.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 38.98,
+            "latency": 0.94,
+            "stability": 100
+          },
+          "final_score": 35.97
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 39.9,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 55.96
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 29.58,
+            "latency": 0.46,
+            "stability": 100
+          },
+          "final_score": 32.02
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210130 170257.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 42.76,
+            "latency": 1.37,
+            "stability": 100
+          },
+          "final_score": 37.65
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 39.96,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 55.98
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 27.72,
+            "latency": 0.68,
+            "stability": 100
+          },
+          "final_score": 31.36
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 200749.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 25.98,
+            "latency": 0.9,
+            "stability": 100
+          },
+          "final_score": 30.75
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 34.56,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 53.82
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 20.12,
+            "latency": 0.47,
+            "stability": 100
+          },
+          "final_score": 28.24
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210201 095005.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 50.84,
+            "latency": 0.9,
+            "stability": 100
+          },
+          "final_score": 40.7
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 46.84,
+            "latency": 100.0,
+            "stability": 55
+          },
+          "final_score": 69.74
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 36.24,
+            "latency": 0.61,
+            "stability": 100
+          },
+          "final_score": 34.74
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210201 095852.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 39.2,
+            "latency": 0.99,
+            "stability": 100
+          },
+          "final_score": 36.08
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 38.1,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 55.24
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 22.24,
+            "latency": 0.48,
+            "stability": 100
+          },
+          "final_score": 29.09
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210203 150846.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 27.02,
+            "latency": 0.95,
+            "stability": 100
+          },
+          "final_score": 31.19
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 33.64,
+            "latency": 100.0,
+            "stability": 30
+          },
+          "final_score": 59.46
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 17.64,
+            "latency": 0.74,
+            "stability": 100
+          },
+          "final_score": 27.35
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210203 200637.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 37.4,
+            "latency": 1.11,
+            "stability": 100
+          },
+          "final_score": 35.4
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 34.2,
+            "latency": 100.0,
+            "stability": 5
+          },
+          "final_score": 54.68
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 23.84,
+            "latency": 1.21,
+            "stability": 100
+          },
+          "final_score": 30.02
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210203 210121.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 30.16,
+            "latency": 1.0,
+            "stability": 100
+          },
+          "final_score": 32.46
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 28.86,
+            "latency": 100.0,
+            "stability": 15
+          },
+          "final_score": 54.54
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 19.72,
+            "latency": 1.13,
+            "stability": 100
+          },
+          "final_score": 28.34
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210203 210544.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 45.8,
+            "latency": 0.88,
+            "stability": 100
+          },
+          "final_score": 38.67
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 37.08,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 54.83
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 26.34,
+            "latency": 0.99,
+            "stability": 100
+          },
+          "final_score": 30.93
+        }
+      ]
+    },
+    {
+      "file": "01_01_000606_210809_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 1.13,
+            "stability": 100
+          },
+          "final_score": 20.45
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 4.14,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 41.66
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 53.58,
+            "latency": 1.37,
+            "stability": 0
+          },
+          "final_score": 21.98
+        }
+      ]
+    },
+    {
+      "file": "01_01_000622_210809_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 1.07,
+            "stability": 100
+          },
+          "final_score": 20.43
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 2.8,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 41.12
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 48.94,
+            "latency": 0.71,
+            "stability": 0
+          },
+          "final_score": 19.86
+        }
+      ]
+    },
+    {
+      "file": "01_01_000643_210810_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.58,
+            "stability": 100
+          },
+          "final_score": 20.23
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 3.4,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 41.36
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 56.98,
+            "latency": 0.66,
+            "stability": 0
+          },
+          "final_score": 23.06
+        }
+      ]
+    },
+    {
+      "file": "01_01_000660_210809_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.63,
+            "stability": 100
+          },
+          "final_score": 20.25
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 0.86,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 60.34
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 43.86,
+            "latency": 0.72,
+            "stability": 0
+          },
+          "final_score": 17.83
+        }
+      ]
+    },
+    {
+      "file": "01_01_000675_210809_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.62,
+            "stability": 100
+          },
+          "final_score": 20.25
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 0.7,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 60.28
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 38.56,
+            "latency": 0.69,
+            "stability": 0
+          },
+          "final_score": 15.7
+        }
+      ]
+    },
+    {
+      "file": "01_01_001118_210818_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.68,
+            "stability": 100
+          },
+          "final_score": 20.27
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 27.86,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 51.14
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 29.06,
+            "latency": 0.75,
+            "stability": 0
+          },
+          "final_score": 11.93
+        }
+      ]
+    },
+    {
+      "file": "01_01_001124_210818_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.48,
+            "stability": 100
+          },
+          "final_score": 20.19
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 7.44,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 42.98
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 38.06,
+            "latency": 1.29,
+            "stability": 0
+          },
+          "final_score": 15.74
+        }
+      ]
+    },
+    {
+      "file": "01_01_001152_210818_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 1.09,
+            "stability": 100
+          },
+          "final_score": 20.44
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 12.58,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 45.03
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 50.82,
+            "latency": 0.25,
+            "stability": 0
+          },
+          "final_score": 20.43
+        }
+      ]
+    },
+    {
+      "file": "01_01_001200_210819_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.71,
+            "stability": 100
+          },
+          "final_score": 20.28
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 0.82,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 60.33
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 40.92,
+            "latency": 0.74,
+            "stability": 0
+          },
+          "final_score": 16.66
+        }
+      ]
+    },
+    {
+      "file": "01_01_001209_210819_SN.wav",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 0.0,
+            "latency": 0.64,
+            "stability": 100
+          },
+          "final_score": 20.26
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 3.44,
+            "latency": 100.0,
+            "stability": 0
+          },
+          "final_score": 41.38
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 43.98,
+            "latency": 0.73,
+            "stability": 0
+          },
+          "final_score": 17.89
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210126 223356.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 45.5,
+            "latency": 0.92,
+            "stability": 100
+          },
+          "final_score": 38.57
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 46.94,
+            "latency": 100.0,
+            "stability": 55
+          },
+          "final_score": 69.78
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 38.4,
+            "latency": 0.39,
+            "stability": 100
+          },
+          "final_score": 35.51
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210128 150834.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 44.02,
+            "latency": 0.63,
+            "stability": 100
+          },
+          "final_score": 37.86
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 39.78,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 75.91
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 37.02,
+            "latency": 0.64,
+            "stability": 100
+          },
+          "final_score": 35.06
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210128 201931.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 49.48,
+            "latency": 0.91,
+            "stability": 100
+          },
+          "final_score": 40.16
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 46.04,
+            "latency": 100.0,
+            "stability": 95
+          },
+          "final_score": 77.42
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 42.34,
+            "latency": 0.46,
+            "stability": 100
+          },
+          "final_score": 37.12
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210128 204918.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 41.22,
+            "latency": 0.96,
+            "stability": 100
+          },
+          "final_score": 36.87
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 43.22,
+            "latency": 100.0,
+            "stability": 90
+          },
+          "final_score": 75.29
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 44.58,
+            "latency": 0.46,
+            "stability": 100
+          },
+          "final_score": 38.02
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 131551.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 69.46,
+            "latency": 1.25,
+            "stability": 100
+          },
+          "final_score": 48.29
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 55.54,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 82.22
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 51.3,
+            "latency": 0.51,
+            "stability": 100
+          },
+          "final_score": 40.73
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 140919.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 70.62,
+            "latency": 0.82,
+            "stability": 100
+          },
+          "final_score": 48.58
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 55.92,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 82.37
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 53.54,
+            "latency": 0.4,
+            "stability": 100
+          },
+          "final_score": 41.58
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 143754.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 65.14,
+            "latency": 0.57,
+            "stability": 100
+          },
+          "final_score": 46.28
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 51.44,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 80.58
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 49.44,
+            "latency": 0.58,
+            "stability": 100
+          },
+          "final_score": 40.01
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 155552.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 64.9,
+            "latency": 0.59,
+            "stability": 100
+          },
+          "final_score": 46.19
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 51.32,
+            "latency": 100.0,
+            "stability": 95
+          },
+          "final_score": 79.53
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 46.88,
+            "latency": 0.62,
+            "stability": 100
+          },
+          "final_score": 39.0
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 155801.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 59.68,
+            "latency": 1.09,
+            "stability": 100
+          },
+          "final_score": 44.31
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 47.6,
+            "latency": 100.0,
+            "stability": 100
+          },
+          "final_score": 79.04
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 43.68,
+            "latency": 0.59,
+            "stability": 100
+          },
+          "final_score": 37.71
+        }
+      ]
+    },
+    {
+      "file": "[수정]20210131 164101.mp3",
+      "evaluation": [
+        {
+          "engine": "Pydub",
+          "scores": {
+            "trim_efficiency": 55.44,
+            "latency": 0.95,
+            "stability": 100
+          },
+          "final_score": 42.55
+        },
+        {
+          "engine": "webrtcvad",
+          "scores": {
+            "trim_efficiency": 43.62,
+            "latency": 100.0,
+            "stability": 95
+          },
+          "final_score": 76.45
+        },
+        {
+          "engine": "Silero VAD",
+          "scores": {
+            "trim_efficiency": 41.56,
+            "latency": 0.49,
+            "stability": 100
+          },
+          "final_score": 36.82
+        }
+      ]
+    }
+  ]
+}
