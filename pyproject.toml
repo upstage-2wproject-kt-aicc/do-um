@@ -5,38 +5,60 @@ description = "AICC Modular Monolith"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    # STT
+    # --- STT & Audio Processing ---
     "torch>=2.0.0",
     "torchaudio",
     "pydub>=0.25.1",
     "silero-vad",
     "numpy",
-    "webrtcvad-wheels",
+    "webrtcvad-wheels>=2.0.14",
     "noisereduce>=3.0.3",
     "soundfile>=0.13.1",
-    "google-cloud-speech>=2.38.0",
-    "pandas>=2.3.3",
+    "google-cloud-speech>=2.30.0",
+    "faster-whisper>=1.1.1",
     "jiwer>=4.0.0",
     "sounddevice>=0.5.1",
-    # TTS / 공통
-    "streamlit>=1.30.0",
-    "openai>=2.32.0",
+    "psutil>=6.1.1",
+
+    # --- NLU & Workflow (LangChain) ---
+    "langchain>=0.3.0",
+    "langchain-core",
+    "langchain-community",
+    "langchain-openai",
+    "langchain-chroma",
+    "langchain-upstage",
+    "langgraph>=0.2.34",
+    "chromadb>=0.5.0",
+    "rank-bm25",
+    "transformers",
+    "huggingface-hub",
+    "onnxruntime",
+
+    # --- API & TTS ---
+    "fastapi>=0.115.0",
+    "uvicorn>=0.45.0",
+    "websockets>=16.0",
+    "openai>=1.64.0",
     "requests>=2.31.0",
     "python-dotenv>=1.2.2",
-    "azure-cognitiveservices-speech>=1.49.1",
-    "pydantic>=2.13.3",
-    "cachetools>=7.0.6",
-    "loguru>=0.7.3",
+    "pydantic>=2.9.2",
     "google-cloud-texttospeech>=2.36.0",
-    "fastapi>=0.136.0",
-    "uvicorn>=0.45.0",
+    "azure-cognitiveservices-speech>=1.49.1",
+    "streamlit>=1.30.0",
+    "loguru>=0.7.3",
+    "cachetools>=7.0.6",
+    "protobuf<6.0.0",
 ]
 
 [tool.uv]
 managed = true
 
 [dependency-groups]
-dev = ["ipykernel"]
+dev = [
+    "ipykernel",
+    "pytest",
+    "pytest-asyncio",
+]
 
 [build-system]
 requires = ["hatchling"]

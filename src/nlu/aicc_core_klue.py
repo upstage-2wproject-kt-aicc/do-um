@@ -15,7 +15,8 @@ from langchain_chroma import Chroma
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 from langchain_upstage import UpstageEmbeddings
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers.models.auto.modeling_auto import AutoModelForSequenceClassification
+from transformers.models.auto.tokenization_auto import AutoTokenizer
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parent.parent
