@@ -6,7 +6,7 @@ from common.schemas import AudioChunk, EvalResult, WorkflowRoutingInput, LLMResp
 from tts.factory import TTSFactory
 from workflow.graph import execute_workflow_item
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 class VoiceAIPipeline:
     """최상위 비동기 파이프라인 인터페이스를 정의합니다."""
