@@ -1,5 +1,27 @@
+# --- Python ---
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
 
 .env
 
@@ -9,3 +31,41 @@ __pycache__/
 
 logs/
 data/
+
+# --- 가상환경 ---
+.venv/
+venv/
+ENV/
+env/
+
+# --- 테스트·커버리지·타입·린트 캐시 ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# --- 환경 변수·비밀 (절대 커밋하지 않음) ---
+.env
+.env.*
+!.env.example
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- IDE (팀에서 공유 설정을 올리는 경우 아래 줄 제거) ---
+.idea/
+.vscode/
+
+# --- 로컬 Chroma / 벡터 DB 퍼시스트 (필요 시 재생성) ---
+**/aicc_chroma_db/
+
