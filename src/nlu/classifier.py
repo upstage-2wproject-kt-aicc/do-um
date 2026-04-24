@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from src.common.schemas import IntentResult, Transcript
+from common.schemas import IntentResult, Transcript
 
 
 class BaseClassifier(ABC):

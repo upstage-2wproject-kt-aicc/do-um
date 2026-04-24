@@ -1,0 +1,11 @@
+# --- TTS API Credentials ---
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Azure Speech Service
+AZURE_SPEECH_KEY=your_azure_speech_key_here
+AZURE_SPEECH_REGION=your_azure_region_here (e.g., eastus)
+
+# Naver Clova Voice
+NAVER_CLIENT_ID=your_naver_client_id_here
+NAVER_CLIENT_SECRET=your_naver_client_secret_here

@@ -1,6 +1,6 @@
 """STT interface skeleton for VAD and transcript generation."""
 
-from src.common.schemas import AudioChunk, Transcript
+from common.schemas import AudioChunk, Transcript
 
 
 class STTService:
