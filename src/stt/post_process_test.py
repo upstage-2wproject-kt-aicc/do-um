@@ -2,10 +2,10 @@ import json
 import os
 import sys
 
-# 프로젝트 루트 경로를 파이썬 모듈 검색 경로에 추가
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+# src/ 를 검색 경로에 추가 (pyright extraPaths = ["src"] 와 일치)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.stt.post_processor import STTPostProcessor
+from stt.post_processor import STTPostProcessor
 
 
 def test_real_data_masking():

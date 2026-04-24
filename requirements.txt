@@ -1,4 +1,20 @@
-langgraph==0.2.34
-pydantic==2.9.2
-httpx==0.27.2
+# --- Core STT & API ---
+openai
+google-cloud-speech
+python-dotenv
 
+# --- Audio Processing & VAD ---
+pydub
+webrtcvad
+noisereduce
+soundfile
+torch
+numpy
+
+# --- Evaluation & Data ---
+pandas
+jiwer
+psutil
+
+# --- Local Alternative (Optional) ---
+faster-whisper

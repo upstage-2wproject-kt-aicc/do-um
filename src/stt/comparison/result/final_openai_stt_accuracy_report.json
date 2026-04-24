@@ -1,63 +1,64 @@
 {
+  "model": "openai",
   "overall": {
-    "avg_wer": 20.893591164864933,
-    "avg_cer": 8.319656342583968,
-    "avg_latency": 7.938764044943821,
+    "avg_wer": 26.422472828563563,
+    "avg_cer": 9.334219693104776,
+    "avg_latency": 3.3947191011235955,
     "total_files": 89
   },
   "domain_summary": {
     "buy_cancel_insurance": {
-      "wer_sum": 1.8936191905145738,
-      "cer_sum": 0.45813553316190325,
-      "lat_sum": 72.34,
+      "wer_sum": 2.3616830953338583,
+      "cer_sum": 0.5605367036996888,
+      "lat_sum": 38.66000000000001,
       "count": 9
     },
     "insurance_money": {
-      "wer_sum": 2.426149161063127,
-      "cer_sum": 0.7904077940796879,
-      "lat_sum": 83.42,
+      "wer_sum": 2.3967786892119127,
+      "cer_sum": 0.6663387971452254,
+      "lat_sum": 38.33,
       "count": 10
     },
     "shopping": {
-      "wer_sum": 2.7573556573139526,
-      "cer_sum": 1.0995704078430337,
-      "lat_sum": 111.01,
+      "wer_sum": 3.2109089499712886,
+      "cer_sum": 1.082905497497767,
+      "lat_sum": 42.809999999999995,
       "count": 10
     },
     "subway": {
-      "wer_sum": 3.22185563451863,
-      "cer_sum": 2.3511331483306765,
-      "lat_sum": 89.07,
+      "wer_sum": 3.847483926286997,
+      "cer_sum": 2.5667755145325577,
+      "lat_sum": 42.540000000000006,
       "count": 10
     },
     "talking_ani": {
-      "wer_sum": 1.0612299465240642,
-      "cer_sum": 0.30421354982671034,
-      "lat_sum": 26.41,
+      "wer_sum": 1.4213598650980055,
+      "cer_sum": 0.40142206715783857,
+      "lat_sum": 13.59,
       "count": 10
     },
     "teen_sns": {
-      "wer_sum": 1.4008472201382625,
-      "cer_sum": 0.5456413648719616,
-      "lat_sum": 44.39,
+      "wer_sum": 2.6584464630627034,
+      "cer_sum": 0.7393266769399465,
+      "lat_sum": 20.060000000000002,
       "count": 10
     },
     "transaction_history": {
-      "wer_sum": 2.8407156734242913,
-      "cer_sum": 0.6535777644341394,
-      "lat_sum": 97.23,
+      "wer_sum": 2.4054517788841627,
+      "cer_sum": 0.8027415004636466,
+      "lat_sum": 31.59,
       "count": 10
     },
     "vacuum": {
-      "wer_sum": 0.7158676567835414,
-      "cer_sum": 0.33429058622172086,
-      "lat_sum": 94.05000000000001,
+      "wer_sum": 1.7905146221388595,
+      "cer_sum": 0.6715260528925946,
+      "lat_sum": 40.69,
       "count": 10
     },
     "withdrawal_loan": {
-      "wer_sum": 2.277655996449343,
-      "cer_sum": 0.8675239961298987,
-      "lat_sum": 88.63,
+      "wer_sum": 3.42337342743379,
+      "cer_sum": 0.8158827165339877,
+      "lat_sum": 33.86,
       "count": 10
     }
   },
@@ -65,625 +66,625 @@
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210202 134445.mp3",
-      "wer": 11.86,
-      "cer": 4.98,
-      "latency": 7.8
+      "wer": 61.02,
+      "cer": 12.03,
+      "latency": 6.28
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210202 140720.mp3",
-      "wer": 13.73,
-      "cer": 4.91,
-      "latency": 6.96
+      "wer": 64.71,
+      "cer": 8.48,
+      "latency": 2.99
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210202 213255.mp3",
-      "wer": 17.24,
-      "cer": 6.53,
-      "latency": 10.16
+      "wer": 31.03,
+      "cer": 11.02,
+      "latency": 6.69
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210205 104732.mp3",
-      "wer": 24.0,
-      "cer": 4.48,
-      "latency": 10.4
+      "wer": 6.67,
+      "cer": 3.45,
+      "latency": 3.03
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210205 105910.mp3",
-      "wer": 30.0,
-      "cer": 5.41,
-      "latency": 9.05
+      "wer": 14.29,
+      "cer": 4.63,
+      "latency": 4.91
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210205 110653.mp3",
-      "wer": 23.73,
-      "cer": 3.4,
-      "latency": 7.81
+      "wer": 15.25,
+      "cer": 7.66,
+      "latency": 2.45
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210205 154141.mp3",
-      "wer": 32.79,
-      "cer": 5.26,
-      "latency": 7.25
+      "wer": 21.31,
+      "cer": 3.64,
+      "latency": 5.91
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210205 154232.mp3",
-      "wer": 23.29,
-      "cer": 4.68,
-      "latency": 7.67
+      "wer": 16.44,
+      "cer": 3.24,
+      "latency": 4.13
     },
     {
       "folder": "buy_cancel_insurance",
       "filename": "[수정]20210206 223950.mp3",
-      "wer": 12.73,
-      "cer": 6.16,
-      "latency": 5.24
+      "wer": 5.45,
+      "cer": 1.9,
+      "latency": 2.27
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210127 205059.mp3",
-      "wer": 16.25,
-      "cer": 4.95,
-      "latency": 8.68
+      "wer": 18.75,
+      "cer": 2.79,
+      "latency": 3.39
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210127 223206.mp3",
-      "wer": 49.15,
-      "cer": 20.17,
-      "latency": 6.43
+      "wer": 33.9,
+      "cer": 17.23,
+      "latency": 2.97
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210127 223709.mp3",
-      "wer": 19.72,
-      "cer": 5.3,
-      "latency": 7.16
+      "wer": 18.31,
+      "cer": 3.79,
+      "latency": 3.96
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210127 224536.mp3",
-      "wer": 18.42,
-      "cer": 4.71,
-      "latency": 7.71
+      "wer": 31.58,
+      "cer": 6.4,
+      "latency": 4.65
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210127 230148.mp3",
-      "wer": 13.85,
-      "cer": 3.86,
-      "latency": 10.21
+      "wer": 15.38,
+      "cer": 3.47,
+      "latency": 2.82
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210129 115108.mp3",
-      "wer": 22.58,
-      "cer": 7.87,
-      "latency": 8.79
+      "wer": 33.87,
+      "cer": 8.66,
+      "latency": 2.91
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210201 101020.mp3",
-      "wer": 21.21,
-      "cer": 7.69,
-      "latency": 8.87
+      "wer": 18.18,
+      "cer": 7.33,
+      "latency": 5.71
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210201 103941.mp3",
-      "wer": 24.66,
-      "cer": 8.67,
-      "latency": 7.33
+      "wer": 21.92,
+      "cer": 3.67,
+      "latency": 4.32
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210201 105826.mp3",
-      "wer": 28.57,
-      "cer": 8.92,
-      "latency": 9.9
+      "wer": 27.27,
+      "cer": 7.08,
+      "latency": 3.67
     },
     {
       "folder": "insurance_money",
       "filename": "[수정]20210201 110645.mp3",
-      "wer": 28.21,
-      "cer": 6.89,
-      "latency": 8.34
+      "wer": 20.51,
+      "cer": 6.23,
+      "latency": 3.93
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_1311.m4a",
-      "wer": 35.96,
-      "cer": 16.86,
-      "latency": 9.2
+      "wer": 44.94,
+      "cer": 18.93,
+      "latency": 3.85
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_2429.m4a",
-      "wer": 16.13,
-      "cer": 4.14,
-      "latency": 11.34
+      "wer": 22.58,
+      "cer": 7.99,
+      "latency": 4.9
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_3057.m4a",
-      "wer": 29.21,
+      "wer": 33.71,
       "cer": 9.38,
-      "latency": 9.13
+      "latency": 4.33
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_3074.m4a",
-      "wer": 39.78,
-      "cer": 21.49,
-      "latency": 15.32
+      "wer": 48.39,
+      "cer": 12.89,
+      "latency": 4.57
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_3117.m4a",
-      "wer": 19.48,
-      "cer": 8.25,
-      "latency": 12.28
+      "wer": 24.68,
+      "cer": 7.62,
+      "latency": 3.72
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_3141.m4a",
-      "wer": 21.78,
-      "cer": 5.91,
-      "latency": 11.27
+      "wer": 40.59,
+      "cer": 10.22,
+      "latency": 5.22
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_3559.m4a",
-      "wer": 33.33,
-      "cer": 13.95,
-      "latency": 10.26
+      "wer": 37.37,
+      "cer": 11.92,
+      "latency": 4.66
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_508.m4a",
-      "wer": 23.38,
-      "cer": 14.18,
-      "latency": 10.29
+      "wer": 38.96,
+      "cer": 16.31,
+      "latency": 5.13
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_638.m4a",
-      "wer": 27.96,
-      "cer": 8.65,
-      "latency": 12.69
+      "wer": 7.53,
+      "cer": 6.76,
+      "latency": 3.72
     },
     {
       "folder": "shopping",
       "filename": "쇼핑_642.m4a",
-      "wer": 28.72,
-      "cer": 7.12,
-      "latency": 9.23
+      "wer": 22.34,
+      "cer": 6.27,
+      "latency": 2.71
     },
     {
       "folder": "subway",
       "filename": "06_07_014041_210927_SN.wav",
-      "wer": 62.75,
-      "cer": 52.3,
-      "latency": 6.12
+      "wer": 54.9,
+      "cer": 39.66,
+      "latency": 4.34
     },
     {
       "folder": "subway",
       "filename": "06_07_020986_211006_SN.wav",
-      "wer": 98.18,
-      "cer": 95.94,
-      "latency": 5.6
+      "wer": 100.0,
+      "cer": 97.46,
+      "latency": 6.29
     },
     {
       "folder": "subway",
       "filename": "06_07_023457_211011_SN.wav",
-      "wer": 12.0,
-      "cer": 6.67,
-      "latency": 9.35
+      "wer": 6.67,
+      "cer": 1.85,
+      "latency": 4.84
     },
     {
       "folder": "subway",
       "filename": "06_07_023469_211011_SN.wav",
-      "wer": 21.52,
-      "cer": 13.11,
-      "latency": 9.64
+      "wer": 29.11,
+      "cer": 9.84,
+      "latency": 3.77
     },
     {
       "folder": "subway",
       "filename": "06_07_023483_211011_SN.wav",
-      "wer": 11.43,
-      "cer": 3.83,
-      "latency": 10.06
+      "wer": 40.0,
+      "cer": 26.82,
+      "latency": 5.19
     },
     {
       "folder": "subway",
       "filename": "06_08_007837_210821_SN.wav",
-      "wer": 17.98,
+      "wer": 20.22,
       "cer": 7.35,
-      "latency": 8.98
+      "latency": 4.05
     },
     {
       "folder": "subway",
       "filename": "06_08_007962_210909_SN.wav",
-      "wer": 12.05,
-      "cer": 2.81,
-      "latency": 11.11
+      "wer": 19.28,
+      "cer": 8.77,
+      "latency": 3.25
     },
     {
       "folder": "subway",
       "filename": "06_08_007969_210909_SN.wav",
-      "wer": 32.91,
-      "cer": 22.63,
-      "latency": 8.95
+      "wer": 34.18,
+      "cer": 21.17,
+      "latency": 3.0
     },
     {
       "folder": "subway",
       "filename": "06_08_014110_210927_SN.wav",
-      "wer": 22.39,
-      "cer": 11.39,
-      "latency": 10.63
+      "wer": 26.87,
+      "cer": 11.81,
+      "latency": 3.28
     },
     {
       "folder": "subway",
       "filename": "06_08_016767_210930_SN.wav",
-      "wer": 30.99,
-      "cer": 19.09,
-      "latency": 8.63
+      "wer": 53.52,
+      "cer": 31.95,
+      "latency": 4.53
     },
     {
       "folder": "talking_ani",
       "filename": "A-A2-A-028-0081.wav",
-      "wer": 29.41,
+      "wer": 35.29,
       "cer": 8.47,
-      "latency": 2.46
+      "latency": 0.93
     },
     {
       "folder": "talking_ani",
       "filename": "A-A2-A-028-0083.wav",
-      "wer": 18.18,
-      "cer": 7.14,
-      "latency": 2.59
+      "wer": 9.09,
+      "cer": 1.43,
+      "latency": 0.89
     },
     {
       "folder": "talking_ani",
       "filename": "A-A2-A-028-0085.wav",
-      "wer": 26.67,
+      "wer": 20.0,
       "cer": 9.8,
-      "latency": 3.0
+      "latency": 1.17
     },
     {
       "folder": "talking_ani",
       "filename": "A-A2-A-028-0086.wav",
-      "wer": 0.0,
-      "cer": 0.0,
-      "latency": 3.11
+      "wer": 22.22,
+      "cer": 3.17,
+      "latency": 1.12
     },
     {
       "folder": "talking_ani",
       "filename": "A-A2-A-028-0097.wav",
-      "wer": 23.53,
-      "cer": 3.08,
-      "latency": 2.42
+      "wer": 11.76,
+      "cer": 7.69,
+      "latency": 1.37
     },
     {
       "folder": "talking_ani",
       "filename": "A-A2-A-028-0100.wav",
       "wer": 8.33,
       "cer": 1.92,
-      "latency": 2.05
+      "latency": 0.93
     },
     {
       "folder": "talking_ani",
       "filename": "A-S2-A-028-0057.wav",
-      "wer": 0.0,
-      "cer": 0.0,
-      "latency": 2.22
+      "wer": 15.38,
+      "cer": 4.26,
+      "latency": 1.52
     },
     {
       "folder": "talking_ani",
       "filename": "D-A3-E-055-0059.wav",
       "wer": 0.0,
       "cer": 0.0,
-      "latency": 2.37
+      "latency": 1.25
     },
     {
       "folder": "talking_ani",
       "filename": "D-A3-E-055-0087.wav",
-      "wer": 0.0,
-      "cer": 0.0,
-      "latency": 3.03
+      "wer": 7.14,
+      "cer": 1.69,
+      "latency": 1.91
     },
     {
       "folder": "talking_ani",
       "filename": "D-S3-E-055-0088.wav",
-      "wer": 0.0,
-      "cer": 0.0,
-      "latency": 3.16
+      "wer": 12.9,
+      "cer": 1.69,
+      "latency": 2.5
     },
     {
       "folder": "teen_sns",
       "filename": "10_12_3415_220907_0319.wav",
-      "wer": 5.41,
-      "cer": 2.74,
-      "latency": 4.35
+      "wer": 45.95,
+      "cer": 10.27,
+      "latency": 2.8
     },
     {
       "folder": "teen_sns",
       "filename": "10_12_3548_220910_0307.wav",
-      "wer": 6.9,
-      "cer": 1.01,
-      "latency": 3.23
+      "wer": 13.79,
+      "cer": 2.02,
+      "latency": 1.63
     },
     {
       "folder": "teen_sns",
       "filename": "10_12_3807_220922_0318.wav",
-      "wer": 12.5,
-      "cer": 3.5,
-      "latency": 6.01
+      "wer": 30.0,
+      "cer": 9.09,
+      "latency": 1.7
     },
     {
       "folder": "teen_sns",
       "filename": "10_12_3821_220923_0212.wav",
       "wer": 20.0,
-      "cer": 6.93,
-      "latency": 3.11
+      "cer": 5.94,
+      "latency": 2.26
     },
     {
       "folder": "teen_sns",
       "filename": "10_12_3863_220922_0303.wav",
-      "wer": 16.13,
-      "cer": 5.83,
-      "latency": 3.66
+      "wer": 9.68,
+      "cer": 3.88,
+      "latency": 1.21
     },
     {
       "folder": "teen_sns",
       "filename": "20_24_3015_220904_0414.wav",
-      "wer": 11.76,
-      "cer": 2.97,
-      "latency": 5.09
+      "wer": 33.33,
+      "cer": 8.42,
+      "latency": 2.42
     },
     {
       "folder": "teen_sns",
       "filename": "20_24_3757_220921_0321.wav",
-      "wer": 11.11,
-      "cer": 7.25,
-      "latency": 4.7
+      "wer": 30.56,
+      "cer": 11.59,
+      "latency": 2.27
     },
     {
       "folder": "teen_sns",
       "filename": "20_24_3757_220921_0417.wav",
-      "wer": 26.67,
-      "cer": 8.73,
-      "latency": 4.48
+      "wer": 43.33,
+      "cer": 12.7,
+      "latency": 1.68
     },
     {
       "folder": "teen_sns",
       "filename": "20_24_3876_220923_0325.wav",
-      "wer": 10.26,
+      "wer": 23.08,
       "cer": 6.02,
-      "latency": 4.85
+      "latency": 2.65
     },
     {
       "folder": "teen_sns",
       "filename": "20_24_3876_220923_0416.wav",
-      "wer": 19.35,
-      "cer": 9.6,
-      "latency": 4.91
+      "wer": 16.13,
+      "cer": 4.0,
+      "latency": 1.44
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210130 160950.mp3",
-      "wer": 21.33,
-      "cer": 5.14,
-      "latency": 8.05
+      "wer": 28.0,
+      "cer": 10.27,
+      "latency": 2.82
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210130 170003.mp3",
       "wer": 26.09,
-      "cer": 7.58,
-      "latency": 10.64
+      "cer": 6.06,
+      "latency": 4.58
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210130 170257.mp3",
-      "wer": 15.28,
-      "cer": 3.91,
-      "latency": 8.09
+      "wer": 30.56,
+      "cer": 9.61,
+      "latency": 2.68
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210131 200749.mp3",
-      "wer": 30.51,
-      "cer": 7.02,
-      "latency": 9.78
+      "wer": 20.34,
+      "cer": 6.61,
+      "latency": 3.13
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210201 095005.mp3",
-      "wer": 47.27,
-      "cer": 10.65,
-      "latency": 8.36
+      "wer": 18.18,
+      "cer": 7.41,
+      "latency": 2.73
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210201 095852.mp3",
-      "wer": 17.91,
-      "cer": 5.15,
-      "latency": 10.24
+      "wer": 14.93,
+      "cer": 4.41,
+      "latency": 3.0
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210203 150846.mp3",
-      "wer": 34.48,
-      "cer": 7.47,
-      "latency": 9.33
+      "wer": 29.31,
+      "cer": 7.88,
+      "latency": 2.97
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210203 200637.mp3",
-      "wer": 26.56,
-      "cer": 4.96,
-      "latency": 11.74
+      "wer": 29.69,
+      "cer": 7.63,
+      "latency": 3.81
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210203 210121.mp3",
-      "wer": 24.29,
-      "cer": 4.73,
-      "latency": 13.34
+      "wer": 17.14,
+      "cer": 3.72,
+      "latency": 2.8
     },
     {
       "folder": "transaction_history",
       "filename": "[수정]20210203 210544.mp3",
-      "wer": 40.35,
-      "cer": 8.75,
-      "latency": 7.66
+      "wer": 26.32,
+      "cer": 16.67,
+      "latency": 3.07
     },
     {
       "folder": "vacuum",
       "filename": "01_01_000606_210809_SN.wav",
-      "wer": 5.41,
-      "cer": 2.14,
-      "latency": 10.39
+      "wer": 18.92,
+      "cer": 6.05,
+      "latency": 4.72
     },
     {
       "folder": "vacuum",
       "filename": "01_01_000622_210809_SN.wav",
-      "wer": 1.47,
-      "cer": 0.38,
-      "latency": 9.98
+      "wer": 11.76,
+      "cer": 4.56,
+      "latency": 6.22
     },
     {
       "folder": "vacuum",
       "filename": "01_01_000643_210810_SN.wav",
       "wer": 10.34,
-      "cer": 6.39,
-      "latency": 9.88
+      "cer": 6.85,
+      "latency": 2.59
     },
     {
       "folder": "vacuum",
       "filename": "01_01_000660_210809_SN.wav",
-      "wer": 6.25,
-      "cer": 3.51,
-      "latency": 8.5
+      "wer": 26.56,
+      "cer": 9.21,
+      "latency": 3.71
     },
     {
       "folder": "vacuum",
       "filename": "01_01_000675_210809_SN.wav",
-      "wer": 6.85,
-      "cer": 2.26,
-      "latency": 9.13
+      "wer": 17.81,
+      "cer": 7.14,
+      "latency": 3.12
     },
     {
       "folder": "vacuum",
       "filename": "01_01_001118_210818_SN.wav",
       "wer": 10.26,
-      "cer": 4.06,
-      "latency": 9.32
+      "cer": 2.95,
+      "latency": 3.3
     },
     {
       "folder": "vacuum",
       "filename": "01_01_001124_210818_SN.wav",
-      "wer": 8.82,
+      "wer": 16.18,
       "cer": 3.54,
-      "latency": 8.3
+      "latency": 4.89
     },
     {
       "folder": "vacuum",
       "filename": "01_01_001152_210818_SN.wav",
-      "wer": 7.69,
-      "cer": 3.28,
-      "latency": 8.9
+      "wer": 32.31,
+      "cer": 14.75,
+      "latency": 2.59
     },
     {
       "folder": "vacuum",
       "filename": "01_01_001200_210819_SN.wav",
-      "wer": 10.0,
-      "cer": 6.59,
-      "latency": 10.34
+      "wer": 21.43,
+      "cer": 9.52,
+      "latency": 4.57
     },
     {
       "folder": "vacuum",
       "filename": "01_01_001209_210819_SN.wav",
-      "wer": 4.49,
-      "cer": 1.28,
-      "latency": 9.31
+      "wer": 13.48,
+      "cer": 2.56,
+      "latency": 4.98
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210126 223356.mp3",
-      "wer": 29.49,
-      "cer": 10.62,
-      "latency": 9.5
+      "wer": 76.92,
+      "cer": 19.78,
+      "latency": 2.95
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210128 150834.mp3",
-      "wer": 31.43,
-      "cer": 9.4,
-      "latency": 8.56
+      "wer": 40.0,
+      "cer": 8.27,
+      "latency": 2.98
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210128 201931.mp3",
       "wer": 13.89,
       "cer": 2.05,
-      "latency": 9.13
+      "latency": 3.78
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210128 204918.mp3",
-      "wer": 10.11,
-      "cer": 1.81,
-      "latency": 8.9
+      "wer": 17.98,
+      "cer": 3.31,
+      "latency": 3.03
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210131 131551.mp3",
-      "wer": 17.86,
-      "cer": 4.27,
-      "latency": 7.64
+      "wer": 39.29,
+      "cer": 11.11,
+      "latency": 4.2
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210131 140919.mp3",
-      "wer": 15.38,
-      "cer": 3.82,
-      "latency": 8.33
+      "wer": 30.77,
+      "cer": 8.78,
+      "latency": 4.18
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210131 143754.mp3",
-      "wer": 17.57,
-      "cer": 5.44,
-      "latency": 8.44
+      "wer": 14.86,
+      "cer": 6.8,
+      "latency": 2.89
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210131 155552.mp3",
-      "wer": 27.54,
+      "wer": 42.03,
       "cer": 7.49,
-      "latency": 13.03
+      "latency": 2.61
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210131 155801.mp3",
-      "wer": 39.22,
-      "cer": 29.79,
-      "latency": 5.02
+      "wer": 47.06,
+      "cer": 9.57,
+      "latency": 3.6
     },
     {
       "folder": "withdrawal_loan",
       "filename": "[수정]20210131 164101.mp3",
-      "wer": 25.29,
-      "cer": 12.06,
-      "latency": 10.08
+      "wer": 19.54,
+      "cer": 4.41,
+      "latency": 3.64
     }
   ]
 }
