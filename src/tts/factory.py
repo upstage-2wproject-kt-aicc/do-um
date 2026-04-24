@@ -11,17 +11,17 @@ class TTSFactory:
     """설정에 기반하여 적절한 TTS 서비스를 인스턴스화하는 팩토리 클래스입니다."""
 
     @staticmethod
-    def get_service(provider: str) -> BaseTTSService:
+    def get_service(provider: str | None = None) -> BaseTTSService:
         """
         요청된 공급자(Provider)에 맞는 TTS 서비스 인스턴스를 반환합니다.
         
         Args:
-            provider (str): 공급자 이름 ('azure', 'openai', 'naver', 'google').
+            provider (str | None): 공급자 이름 ('azure', 'openai', 'naver', 'google'). 지정하지 않으면 설정의 기본값을 사용합니다.
             
         Returns:
             BaseTTSService: 초기화된 TTS 서비스 객체.
         """
-        provider = provider.lower().strip()
+        provider = (provider or config.default_tts_provider).lower().strip()
         
         if provider == "azure":
             return AzureTTSService(config.azure_tts)

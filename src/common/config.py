@@ -39,6 +39,7 @@ class GoogleTTSConfig(BaseModel):
 
 class AppConfig(BaseModel):
     """메인 애플리케이션 통합 설정"""
+    default_tts_provider: str = Field(default_factory=lambda: os.environ.get("DEFAULT_TTS_PROVIDER", "openai").lower())
     openai_tts: OpenAITTSConfig = Field(default_factory=OpenAITTSConfig)
     azure_tts: AzureTTSConfig = Field(default_factory=AzureTTSConfig)
     naver_tts: NaverTTSConfig = Field(default_factory=NaverTTSConfig)

@@ -11,9 +11,9 @@ logger = get_logger()
 class VoiceAIPipeline:
     """최상위 비동기 파이프라인 인터페이스를 정의합니다."""
 
-    def __init__(self):
-        # 팩토리를 통해 TTS 서비스를 동적으로 주입합니다. (기본값: openai)
-        self.tts_service = TTSFactory.get_service("openai")
+    def __init__(self, tts_provider: str | None = None):
+        # 팩토리를 통해 TTS 서비스를 동적으로 주입합니다. (지정하지 않으면 설정의 기본값 사용)
+        self.tts_service = TTSFactory.get_service(tts_provider)
 
     async def run_workflow_to_tts(self, payload: WorkflowRoutingInput) -> AsyncIterator[TTSChunk]:
         """

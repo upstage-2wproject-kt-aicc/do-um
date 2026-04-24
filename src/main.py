@@ -35,8 +35,8 @@ async def tts_test(text: str = None):
         )
     
     # 2. TTS 서비스 호출 (에러 발생 시 전역 처리기가 자동으로 낚아챔)
-    service = TTSFactory.get_service("openai")
-    resp = LLMResponse(session_id="api_test", provider="openai", text=text, latency_ms=0)
+    service = TTSFactory.get_service()
+    resp = LLMResponse(session_id="api_test", provider=service.__class__.__name__, text=text, latency_ms=0)
     
     audio_chunks = []
     async for chunk in service.stream(resp):
@@ -60,15 +60,15 @@ async def tts_stream(text: str = None):
         # 2. 문장 단위 Chunker 연결
         sentences = sentence_chunker(llm_stream)
         
-        # 3. TTS 서비스 초기화 (OpenAI 사용)
-        tts_service = TTSFactory.get_service("openai")
+        # 3. TTS 서비스 초기화 (설정된 기본값 사용)
+        tts_service = TTSFactory.get_service()
         
         chunk_index = 0
         async for sentence in sentences:
             # 임시 LLMResponse 객체 생성
             resp = LLMResponse(
                 session_id=f"stream_test_{chunk_index}", 
-                provider="openai", 
+                provider=tts_service.__class__.__name__, 
                 text=sentence, 
                 latency_ms=0
             )
@@ -84,11 +84,12 @@ async def tts_stream(text: str = None):
     return StreamingResponse(audio_generator(), media_type="audio/mpeg")
 
 @app.post("/pipeline/stream")
-async def pipeline_stream(payload: WorkflowRoutingInput):
+async def pipeline_stream(payload: WorkflowRoutingInput, provider: str = None):
     """
     NLU의 라우팅 정보(JSON)를 받아 워크플로우를 실행하고 그 결과를 오디오 스트림으로 반환합니다.
+    - provider: TTS 공급자 ('openai', 'azure', 'naver', 'google'). 생략 시 환경 변수의 기본값 사용.
     """
-    pipeline = VoiceAIPipeline()
+    pipeline = VoiceAIPipeline(tts_provider=provider)
     
     async def audio_generator():
         async for chunk in pipeline.run_workflow_to_tts(payload):
