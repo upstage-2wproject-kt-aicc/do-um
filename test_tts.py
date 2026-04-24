@@ -1,8 +1,8 @@
 import asyncio
 import time
-from src.tts.service import TTSService, AzureTTSService, NaverTTSService, GoogleTTSService
-from src.common.schemas import LLMResponse
-from src.common.logger import get_logger
+from tts.service import TTSService, AzureTTSService, NaverTTSService, GoogleTTSService
+from common.schemas import LLMResponse
+from common.logger import get_logger
 
 logger = get_logger()
 
