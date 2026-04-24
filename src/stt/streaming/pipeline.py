@@ -2,7 +2,7 @@
 
 STT 백엔드 선택:
     stt_provider="google"  → Google Cloud STT (기본값, 현재 사용 가능)
-    stt_provider="openai"  → OpenAI Whisper API (.env의 OPENAI_API_KEY 필요)
+    stt_provider="openai"  → OpenAI Whisper API (.env의 LLM_GPT_API_KEY 필요)
 """
 
 import os
@@ -47,11 +47,11 @@ class StreamingPipeline:
         self._vad = webrtcvad.Vad(self.vad_aggressiveness)
         if self.stt_provider == "google" and not self.google_project_id:
             raise ValueError("Google STT 사용 시 google_project_id가 필요합니다.")
-        if self.stt_provider == "openai" and not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("OpenAI STT 사용 시 .env에 OPENAI_API_KEY가 필요합니다.")
+        if self.stt_provider == "openai" and not os.getenv("LLM_GPT_API_KEY"):
+            raise ValueError("OpenAI STT 사용 시 .env에 LLM_GPT_API_KEY가 필요합니다.")
         if self.stt_provider == "openai":
             from openai import OpenAI
-            self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            self._openai_client = OpenAI(api_key=os.getenv("LLM_GPT_API_KEY"))
 
     def feed(self, frame: bytes) -> Transcript | None:
         """30ms PCM 프레임(16kHz·16-bit·mono) 입력 → 발화 완료 시 Transcript 반환."""

@@ -11,7 +11,7 @@ load_dotenv()
 
 async def transcribe_openai(file_path):
     """OpenAI Whisper API를 이용한 전사"""
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    client = OpenAI(api_key=os.getenv("LLM_GPT_API_KEY"))
     start_time = time.time()
     try:
         with open(file_path, "rb") as audio_file:

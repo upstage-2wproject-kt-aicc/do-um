@@ -34,11 +34,12 @@ class AICC_NLU_Router:
     """KLUE 기반 의도분류 + BM25/Chroma RAG + 시맨틱 캐시."""
 
     def __init__(self) -> None:
-        if not os.environ.get("UPSTAGE_API_KEY"):
+        if not os.environ.get("LLM_SOLAR_API_KEY"):
             raise RuntimeError(
-                "UPSTAGE_API_KEY가 없습니다. 저장소 루트에 .env를 두고 "
-                "UPSTAGE_API_KEY=... 를 설정하거나, .env.example을 복사해 채워 넣으세요."
+                "LLM_SOLAR_API_KEY가 없습니다. 저장소 루트에 .env를 두고 "
+                "LLM_SOLAR_API_KEY=... 를 설정하거나, .env.example을 복사해 채워 넣으세요."
             )
+        os.environ.setdefault("UPSTAGE_API_KEY", os.environ["LLM_SOLAR_API_KEY"])
 
         boot_t0 = time.perf_counter()
         print("\n🚀 [NLU Router] KLUE 로컬 모델 부팅 중...")
