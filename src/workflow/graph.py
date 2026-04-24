@@ -219,13 +219,29 @@ def workflow_input_from_nlu_dict(payload: dict[str, Any]) -> WorkflowRoutingInpu
         }
     else:
         intent_result = payload.get("intent_result", {})
-        rag_meta = intent_result.get("rag_context", {}).get("metadata", {})
+        rag_meta = (
+            payload.get("metadata")
+            or intent_result.get("rag_context", {}).get("metadata", {})
+            or {}
+        )
         normalized_routing = {
-            "intent": intent_result.get("intent", ""),
+            "intent": payload.get("intent") or intent_result.get("intent", ""),
             "subdomain": rag_meta.get("subdomain", ""),
-            "router_confidence": intent_result.get("score", 0.0),
+            "router_confidence": payload.get("router_confidence")
+            or intent_result.get("score", 0.0),
             "domain": rag_meta.get("domain", ""),
         }
+
+    internal_context = payload.get("internal_context", [])
+    retrieved_context = payload.get("retrieved_context")
+    if retrieved_context and not internal_context:
+        internal_context = [
+            {
+                "source": "nlu_rag",
+                "content": retrieved_context,
+                "metadata": payload.get("metadata", {}),
+            }
+        ]
 
     return WorkflowRoutingInput.model_validate(
         {
@@ -233,7 +249,7 @@ def workflow_input_from_nlu_dict(payload: dict[str, Any]) -> WorkflowRoutingInpu
             "original_query": user_query,
             "routing_info": normalized_routing,
             "chat_history": payload.get("chat_history", []),
-            "internal_context": payload.get("internal_context", []),
+            "internal_context": internal_context,
             "policy_rules": payload.get("policy_rules", []),
         }
     )

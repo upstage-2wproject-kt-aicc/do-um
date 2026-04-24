@@ -30,6 +30,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from src.nlu.aicc_core_klue import AICC_NLU_Router
+from src.workflow.graph import execute_workflow_item, workflow_input_from_nlu_dict
 from .pipeline import StreamingPipeline
 
 load_dotenv()
@@ -63,17 +64,22 @@ async def stt_websocket(websocket: WebSocket):
             frame = await websocket.receive_bytes()
             transcript = pipeline.feed(frame)
             if transcript:
+                transcript_text = transcript.text
                 if nlu_router is None:
                     # NLU 초기화 실패 시 STT 결과만 전송
                     await websocket.send_json(
-                        {"transcript": transcript, "is_final": True}
+                        {
+                            "session_id": transcript.session_id,
+                            "transcript": transcript_text,
+                            "is_final": True,
+                        }
                     )
                     continue
 
                 # NLU는 동기/무거운 작업이므로 executor에서 실행
                 loop = asyncio.get_running_loop()
                 nlu_result = await loop.run_in_executor(
-                    None, nlu_router.process_query, transcript
+                    None, nlu_router.process_query, transcript_text
                 )
 
                 # 클라이언트 전송은 경량 필드 중심으로 제한
@@ -85,11 +91,29 @@ async def stt_websocket(websocket: WebSocket):
                     "timings_sec": nlu_result.get("timings_sec"),
                 }
 
+                workflow_payload = None
+                workflow_output = None
+                if nlu_result.get("status") == "REQUIRE_LLM":
+                    workflow_payload = workflow_input_from_nlu_dict(
+                        {
+                            "session_id": transcript.session_id,
+                            "user_query": transcript_text,
+                            **nlu_result,
+                        }
+                    )
+                    workflow_output = await execute_workflow_item(workflow_payload)
+
                 await websocket.send_json(
                     {
-                        "transcript": transcript,
+                        "session_id": transcript.session_id,
+                        "transcript": transcript_text,
                         "is_final": True,
                         "nlu_analysis": nlu_payload,
+                        "workflow": (
+                            workflow_output.model_dump(mode="json")
+                            if workflow_output
+                            else None
+                        ),
                     }
                 )
     except WebSocketDisconnect:
