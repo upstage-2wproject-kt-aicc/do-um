@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from common.error_handlers import register_error_handlers
 from middleware.logging import LoggingMiddleware
-from tts.service import AzureTTSService
-from common.schemas import LLMResponse
+from tts.factory import TTSFactory
+from pipeline import VoiceAIPipeline
+from common.schemas import LLMResponse, WorkflowRoutingInput
 from common.exceptions import ValidationException
 from fastapi.responses import StreamingResponse
 from llm.mock import mock_llm_stream, sentence_chunker
@@ -34,7 +35,7 @@ async def tts_test(text: str = None):
         )
     
     # 2. TTS 서비스 호출 (에러 발생 시 전역 처리기가 자동으로 낚아챔)
-    service = AzureTTSService()
+    service = TTSFactory.get_service("azure")
     resp = LLMResponse(session_id="api_test", provider="azure", text=text, latency_ms=0)
     
     audio_chunks = []
@@ -60,7 +61,7 @@ async def tts_stream(text: str = None):
         sentences = sentence_chunker(llm_stream)
         
         # 3. TTS 서비스 초기화 (Azure 사용)
-        tts_service = AzureTTSService()
+        tts_service = TTSFactory.get_service("azure")
         
         chunk_index = 0
         async for sentence in sentences:
@@ -80,6 +81,19 @@ async def tts_stream(text: str = None):
             chunk_index += 1
 
     # Chunked Transfer Encoding으로 클라이언트에 전송
+    return StreamingResponse(audio_generator(), media_type="audio/mpeg")
+
+@app.post("/pipeline/stream")
+async def pipeline_stream(payload: WorkflowRoutingInput):
+    """
+    NLU의 라우팅 정보(JSON)를 받아 워크플로우를 실행하고 그 결과를 오디오 스트림으로 반환합니다.
+    """
+    pipeline = VoiceAIPipeline()
+    
+    async def audio_generator():
+        async for chunk in pipeline.run_workflow_to_tts(payload):
+            yield chunk.audio_bytes
+            
     return StreamingResponse(audio_generator(), media_type="audio/mpeg")
 
 if __name__ == "__main__":

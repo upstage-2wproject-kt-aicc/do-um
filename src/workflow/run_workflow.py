@@ -7,7 +7,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from src.workflow.graph import execute_workflow_json
+from src.workflow.graph import execute_workflow_json, execute_workflow_nlu_json
 
 
 def main() -> None:
@@ -15,8 +15,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input",
-        default="data/workflow_input_dummy.json",
+        default="data/nlu_dummy_input.json",
         help="Path to workflow input JSON file.",
+    )
+    parser.add_argument(
+        "--input-type",
+        choices=("workflow", "nlu"),
+        default="nlu",
+        help="Input JSON schema type.",
     )
     parser.add_argument(
         "--output",
@@ -24,7 +30,10 @@ def main() -> None:
         help="Path to save workflow output JSON file.",
     )
     args = parser.parse_args()
-    outputs = asyncio.run(execute_workflow_json(args.input))
+    if args.input_type == "workflow":
+        outputs = asyncio.run(execute_workflow_json(args.input))
+    else:
+        outputs = asyncio.run(execute_workflow_nlu_json(args.input))
     payload = [item.model_dump(mode="json") for item in outputs]
     text = json.dumps(payload, ensure_ascii=False, indent=2)
     output_path = Path(args.output)

@@ -11,7 +11,7 @@ from typing import Any
 
 import httpx
 
-from common.schemas import LLMBatchResponse, LLMRequest, LLMResponse
+from src.common.schemas import LLMBatchResponse, LLMRequest, LLMResponse
 
 
 @dataclass(frozen=True)

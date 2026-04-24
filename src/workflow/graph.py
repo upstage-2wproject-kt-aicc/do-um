@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
+from typing import Any
 
 try:
     from langgraph.graph import END, StateGraph
@@ -12,7 +13,7 @@ except ModuleNotFoundError:  # pragma: no cover - runtime dependency guard
     END = "__end__"
     StateGraph = object  # type: ignore[assignment]
 
-from src.common.schemas import RouteType, WorkflowRoutingInput, WorkflowRoutingResult
+from src.common.schemas import IntentResult, RouteType, Transcript, WorkflowRoutingInput, WorkflowRoutingResult
 from src.common.schemas import WorkflowOutput
 from src.workflow.context_builder import ContextBuilder
 from src.workflow.formatter import format_workflow_output
@@ -117,6 +118,21 @@ def load_workflow_inputs_from_json(path: str | Path) -> list[WorkflowRoutingInpu
     return parse_workflow_inputs(data)
 
 
+def parse_nlu_outputs(payload: dict | list[dict]) -> list[WorkflowRoutingInput]:
+    """Parses NLU output payload into validated workflow routing input objects."""
+    if isinstance(payload, dict):
+        return [workflow_input_from_nlu_dict(payload)]
+    if isinstance(payload, list):
+        return [workflow_input_from_nlu_dict(item) for item in payload]
+    raise TypeError("Payload must be dict or list[dict].")
+
+
+def load_nlu_outputs_from_json(path: str | Path) -> list[WorkflowRoutingInput]:
+    """Loads NLU output JSON and converts it to workflow routing inputs."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    return parse_nlu_outputs(data)
+
+
 def route_from_inputs(inputs: list[WorkflowRoutingInput]) -> list[WorkflowRoutingResult]:
     """Computes route results from validated workflow inputs."""
     return [
@@ -154,6 +170,75 @@ async def execute_workflow_json(path: str | Path) -> list[WorkflowOutput]:
     return await asyncio.gather(*outputs)
 
 
+async def execute_workflow_nlu_json(path: str | Path) -> list[WorkflowOutput]:
+    """Executes workflow from NLU output JSON payload."""
+    inputs = load_nlu_outputs_from_json(path)
+    outputs = [execute_workflow_item(item) for item in inputs]
+    return await asyncio.gather(*outputs)
+
+
+def workflow_input_from_nlu_result(
+    transcript: Transcript,
+    intent_result: IntentResult,
+    chat_history: list[dict[str, Any]] | None = None,
+    internal_context: list[dict[str, Any]] | None = None,
+    policy_rules: list[dict[str, Any]] | None = None,
+) -> WorkflowRoutingInput:
+    """Builds workflow input from typed NLU outputs."""
+    payload: dict[str, Any] = {
+        "session_id": transcript.session_id,
+        "user_query": transcript.text,
+        "intent_result": intent_result.model_dump(mode="json"),
+        "chat_history": chat_history or [],
+        "internal_context": internal_context or [],
+        "policy_rules": policy_rules or [],
+    }
+    return workflow_input_from_nlu_dict(payload)
+
+
+def workflow_input_from_nlu_dict(payload: dict[str, Any]) -> WorkflowRoutingInput:
+    """Converts one raw NLU output dict into WorkflowRoutingInput."""
+    session_id = str(
+        payload.get("session_id")
+        or payload.get("transcript", {}).get("session_id", "")
+        or payload.get("intent_result", {}).get("session_id", "")
+    )
+    user_query = str(
+        payload.get("user_query")
+        or payload.get("original_query")
+        or payload.get("transcript", {}).get("text", "")
+    )
+
+    routing_info = payload.get("routing_info")
+    if isinstance(routing_info, dict):
+        normalized_routing = {
+            "intent": routing_info.get("intent", ""),
+            "subdomain": routing_info.get("subdomain", ""),
+            "router_confidence": routing_info.get("router_confidence", 0.0),
+            "domain": routing_info.get("domain", ""),
+        }
+    else:
+        intent_result = payload.get("intent_result", {})
+        rag_meta = intent_result.get("rag_context", {}).get("metadata", {})
+        normalized_routing = {
+            "intent": intent_result.get("intent", ""),
+            "subdomain": rag_meta.get("subdomain", ""),
+            "router_confidence": intent_result.get("score", 0.0),
+            "domain": rag_meta.get("domain", ""),
+        }
+
+    return WorkflowRoutingInput.model_validate(
+        {
+            "session_id": session_id,
+            "original_query": user_query,
+            "routing_info": normalized_routing,
+            "chat_history": payload.get("chat_history", []),
+            "internal_context": payload.get("internal_context", []),
+            "policy_rules": payload.get("policy_rules", []),
+        }
+    )
+
+
 def _route_key(state: WorkflowRoutingInput) -> str:
     """Converts route enum into LangGraph conditional edge key."""
     return route_selector(state).value
@@ -169,9 +254,14 @@ __all__ = [
     "build_workflow_graph",
     "compile_workflow_graph",
     "parse_workflow_inputs",
+    "parse_nlu_outputs",
     "load_workflow_inputs_from_json",
+    "load_nlu_outputs_from_json",
     "route_from_inputs",
     "load_and_route_json",
     "execute_workflow_item",
     "execute_workflow_json",
+    "execute_workflow_nlu_json",
+    "workflow_input_from_nlu_result",
+    "workflow_input_from_nlu_dict",
 ]
