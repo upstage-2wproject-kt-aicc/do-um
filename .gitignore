@@ -69,6 +69,15 @@ Thumbs.db
 # --- 로컬 Chroma / 벡터 DB 퍼시스트 (필요 시 재생성) ---
 **/aicc_chroma_db/
 
+
 # NLU 로컬 산출물 및 아카이브 제외
 src/nlu/archive/
 src/nlu/my_aicc_nlu_model_klue*
+
+# NLU Local Model & DB
+src/nlu/my_aicc_nlu_model_klue:roberta-base/
+src/nlu/aicc_chroma_db/
+src/nlu/__pycache__/
+
+# Personal Backup
+src/nlu/archive/
