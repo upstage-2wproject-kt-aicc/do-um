@@ -8,12 +8,16 @@ STT 백엔드 선택:
 import os
 import subprocess
 import tempfile
+import time
+import uuid
 import wave
 from dataclasses import dataclass, field
 from typing import Literal
 
 import webrtcvad
 from dotenv import load_dotenv
+
+from common.schemas import Transcript
 
 load_dotenv()
 
@@ -30,6 +34,7 @@ class StreamingPipeline:
 
     google_project_id: str = ""
     stt_provider: Literal["google", "openai"] = "google"
+    session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     vad_aggressiveness: int = 3
     silence_limit: int = SILENCE_LIMIT_FRAMES
 
@@ -44,9 +49,12 @@ class StreamingPipeline:
             raise ValueError("Google STT 사용 시 google_project_id가 필요합니다.")
         if self.stt_provider == "openai" and not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OpenAI STT 사용 시 .env에 OPENAI_API_KEY가 필요합니다.")
+        if self.stt_provider == "openai":
+            from openai import OpenAI
+            self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    def feed(self, frame: bytes) -> str | None:
-        """30ms PCM 프레임(16kHz·16-bit·mono) 입력 → 발화 완료 시 전사 텍스트 반환."""
+    def feed(self, frame: bytes) -> Transcript | None:
+        """30ms PCM 프레임(16kHz·16-bit·mono) 입력 → 발화 완료 시 Transcript 반환."""
         if len(frame) != FRAME_BYTES:
             return None
 
@@ -71,7 +79,7 @@ class StreamingPipeline:
         self._silent_frames = 0
         self._is_speaking = False
 
-    def _flush(self) -> str | None:
+    def _flush(self) -> Transcript | None:
         if not self._speech_buffer:
             return None
         raw_pcm = b"".join(self._speech_buffer)
@@ -101,46 +109,65 @@ class StreamingPipeline:
                 if os.path.exists(p):
                     os.remove(p)
 
-    def _transcribe(self, wav_bytes: bytes) -> str | None:
+    def _transcribe(self, wav_bytes: bytes) -> Transcript | None:
         if self.stt_provider == "google":
             return self._transcribe_google(wav_bytes)
         return self._transcribe_openai(wav_bytes)
 
-    def _transcribe_google(self, wav_bytes: bytes) -> str | None:
+    def _transcribe_google(self, wav_bytes: bytes) -> Transcript | None:
         from google.cloud import speech_v2
 
         client = speech_v2.SpeechClient()
-        config = speech_v2.types.RecognitionConfig(
-            auto_decoding_config=speech_v2.types.AutoDetectDecodingConfig(),
+        config = speech_v2.RecognitionConfig(
+            auto_decoding_config=speech_v2.AutoDetectDecodingConfig(),
             language_codes=["ko-KR"],
             model="telephony",
         )
-        request = speech_v2.types.RecognizeRequest(
+        request = speech_v2.RecognizeRequest(
             recognizer=f"projects/{self.google_project_id}/locations/global/recognizers/_",
             config=config,
             content=wav_bytes,
         )
         try:
             response = client.recognize(request=request)
-            return " ".join(r.alternatives[0].transcript for r in response.results) or None
+            if not response.results:
+                return None
+            text = " ".join(r.alternatives[0].transcript for r in response.results)
+            confidence = response.results[0].alternatives[0].confidence if response.results else 0.0
+            return Transcript(
+                session_id=self.session_id,
+                text=text,
+                language="ko-KR",
+                confidence=confidence,
+                is_final=True,
+                timestamp_ms=int(time.time() * 1000),
+            )
         except Exception as e:
             print(f"  ⚠️ Google STT 오류: {e}")
             return None
 
-    def _transcribe_openai(self, wav_bytes: bytes) -> str | None:
-        # OpenAI API 키가 생기면 주석 해제 후 사용
-        # from openai import OpenAI
-        # import io
-        # client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        # response = client.audio.transcriptions.create(
-        #     model="whisper-1",
-        #     file=("audio.wav", io.BytesIO(wav_bytes), "audio/wav"),
-        #     language="ko",
-        # )
-        # return response.text or None
-        raise NotImplementedError(
-            "OPENAI_API_KEY를 .env에 추가한 뒤 _transcribe_openai() 주석을 해제하세요."
-        )
+    def _transcribe_openai(self, wav_bytes: bytes) -> Transcript | None:
+        import io
+        try:
+            response = self._openai_client.audio.transcriptions.create(
+                model="whisper-1",
+                file=("audio.wav", io.BytesIO(wav_bytes), "audio/wav"),
+                language="ko",
+            )
+            text = response.text
+            if not text:
+                return None
+            return Transcript(
+                session_id=self.session_id,
+                text=text,
+                language="ko-KR",
+                confidence=1.0,  # Whisper는 confidence를 제공하지 않음
+                is_final=True,
+                timestamp_ms=int(time.time() * 1000),
+            )
+        except Exception as e:
+            print(f"  ⚠️ OpenAI STT 오류: {e}")
+            return None
 
 
 def _write_wav(path: str, pcm_bytes: bytes):

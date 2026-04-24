@@ -7,7 +7,7 @@ import subprocess
 import uuid
 from datetime import datetime
 from dotenv import load_dotenv
-from google.cloud import speech_v2
+from openai import OpenAI
 from pydub import AudioSegment
 import webrtcvad
 
@@ -71,41 +71,41 @@ def apply_optimal_preprocessing(input_path, temp_dir):
         print(f"  ⚠️ VAD 처리 실패, NR 결과물 사용: {e}")
         return nr_output, None
 
-# --- 2. Google STT API 호출 ---
-async def transcribe_google_optimal(file_path):
-    project_id = os.getenv("GOOGLE_PROJECT_ID")
-    if not project_id: return "Google Project ID missing", 0
+# --- 2. OpenAI STT API 호출 ---
+async def transcribe_openai_optimal(file_path):
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key: return "OPENAI_API_KEY missing", 0
         
-    client = speech_v2.SpeechClient()
+    client = OpenAI(api_key=api_key)
     start_t = time.time()
     
     try:
         import io
         audio = AudioSegment.from_file(file_path)
+        
+        # [중요] 구글 STT와 동일한 절단 로직 적용
         if len(audio) > 60000:
-            audio = audio[:50000] # API 제약 60초
+            audio = audio[:50000] # 50초로 절단
             buffer = io.BytesIO()
             audio.export(buffer, format="wav")
-            content = buffer.getvalue()
+            buffer.seek(0)
+            audio_file_tuple = ("temp.wav", buffer, "audio/wav")
+            response = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file_tuple,
+                response_format="text"
+            )
         else:
+            # [버그 수정] with 문을 사용하여 파일이 자동으로 닫히도록 보장 (윈도우 잠금 해결)
             with open(file_path, "rb") as f:
-                content = f.read()
-
-        config = speech_v2.types.RecognitionConfig(
-            auto_decoding_config=speech_v2.types.AutoDetectDecodingConfig(),
-            language_codes=["ko-KR"],
-            model="telephony",
-        )
-        request = speech_v2.types.RecognizeRequest(
-            recognizer=f"projects/{project_id}/locations/global/recognizers/_",
-            config=config,
-            content=content,
-        )
-        response = client.recognize(request=request)
-        transcript = " ".join([result.alternatives[0].transcript for result in response.results])
-        return transcript, time.time() - start_t
+                response = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=f,
+                    response_format="text"
+                )
+        return response.strip(), time.time() - start_t
     except Exception as e:
-        return f"Google Error: {e}", 0
+        return f"OpenAI Error: {e}", 0
 
 # --- 3. 메인 실행 로직 ---
 async def process_file(input_file, temp_dir):
@@ -115,7 +115,7 @@ async def process_file(input_file, temp_dir):
     processed_audio_path, mid_audio_path = apply_optimal_preprocessing(input_file, temp_dir)
     pre_latency = time.time() - start_pre
     
-    text_gg, stt_latency = await transcribe_google_optimal(processed_audio_path)
+    text_oa, stt_latency = await transcribe_openai_optimal(processed_audio_path)
     
     # [중요] STT 완료 후 해당 파일의 임시 파일 즉시 삭제
     for p in [processed_audio_path, mid_audio_path]:
@@ -129,12 +129,12 @@ async def process_file(input_file, temp_dir):
         "pre_latency": round(pre_latency, 2),
         "stt_latency": round(stt_latency, 2),
         "total_latency": round(total_latency, 2),
-        "text": text_gg
+        "text": text_oa
     }
 
 async def main():
     data_dir = "src/stt/data/evaluation"
-    temp_dir = "src/stt/temp/final_pipeline"
+    temp_dir = "src/stt/temp/final_pipeline_openai"
     os.makedirs(temp_dir, exist_ok=True)
 
     audio_files = glob.glob(os.path.join(data_dir, "**", "*.*"), recursive=True)
@@ -144,17 +144,17 @@ async def main():
         print("❌ 테스트할 오디오 파일이 없습니다.")
         return
 
-    print(f"🌟 [최종 파이프라인 검증] FFmpeg + webrtcvad -> Google STT 시작 ({len(audio_files)}개 파일)")
-    print("-" * 60)
+    print(f"🌟 [최종 파이프라인 검증] FFmpeg + webrtcvad -> OpenAI Whisper 시작 ({len(audio_files)}개 파일)")
+    print("-" * 70)
 
     all_results = {
         "timestamp": datetime.now().strftime("%Y%m%d_%H%M%S"),
-        "pipeline": "FFmpeg -> webrtcvad -> Google Telephony",
+        "pipeline": "FFmpeg -> webrtcvad -> OpenAI Whisper",
         "files_processed": len(audio_files),
         "results": []
     }
 
-    # API 동시 호출 제한을 위해 청크(chunk) 단위로 나누어 실행
+    # API 동시 호출 제한을 위해 청크 단위 실행
     chunk_size = 5 
     for i in range(0, len(audio_files), chunk_size):
         chunk_files = audio_files[i:i + chunk_size]
@@ -167,18 +167,18 @@ async def main():
     # 결과 저장
     result_dir = "src/stt/comparison/result"
     os.makedirs(result_dir, exist_ok=True)
-    metric_file = os.path.join(result_dir, "final_pipeline_google_stt_result.json")
+    metric_file = os.path.join(result_dir, "final_pipeline_openai_stt_result.json")
     
     with open(metric_file, "w", encoding="utf-8") as f:
         json.dump(all_results, f, ensure_ascii=False, indent=2)
 
-    # 잔여 임시 파일 정리
+    # 잔여 임시 파일 정리 (혹시 남은 것들)
     if os.path.exists(temp_dir):
         for f in os.listdir(temp_dir):
             try: os.remove(os.path.join(temp_dir, f))
             except: pass
 
-    print(f"\n✅ 구글 파이프라인 전수 조사 완료! 결과: {metric_file}")
+    print(f"\n✅ OpenAI 파이프라인 전수 조사 완료! 결과: {metric_file}")
 
 if __name__ == "__main__":
     asyncio.run(main())

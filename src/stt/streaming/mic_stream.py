@@ -1,11 +1,18 @@
 """로컬 마이크 입력 → StreamingPipeline 테스트 진입점.
 
 실행:
+    # Google STT (기본값)
     uv run python -m src.stt.streaming.mic_stream
 
-사전 요건:
+    # OpenAI Whisper
+    STT_PROVIDER=openai uv run python -m src.stt.streaming.mic_stream
+
+사전 요건 (Google):
     - .env에 GOOGLE_PROJECT_ID 설정
     - Google Cloud 인증: gcloud auth application-default login
+
+사전 요건 (OpenAI):
+    - .env에 OPENAI_API_KEY 설정
 """
 
 import os
@@ -22,12 +29,25 @@ load_dotenv()
 
 
 def run():
-    project_id = os.getenv("GOOGLE_PROJECT_ID", "")
-    if not project_id:
-        print("❌ GOOGLE_PROJECT_ID 환경변수가 없습니다.")
+    provider = os.getenv("STT_PROVIDER", "google")
+
+    if provider == "google":
+        project_id = os.getenv("GOOGLE_PROJECT_ID", "")
+        if not project_id:
+            print("❌ GOOGLE_PROJECT_ID 환경변수가 없습니다.")
+            return
+        pipeline = StreamingPipeline(google_project_id=project_id, stt_provider="google")
+    elif provider == "openai":
+        if not os.getenv("OPENAI_API_KEY"):
+            print("❌ OPENAI_API_KEY 환경변수가 없습니다.")
+            return
+        pipeline = StreamingPipeline(stt_provider="openai")
+    else:
+        print(f"❌ 알 수 없는 STT_PROVIDER: {provider} (google 또는 openai)")
         return
 
-    pipeline = StreamingPipeline(google_project_id=project_id)
+    print(f"🔧 STT 백엔드: {provider.upper()}")
+    print(f"🆔 세션 ID: {pipeline.session_id}")
 
     # callback은 빠르게 리턴해야 하므로 Queue로 분리
     # VAD·NR·STT 처리는 별도 스레드에서 수행
@@ -58,7 +78,7 @@ def run():
                 was_speaking = False
 
             if result:
-                print(f"📝 전사: {result}")
+                print(f"📝 [{result.session_id}] {result.text}  (confidence={result.confidence:.2f})")
 
     worker = threading.Thread(target=processing_worker, daemon=True)
     worker.start()
