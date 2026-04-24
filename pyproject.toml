@@ -11,6 +11,14 @@ dependencies = [
     "silero-vad",
     "numpy",
     "webrtcvad-wheels",
+    "noisereduce>=3.0.3",
+    "soundfile>=0.13.1",
+    "python-dotenv>=1.2.2",
+    "openai>=2.32.0",
+    "google-cloud-speech>=2.38.0",
+    "pandas>=2.3.3",
+    "jiwer>=4.0.0",
+    "sounddevice>=0.5.1",
 ]
 
 [tool.uv]
