@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 
-from src.common.schemas import LLMBatchResponse, LLMRequest, LLMResponse
+from common.schemas import LLMBatchResponse, LLMRequest, LLMResponse
 
 
 class MultiLLMService:

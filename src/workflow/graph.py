@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from langgraph.graph import END, StateGraph
 
-from src.common.schemas import RouteType, WorkflowState
+from common.schemas import RouteType, WorkflowState
 
 
 async def faq_node(state: WorkflowState) -> WorkflowState:
