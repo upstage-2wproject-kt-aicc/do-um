@@ -2,10 +2,17 @@ version: "3.9"
 
 services:
   app:
-    image: python:3.11-slim
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - type=local,src=.buildx-cache
+      cache_to:
+        - type=local,dest=.buildx-cache,mode=max
     container_name: modular-monolith-skeleton
     working_dir: /app
+    env_file:
+      - .env
     volumes:
       - ./:/app
     command: ["python", "-m", "src.pipeline"]
-
