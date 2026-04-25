@@ -25,13 +25,15 @@
 - `3.12+` 또는 `3.14` 기본 인터프리터에서 바로 `uv sync`하면 의존성 해석이 깨질 수 있음.
 
 2. 의존성 설치 명령 고정
-- 최초/갱신 설치는 반드시 아래 명령 사용:
-```bash
-UV_CACHE_DIR=.uv-cache uv sync --python 3.11
-```
-- `pyproject.toml`의 `tool.uv.environments`는 현재 `darwin + py3.11` 기준으로 잠겨 있음.
+- 최초/갱신 설치는 반드시 `uv sync --python 3.11` 사용.
+- `pyproject.toml`과 `uv.lock`은 macOS/Windows/Linux를 모두 포함하도록 잠금되어 있음.
+- OS별 캐시 변수 설정은 아래 실행 절차를 따를 것.
 
-3. 환경변수 키 이름 고정
+3. 모델 디렉토리 경로 고정
+- 공유받은 NLU 모델 디렉토리를 아래 경로에 배치:
+  - `src/nlu/my_aicc_nlu_model_klue`
+
+4. 환경변수 키 이름 고정
 - `.env.example`을 복사해 `.env` 생성 후 값 주입.
 - 키 이름을 임의로 바꾸지 말 것. 코드에서 다음 이름을 기준으로 읽음:
   - `LLM_SOLAR_API_KEY`
@@ -43,18 +45,45 @@ UV_CACHE_DIR=.uv-cache uv sync --python 3.11
   - `GOOGLE_PROJECT_ID` (Google STT 사용 시)
   - `AZURE_SPEECH_KEY`, `AZURE_SERVICE_REGION` (Azure TTS 사용 시)
 
-4. 캐시/로컬 산출물 커밋 금지
+5. 캐시/로컬 산출물 커밋 금지
 - `.venv/`, `.uv-cache/`, `.hf-cache/`, 실행 결과 오디오/JSON은 커밋하지 않음.
 
-## 실행 방법
-### 1) API 서버 실행
+## OS별 실행 방법 (pull 이후)
+아래 순서를 그대로 실행하면 됨.
+
+### macOS (zsh/bash)
+1. 설치
+```bash
+UV_CACHE_DIR=.uv-cache uv sync --python 3.11
+```
+2. 서버 실행
 ```bash
 HF_HOME=.hf-cache STT_PROVIDER=openai TTS_PROVIDER=openai UV_CACHE_DIR=.uv-cache uv run python -m src.main
 ```
 
-### 2) 워크플로우 JSON 단독 실행
+### Windows (PowerShell)
+1. 설치
+```powershell
+$env:UV_CACHE_DIR=".uv-cache"
+uv sync --python 3.11
+```
+2. 서버 실행
+```powershell
+$env:HF_HOME=".hf-cache"
+$env:STT_PROVIDER="openai"
+$env:TTS_PROVIDER="openai"
+$env:UV_CACHE_DIR=".uv-cache"
+uv run python -m src.main
+```
+
+### Linux (bash)
+1. 설치
 ```bash
-UV_CACHE_DIR=.uv-cache uv run python -m src.workflow.run_workflow --input data/workflow_input_dummy.json --input-type workflow
+UV_CACHE_DIR=.uv-cache uv sync --python 3.11
+```
+2. 서버 실행
+```bash
+HF_HOME=.hf-cache STT_PROVIDER=openai TTS_PROVIDER=openai UV_CACHE_DIR=.uv-cache uv run python -m src.main
 ```
 
 ## 인터페이스 우선 원칙
