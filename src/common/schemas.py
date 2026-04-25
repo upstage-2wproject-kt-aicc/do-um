@@ -90,6 +90,9 @@ class RoutingInfo(BaseModel):
         ..., ge=0.0, le=1.0, description="Router confidence from NLU."
     )
     domain: str = Field(..., description="Top-level domain label.")
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Raw NLU metadata used for routing decisions."
+    )
 
 
 class ChatTurn(BaseModel):
