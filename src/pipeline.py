@@ -1,5 +1,6 @@
 """전체 모듈을 관통하는 End-to-end 비동기 파이프라인 규약 모듈입니다."""
 
+import os
 from typing import AsyncIterator
 from common.logger import get_logger
 from common.schemas import AudioChunk, EvalResult, WorkflowRoutingInput, LLMResponse, TTSChunk
@@ -13,7 +14,8 @@ class VoiceAIPipeline:
 
     def __init__(self):
         # 팩토리를 통해 TTS 서비스를 동적으로 주입합니다.
-        self.tts_service = TTSFactory.get_service("azure")
+        tts_provider = os.getenv("TTS_PROVIDER", "azure").strip().lower()
+        self.tts_service = TTSFactory.get_service(tts_provider)
 
     async def run_workflow_to_tts(self, payload: WorkflowRoutingInput) -> AsyncIterator[TTSChunk]:
         """
@@ -46,4 +48,3 @@ class VoiceAIPipeline:
     async def run(self, audio_chunk: AudioChunk) -> EvalResult:
         """STT, NLU, 워크플로우, 다중 LLM, TTS 및 평가 단계를 차례로 실행합니다."""
         raise NotImplementedError
-

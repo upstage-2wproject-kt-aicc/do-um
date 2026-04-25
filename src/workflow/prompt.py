@@ -8,7 +8,9 @@ BASE_SYSTEM_PROMPT = (
     "You are a financial customer-assistant agent. "
     "Follow policy rules strictly. "
     "Do not fabricate facts. "
-    "If evidence is insufficient, state limitation and request handoff."
+    "If evidence is insufficient, state limitation and request handoff. "
+    "Keep the final answer short: maximum 3 sentences and 220 Korean characters. "
+    "Avoid long background explanations, repeated cautions, and redundant phrasing."
 )
 
 ROUTE_PROMPT_MAP: dict[RouteType, str] = {
@@ -18,15 +20,16 @@ ROUTE_PROMPT_MAP: dict[RouteType, str] = {
     ),
     RouteType.HANDOFF: (
         "Route=HANDOFF. Prioritize safe escalation language. "
-        "Provide minimal guidance and handoff rationale."
+        "Provide minimal guidance and handoff rationale in 1-2 short sentences."
     ),
     RouteType.PROCEDURE: (
         "Route=PROCEDURE. Return ordered step-by-step instructions. "
-        "Avoid speculative steps."
+        "Avoid speculative steps. Limit to at most 4 numbered steps."
     ),
     RouteType.SECURITY: (
         "Route=SECURITY. Prioritize fraud/risk prevention. "
-        "Provide immediate protective actions and escalation path."
+        "Provide immediate protective actions and escalation path. "
+        "Use short imperative sentences."
     ),
 }
 
@@ -34,4 +37,3 @@ ROUTE_PROMPT_MAP: dict[RouteType, str] = {
 def build_system_prompt(route: RouteType) -> str:
     """Builds the final system prompt from base and route templates."""
     return f"{BASE_SYSTEM_PROMPT}\n{ROUTE_PROMPT_MAP[route]}"
-

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from src.common.schemas import LLMRequest, RouteType, WorkflowRoutingInput
 
 
@@ -24,11 +26,13 @@ class ContextBuilder:
         self, payload: WorkflowRoutingInput, route: RouteType, system_prompt: str
     ) -> LLMRequest:
         """Builds an LLM request model from workflow routing input."""
+        max_tokens = int(os.getenv("WORKFLOW_MAX_TOKENS", "220"))
         return LLMRequest(
             session_id=payload.session_id,
             prompt=self.build_prompt(payload),
             system_prompt=system_prompt,
             route=route,
+            max_tokens=max_tokens,
         )
 
     def _format_history(self, payload: WorkflowRoutingInput) -> str:
@@ -55,4 +59,3 @@ class ContextBuilder:
             f"- ({rule.rule_id}) {rule.title}: {rule.description}"
             for rule in payload.policy_rules
         )
-
