@@ -30,6 +30,7 @@ dependencies = [
     "langgraph>=0.2.34",
     "chromadb>=0.5.0",
     "rank-bm25",
+    "tokenizers==0.20.3",
     "transformers",
     "huggingface-hub",
     "onnxruntime",
@@ -52,6 +53,7 @@ dependencies = [
 
 [tool.uv]
 managed = true
+environments = ["sys_platform == 'darwin' and python_full_version >= '3.11' and python_full_version < '3.12'"]
 
 [dependency-groups]
 dev = [
