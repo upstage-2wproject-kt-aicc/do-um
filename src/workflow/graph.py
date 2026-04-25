@@ -35,6 +35,18 @@ SECURITY_KEYWORDS: tuple[str, ...] = (
 )
 
 
+def _is_high_risk(value: Any) -> bool:
+    """Normalizes risk_level metadata to a high-risk boolean."""
+    normalized = str(value).strip().lower()
+    return normalized in {"high", "높음", "상", "critical"}
+
+
+def _is_handoff_required(value: Any) -> bool:
+    """Normalizes handoff_required metadata to a required boolean."""
+    normalized = str(value).strip().lower()
+    return normalized in {"y", "yes", "true", "1", "required"}
+
+
 async def faq_node(state: WorkflowRoutingInput) -> WorkflowRoutingInput:
     """Handles FAQ route state transitions."""
     return state
@@ -62,6 +74,13 @@ def route_selector(state: WorkflowRoutingInput) -> RouteType:
     ).lower()
     if any(keyword in text_space for keyword in SECURITY_KEYWORDS):
         return RouteType.SECURITY
+
+    metadata = state.routing_info.metadata
+    if _is_high_risk(metadata.get("risk_level")):
+        return RouteType.HANDOFF
+    if _is_handoff_required(metadata.get("handoff_required")):
+        return RouteType.HANDOFF
+
     intent = state.routing_info.intent.strip()
     if intent == "민원형":
         return RouteType.HANDOFF
@@ -216,6 +235,7 @@ def workflow_input_from_nlu_dict(payload: dict[str, Any]) -> WorkflowRoutingInpu
             "subdomain": routing_info.get("subdomain", ""),
             "router_confidence": routing_info.get("router_confidence", 0.0),
             "domain": routing_info.get("domain", ""),
+            "metadata": routing_info.get("metadata", payload.get("metadata", {})),
         }
     else:
         intent_result = payload.get("intent_result", {})
@@ -230,6 +250,7 @@ def workflow_input_from_nlu_dict(payload: dict[str, Any]) -> WorkflowRoutingInpu
             "router_confidence": payload.get("router_confidence")
             or intent_result.get("score", 0.0),
             "domain": rag_meta.get("domain", ""),
+            "metadata": rag_meta,
         }
 
     internal_context = payload.get("internal_context", [])
