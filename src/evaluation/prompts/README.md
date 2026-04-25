@@ -4,7 +4,7 @@ This directory stores versioned prompt templates used by the evaluation module.
 
 ## Files
 
-- `judge_v1.md`: Korean financial 상담 LLM-as-a-Judge prompt for the 7 judge-scored benchmark items.
+- `judge_v1.md`: Korean financial 상담 LLM-as-a-Judge prompt for the 5 primary judge-scored benchmark items.
 
 ## Scoring
 

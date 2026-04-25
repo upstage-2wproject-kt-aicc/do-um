@@ -1,0 +1,407 @@
+"""HTTP clients for candidate generation and judge evaluation."""
+
+from __future__ import annotations
+
+import json
+import os
+import time
+from pathlib import Path
+from typing import Any, TypeAlias
+
+import httpx
+
+from src.common.schemas import LLMRequest, LLMResponse
+from src.evaluation.env import load_evaluation_env
+from src.evaluation.schemas import (
+    CandidateModel,
+    EvaluationScenario,
+    JUDGE_METRIC_NAMES,
+    JudgeEvaluation,
+    JudgeMetricScore,
+    JudgeModel,
+    RagasEvaluation,
+)
+
+
+load_evaluation_env()
+
+
+EnvName: TypeAlias = str | tuple[str, ...]
+
+
+OPENAI_COMPATIBLE_ENV: dict[str, dict[str, EnvName]] = {
+    "solar": {
+        "api_key": "LLM_SOLAR_API_KEY",
+        "model": "LLM_SOLAR_MODEL",
+        "base_url": "LLM_SOLAR_BASE_URL",
+        "default_base_url": "https://api.upstage.ai/v1",
+    },
+    "gpt": {
+        "api_key": "LLM_GPT_API_KEY",
+        "model": "LLM_GPT_MODEL",
+        "base_url": "LLM_GPT_BASE_URL",
+        "default_base_url": "https://api.openai.com/v1",
+    },
+    "openai": {
+        "api_key": ("JUDGE_OPENAI_API_KEY", "LLM_GPT_API_KEY"),
+        "model": "JUDGE_OPENAI_MODEL",
+        "base_url": "JUDGE_OPENAI_BASE_URL",
+        "default_base_url": "https://api.openai.com/v1",
+    },
+    "grok": {
+        "api_key": "LLM_GROK_API_KEY",
+        "model": "LLM_GROK_MODEL",
+        "base_url": "LLM_GROK_BASE_URL",
+        "default_base_url": "https://api.x.ai/v1",
+    },
+}
+
+
+class OpenAICompatibleChatClient:
+    """Calls OpenAI-compatible chat completion APIs."""
+
+    def __init__(self, timeout_s: float = 20.0) -> None:
+        self.timeout_s = timeout_s
+
+    async def generate(
+        self, model: CandidateModel | JudgeModel, request: LLMRequest
+    ) -> LLMResponse:
+        env = _provider_env(model.provider, OPENAI_COMPATIBLE_ENV)
+        api_key = _get_required_env(env["api_key"])
+        model_id = model.model_id or _get_required_env(env["model"])
+        base_url = os.getenv(env["base_url"], env["default_base_url"]).strip()
+        started = time.perf_counter()
+        payload = {
+            "model": model_id,
+            "messages": [
+                {"role": "system", "content": request.system_prompt or ""},
+                {"role": "user", "content": request.prompt},
+            ],
+            "stream": False,
+        }
+        if _uses_max_completion_tokens(model_id):
+            payload["max_completion_tokens"] = request.max_tokens
+        else:
+            payload["temperature"] = request.temperature
+            payload["max_tokens"] = request.max_tokens
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        async with httpx.AsyncClient(timeout=self.timeout_s) as client:
+            response = await client.post(
+                f"{base_url.rstrip('/')}/chat/completions",
+                json=payload,
+                headers=headers,
+            )
+            response.raise_for_status()
+            body = response.json()
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        content = _openai_content(body)
+        usage = _int_dict(body.get("usage", {}))
+        finish_reason = None
+        if body.get("choices"):
+            finish_reason = body["choices"][0].get("finish_reason")
+        return LLMResponse(
+            session_id=request.session_id,
+            provider=model.provider,
+            text=content,
+            latency_ms=latency_ms,
+            ttft_ms=latency_ms,
+            finish_reason=finish_reason,
+            token_usage=usage,
+        )
+
+
+class AnthropicChatClient:
+    """Calls Anthropic Messages API."""
+
+    def __init__(
+        self,
+        api_key_env: EnvName = "LLM_CLAUDE_SONNET_API_KEY",
+        base_url_env: EnvName = "LLM_CLAUDE_SONNET_BASE_URL",
+        timeout_s: float = 20.0,
+    ) -> None:
+        self.api_key_env = api_key_env
+        self.base_url_env = base_url_env
+        self.timeout_s = timeout_s
+
+    async def generate(
+        self, model: CandidateModel | JudgeModel, request: LLMRequest
+    ) -> LLMResponse:
+        api_key_env = self.api_key_env
+        if model.provider == "anthropic":
+            api_key_env = ("JUDGE_ANTHROPIC_API_KEY", "LLM_CLAUDE_SONNET_API_KEY")
+        api_key = _get_required_env(api_key_env)
+        base_url = _get_env(self.base_url_env, "https://api.anthropic.com/v1")
+        started = time.perf_counter()
+        payload = {
+            "model": model.model_id,
+            "max_tokens": request.max_tokens,
+            "system": request.system_prompt or "",
+            "messages": [{"role": "user", "content": request.prompt}],
+        }
+        if request.temperature > 0:
+            payload["temperature"] = request.temperature
+        headers = {
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+        }
+        async with httpx.AsyncClient(timeout=self.timeout_s) as client:
+            response = await client.post(
+                f"{base_url.rstrip('/')}/messages",
+                json=payload,
+                headers=headers,
+            )
+            response.raise_for_status()
+            body = response.json()
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        return LLMResponse(
+            session_id=request.session_id,
+            provider=model.provider,
+            text=_anthropic_content(body),
+            latency_ms=latency_ms,
+            ttft_ms=latency_ms,
+            finish_reason=body.get("stop_reason"),
+            token_usage=_int_dict(body.get("usage", {})),
+        )
+
+
+class GeminiChatClient:
+    """Calls Gemini generateContent REST API."""
+
+    def __init__(
+        self,
+        api_key_env: EnvName = "JUDGE_GOOGLE_API_KEY",
+        base_url_env: EnvName = "JUDGE_GOOGLE_BASE_URL",
+        timeout_s: float = 20.0,
+    ) -> None:
+        self.api_key_env = api_key_env
+        self.base_url_env = base_url_env
+        self.timeout_s = timeout_s
+
+    async def generate(
+        self, model: CandidateModel | JudgeModel, request: LLMRequest
+    ) -> LLMResponse:
+        api_key = _get_required_env(self.api_key_env)
+        base_url = _get_env(
+            self.base_url_env, "https://generativelanguage.googleapis.com/v1beta"
+        )
+        started = time.perf_counter()
+        payload = {
+            "system_instruction": {"parts": [{"text": request.system_prompt or ""}]},
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": request.prompt}],
+                }
+            ],
+            "generationConfig": {
+                "temperature": request.temperature,
+                "maxOutputTokens": request.max_tokens,
+            },
+        }
+        headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
+        async with httpx.AsyncClient(timeout=self.timeout_s) as client:
+            response = await client.post(
+                f"{base_url.rstrip('/')}/models/{model.model_id}:generateContent",
+                json=payload,
+                headers=headers,
+            )
+            response.raise_for_status()
+            body = response.json()
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        return LLMResponse(
+            session_id=request.session_id,
+            provider=model.provider,
+            text=_gemini_content(body),
+            latency_ms=latency_ms,
+            ttft_ms=latency_ms,
+            finish_reason=_gemini_finish_reason(body),
+            token_usage=_int_dict(body.get("usageMetadata", {})),
+        )
+
+
+class CompositeCandidateClient:
+    """Routes candidate model calls to provider-specific clients."""
+
+    def __init__(self) -> None:
+        self.openai_compatible = OpenAICompatibleChatClient()
+        self.anthropic = AnthropicChatClient()
+        self.gemini = GeminiChatClient(
+            api_key_env=("LLM_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY")
+        )
+
+    async def generate(self, model: CandidateModel, request: LLMRequest) -> LLMResponse:
+        if model.provider in {"solar", "gpt", "openai", "grok"}:
+            return await self.openai_compatible.generate(model, request)
+        if model.provider in {"claude-sonnet", "anthropic"}:
+            return await self.anthropic.generate(model, request)
+        if model.provider == "google":
+            return await self.gemini.generate(model, request)
+        raise ValueError(f"Unsupported candidate provider: {model.provider}")
+
+
+class CompositeJudgeClient:
+    """Routes judge calls and parses judge JSON output."""
+
+    def __init__(self, prompt_path: str | Path | None = None) -> None:
+        self.prompt_path = prompt_path or Path(__file__).parent / "prompts" / "judge_v1.md"
+        self.openai = OpenAICompatibleChatClient()
+        self.anthropic = AnthropicChatClient(
+            api_key_env=("JUDGE_ANTHROPIC_API_KEY", "LLM_CLAUDE_SONNET_API_KEY")
+        )
+        self.gemini = GeminiChatClient(
+            api_key_env=("JUDGE_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY", "LLM_GOOGLE_API_KEY")
+        )
+
+    async def evaluate(
+        self,
+        judge: JudgeModel,
+        scenario: EvaluationScenario,
+        answer: LLMResponse,
+    ) -> JudgeEvaluation:
+        request = LLMRequest(
+            session_id=scenario.scenario_id,
+            system_prompt=Path(self.prompt_path).read_text(encoding="utf-8"),
+            prompt=build_judge_user_prompt(scenario, answer),
+            temperature=0.0,
+            max_tokens=1200,
+        )
+        if judge.provider in {"openai", "gpt"}:
+            response = await self.openai.generate(judge, request)
+        elif judge.provider in {"anthropic", "claude"}:
+            response = await self.anthropic.generate(judge, request)
+        elif judge.provider in {"google", "gemini"}:
+            response = await self.gemini.generate(judge, request)
+        else:
+            raise ValueError(f"Unsupported judge provider: {judge.provider}")
+        return parse_judge_json(judge.model_id, response.text)
+
+
+class NullRagasClient:
+    """RAGAS placeholder for runs before the ragas dependency is enabled."""
+
+    async def evaluate(
+        self, scenario: EvaluationScenario, answer: LLMResponse
+    ) -> RagasEvaluation:
+        return RagasEvaluation(
+            faithfulness=None,
+            answer_relevancy=None,
+            details={"status": "not_configured"},
+        )
+
+
+def build_judge_user_prompt(
+    scenario: EvaluationScenario, answer: LLMResponse
+) -> str:
+    """Builds the user payload given to judge models."""
+    payload = {
+        "user_query": scenario.user_query,
+        "context": scenario.retrieved_context,
+        "candidate_answer": answer.text,
+        "expected_route": scenario.metadata.get("expected_route", ""),
+        "reference_answer": scenario.reference_answer,
+        "context_metadata": scenario.metadata,
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+def parse_judge_json(judge_model: str, text: str) -> JudgeEvaluation:
+    """Parses judge JSON and validates the required metric keys."""
+    data = json.loads(_strip_json_fence(text))
+    metrics: dict[str, JudgeMetricScore] = {}
+    for metric_name in JUDGE_METRIC_NAMES:
+        raw_metric = data.get(metric_name)
+        if not isinstance(raw_metric, dict):
+            raise ValueError(f"Missing judge metric: {metric_name}")
+        metrics[metric_name] = JudgeMetricScore.model_validate(raw_metric)
+    summary = data.get("summary", {})
+    if not isinstance(summary, dict):
+        summary = {}
+    return JudgeEvaluation(judge_model=judge_model, metrics=metrics, summary=summary)
+
+
+def _provider_env(
+    provider: str, env_map: dict[str, dict[str, EnvName]]
+) -> dict[str, EnvName]:
+    try:
+        return env_map[provider]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported provider: {provider}") from exc
+
+
+def _get_required_env(name: EnvName) -> str:
+    value = _get_env(name)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {_env_label(name)}")
+    return value
+
+
+def _get_env(name: EnvName, default: str = "") -> str:
+    names = (name,) if isinstance(name, str) else name
+    for env_name in names:
+        value = os.getenv(env_name, "").strip()
+        if value:
+            return value
+    return default
+
+
+def _env_label(name: EnvName) -> str:
+    if isinstance(name, str):
+        return name
+    return " or ".join(name)
+
+
+def _uses_max_completion_tokens(model_id: str) -> bool:
+    normalized = model_id.lower()
+    return normalized.startswith(("gpt-5", "o1", "o3", "o4"))
+
+
+def _openai_content(body: dict[str, Any]) -> str:
+    choices = body.get("choices", [])
+    if not choices:
+        return ""
+    message = choices[0].get("message", {})
+    return str(message.get("content", ""))
+
+
+def _anthropic_content(body: dict[str, Any]) -> str:
+    parts = body.get("content", [])
+    texts = [
+        str(part.get("text", ""))
+        for part in parts
+        if isinstance(part, dict) and part.get("type") == "text"
+    ]
+    return "".join(texts)
+
+
+def _gemini_content(body: dict[str, Any]) -> str:
+    candidates = body.get("candidates", [])
+    if not candidates:
+        return ""
+    parts = candidates[0].get("content", {}).get("parts", [])
+    return "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
+
+
+def _gemini_finish_reason(body: dict[str, Any]) -> str | None:
+    candidates = body.get("candidates", [])
+    if not candidates:
+        return None
+    return candidates[0].get("finishReason")
+
+
+def _int_dict(raw: object) -> dict[str, int]:
+    if not isinstance(raw, dict):
+        return {}
+    return {key: int(value) for key, value in raw.items() if isinstance(value, (int, float))}
+
+
+def _strip_json_fence(text: str) -> str:
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        lines = stripped.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        return "\n".join(lines).strip()
+    return stripped
