@@ -79,6 +79,28 @@ class AICC_NLU_Router:
             f"✅ [NLU Router] 부팅 완료 — 총 소요 ⏱️ {time.perf_counter() - boot_t0:.3f}s\n"
         )
 
+    @staticmethod
+    def _normalize_risk_level(value: Any) -> str:
+        """Normalizes risk level labels for workflow handoff rules."""
+        raw = str(value).strip().lower()
+        if raw in {"high", "높음", "상", "critical", "crit"}:
+            return "high"
+        if raw in {"medium", "보통", "중간", "mid"}:
+            return "medium"
+        if raw in {"low", "낮음", "하"}:
+            return "low"
+        return raw or "low"
+
+    @staticmethod
+    def _normalize_handoff_required(value: Any) -> str:
+        """Normalizes handoff flags to Y/N."""
+        raw = str(value).strip().lower()
+        if raw in {"y", "yes", "true", "1", "required"}:
+            return "Y"
+        if raw in {"n", "no", "false", "0", "optional"}:
+            return "N"
+        return "N"
+
     def _prepare_datasets(self) -> None:
         if not faq_csv.is_file():
             raise FileNotFoundError(f"FAQ CSV가 없습니다: {faq_csv}")
@@ -94,8 +116,10 @@ class AICC_NLU_Router:
                     "subdomain": str(row["subdomain"]),
                     "intent_type": str(row["intent_type"]),
                     "keywords": str(row["keywords"]),
-                    "risk_level": str(row["risk_level"]),
-                    "handoff_required": str(row["handoff_required"]),
+                    "risk_level": self._normalize_risk_level(row["risk_level"]),
+                    "handoff_required": self._normalize_handoff_required(
+                        row["handoff_required"]
+                    ),
                 }
                 self.docs.append(
                     Document(page_content=str(row["embedding_text"]), metadata=metadata)
