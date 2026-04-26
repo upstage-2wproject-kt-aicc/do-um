@@ -93,6 +93,7 @@ class AICC_NLU_Router:
                     "domain": str(row["domain"]),
                     "subdomain": str(row["subdomain"]),
                     "intent_type": str(row["intent_type"]),
+                    "keywords": str(row["keywords"]),
                     "risk_level": str(row["risk_level"]),
                     "handoff_required": str(row["handoff_required"]),
                 }

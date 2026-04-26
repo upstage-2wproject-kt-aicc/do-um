@@ -75,7 +75,7 @@ src/nlu/archive/
 src/nlu/my_aicc_nlu_model_klue*
 
 # NLU Local Model & DB
-src/nlu/my_aicc_nlu_model_klue:roberta-base/
+src/nlu/my_aicc_nlu_model_klue/
 src/nlu/aicc_chroma_db/
 src/nlu/__pycache__/
 
