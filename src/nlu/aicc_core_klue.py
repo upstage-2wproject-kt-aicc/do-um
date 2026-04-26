@@ -30,6 +30,11 @@ load_dotenv(_REPO_ROOT / ".env")
 _CACHE_SIM_THRESHOLD = 0.75
 
 
+def _chroma_sqlite_exists(persist_path: Path) -> bool:
+    """로컬 Chroma persist 디렉터리에 SQLite 스토어가 있는지(이미 구축됐는지) 확인."""
+    return persist_path.is_dir() and (persist_path / "chroma.sqlite3").is_file()
+
+
 class AICC_NLU_Router:
     """KLUE 기반 의도분류 + BM25/Chroma RAG + 시맨틱 캐시."""
 
@@ -134,14 +139,35 @@ class AICC_NLU_Router:
         print(f"   ↳ BM25 인덱스 구축 (⏱️ {t_bm25:.3f}s)")
 
         t0 = time.perf_counter()
-        print("   ↳ Chroma Vector DB 적재 중...")
-        self.vector_db = Chroma.from_documents(
-            documents=self.docs,
-            embedding=self.embeddings,
-            persist_directory=persist_dir,
-        )
-        t_chroma = time.perf_counter() - t0
-        print(f"   ↳ Chroma 적재 완료 (⏱️ {t_chroma:.3f}s)")
+        persist_path = Path(persist_dir)
+        loaded = False
+        if _chroma_sqlite_exists(persist_path):
+            try:
+                print("   ↳ Chroma: 기존 persist에서 로드 시도...")
+                candidate = Chroma(
+                    persist_directory=persist_dir,
+                    embedding_function=self.embeddings,
+                )
+                probe = candidate.get(limit=1, include=[])
+                if probe.get("ids"):
+                    self.vector_db = candidate
+                    loaded = True
+                    print(
+                        f"   ↳ Chroma 로드 완료 (재임베딩 없음, ⏱️ {time.perf_counter() - t0:.3f}s)"
+                    )
+                else:
+                    print("   ↳ Chroma persist는 있으나 문서가 없어 재구축합니다.")
+            except Exception as e:
+                print(f"   ⚠️ Chroma 로드 실패, 재구축합니다: {e}")
+
+        if not loaded:
+            print("   ↳ Chroma Vector DB 적재 중(최초 구축 또는 재구축)...")
+            self.vector_db = Chroma.from_documents(
+                documents=self.docs,
+                embedding=self.embeddings,
+                persist_directory=persist_dir,
+            )
+            print(f"   ↳ Chroma 적재 완료 (⏱️ {time.perf_counter() - t0:.3f}s)")
 
     def _warm_up_cache(self) -> None:
         t0 = time.perf_counter()
