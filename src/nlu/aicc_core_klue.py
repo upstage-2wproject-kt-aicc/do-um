@@ -6,7 +6,6 @@ import asyncio
 import hashlib
 import json
 import os
-import shutil
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -16,10 +15,11 @@ from dotenv import load_dotenv
 import numpy as np
 import pandas as pd
 import torch
-from langchain_chroma import Chroma
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
+from langchain_pinecone import PineconeVectorStore
 from langchain_upstage import UpstageEmbeddings
+from pinecone import Pinecone
 from transformers.models.auto.modeling_auto import AutoModelForSequenceClassification
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
@@ -66,19 +66,31 @@ def _write_index_fingerprint(
     )
 
 
-def _chroma_sqlite_exists(persist_path: Path) -> bool:
-    """로컬 Chroma persist 디렉터리에 SQLite 스토어가 있는지(이미 구축됐는지) 확인."""
-    return persist_path.is_dir() and (persist_path / "chroma.sqlite3").is_file()
+def _pinecone_total_vector_count(stats: Any) -> int:
+    """Pinecone describe_index_stats 응답에서 총 벡터 수를 추출."""
+    if isinstance(stats, dict):
+        return int(stats.get("total_vector_count", 0))
+    return int(getattr(stats, "total_vector_count", 0))
 
 
 class AICC_NLU_Router:
-    """KLUE 기반 의도분류 + BM25/Chroma RAG + 시맨틱 캐시."""
+    """KLUE 기반 의도분류 + BM25/Pinecone RAG + 시맨틱 캐시."""
 
     def __init__(self) -> None:
         if not os.environ.get("LLM_SOLAR_API_KEY"):
             raise RuntimeError(
                 "LLM_SOLAR_API_KEY가 없습니다. 저장소 루트에 .env를 두고 "
                 "LLM_SOLAR_API_KEY=... 를 설정하거나, .env.example을 복사해 채워 넣으세요."
+            )
+        if not os.environ.get("PINECONE_API_KEY"):
+            raise RuntimeError(
+                "PINECONE_API_KEY가 없습니다. 저장소 루트 .env에 "
+                "PINECONE_API_KEY=... 를 설정하세요."
+            )
+        if not os.environ.get("PINECONE_INDEX_NAME"):
+            raise RuntimeError(
+                "PINECONE_INDEX_NAME가 없습니다. 저장소 루트 .env에 "
+                "PINECONE_INDEX_NAME=... 를 설정하세요."
             )
         os.environ.setdefault("UPSTAGE_API_KEY", os.environ["LLM_SOLAR_API_KEY"])
 
@@ -191,47 +203,44 @@ class AICC_NLU_Router:
         if not index_matches_csv:
             if stored:
                 print(
-                    "   ↳ 저장된 Chroma 지문과 FAQ CSV 불일치 — 재색인이 필요합니다."
+                    "   ↳ 저장된 인덱스 지문과 FAQ CSV 불일치 — 재색인이 필요합니다."
                 )
             else:
                 print(
-                    "   ↳ Chroma 지문 파일 없음(구버전 포함) — 필요 시 재색인합니다."
+                    "   ↳ 인덱스 지문 파일 없음(구버전 포함) — 필요 시 재색인합니다."
                 )
 
-        loaded = False
-        if index_matches_csv and _chroma_sqlite_exists(persist_path):
-            try:
-                print("   ↳ Chroma: 동일 지문 확인, persist에서 로드 시도...")
-                candidate = Chroma(
-                    persist_directory=persist_dir,
-                    embedding_function=self.embeddings,
-                )
-                probe = candidate.get(limit=1, include=[])
-                if probe.get("ids"):
-                    self.vector_db = candidate
-                    loaded = True
-                    print(
-                        f"   ↳ Chroma 로드 완료 (재임베딩 없음, ⏱️ {time.perf_counter() - t0:.3f}s)"
-                    )
-                else:
-                    print("   ↳ Chroma persist는 있으나 문서가 없어 재구축합니다.")
-            except Exception as e:
-                print(f"   ⚠️ Chroma 로드 실패, 재구축합니다: {e}")
+        index_name = os.environ["PINECONE_INDEX_NAME"]
+        pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
+        index = pc.Index(index_name)
+        index_stats = index.describe_index_stats()
+        total_vectors = _pinecone_total_vector_count(index_stats)
+        needs_rebuild = (not index_matches_csv) or (total_vectors == 0)
 
-        if not loaded:
-            if persist_path.is_dir():
-                print("   ↳ 기존 Chroma persist 디렉터리를 비우고 재구축합니다…")
-                shutil.rmtree(persist_path)
-            print("   ↳ Chroma Vector DB 적재 중(최초 구축 또는 재구축)...")
-            self.vector_db = Chroma.from_documents(
+        if needs_rebuild:
+            if total_vectors > 0 and not index_matches_csv:
+                print("   ↳ 기존 Pinecone 인덱스 데이터를 전체 삭제 후 재색인합니다...")
+                index.delete(delete_all=True)
+                time.sleep(2)
+            print("   ↳ Pinecone Vector DB 적재 중(최초 구축 또는 재구축)...")
+            self.vector_db = PineconeVectorStore.from_documents(
                 documents=self.docs,
                 embedding=self.embeddings,
-                persist_directory=persist_dir,
+                index_name=index_name,
             )
             _write_index_fingerprint(
                 persist_path, source_name=faq_csv.name, sha256_hex=csv_fp
             )
-            print(f"   ↳ Chroma 적재 및 지문 저장 완료 (⏱️ {time.perf_counter() - t0:.3f}s)")
+            print(
+                f"   ↳ Pinecone 적재 및 지문 저장 완료 (⏱️ {time.perf_counter() - t0:.3f}s)"
+            )
+        else:
+            print(f"   ↳ Pinecone 기존 인덱스 연결 (벡터 {total_vectors}건)...")
+            self.vector_db = PineconeVectorStore(
+                index_name=index_name,
+                embedding=self.embeddings,
+            )
+            print(f"   ↳ Pinecone 연결 완료 (⏱️ {time.perf_counter() - t0:.3f}s)")
 
     def _warm_up_cache(self) -> None:
         t0 = time.perf_counter()
@@ -373,7 +382,7 @@ class AICC_NLU_Router:
         t0 = time.perf_counter()
         vector_res = self.vector_db.similarity_search_by_vector(query_vector, k=1)
         timings["rag_search_sec"] = time.perf_counter() - t0
-        print(f"  🔎 [4] Chroma 벡터 검색 (⏱️ {timings['rag_search_sec']:.3f}s)")
+        print(f"  🔎 [4] Pinecone 벡터 검색 (⏱️ {timings['rag_search_sec']:.3f}s)")
 
         retrieved_context = ""
         metadata: dict[str, Any] = {}
