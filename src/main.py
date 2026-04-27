@@ -8,6 +8,7 @@ from common.exceptions import ValidationException
 from fastapi.responses import StreamingResponse
 from llm.mock import mock_llm_stream, sentence_chunker
 from src.stt.streaming.websocket_stream import router as stt_router
+import os
 
 app = FastAPI(title="금융 챗봇 TTS API")
 
@@ -26,7 +27,7 @@ async def root():
     return {"message": "금융 챗봇 TTS API가 정상 동작 중입니다."}
 
 @app.get("/tts/test")
-async def tts_test(text: str = None):
+async def tts_test(text: str | None = None):
     """
     에러 핸들링 테스트를 위한 엔드포인트입니다.
     텍스트가 없으면 ValidationException을, TTS 호출 실패 시 TTSException을 발생시킵니다.
@@ -39,10 +40,23 @@ async def tts_test(text: str = None):
         )
     
     # 2. TTS 서비스 호출 (에러 발생 시 전역 처리기가 자동으로 낚아챔)
-    service = TTSFactory.get_service("azure")
-    resp = LLMResponse(session_id="api_test", provider="azure", text=text, latency_ms=0)
+    tts_provider = os.getenv("TTS_PROVIDER", "openai").strip().lower()
+    service = TTSFactory.get_service(tts_provider)
+    
+    # LLMResponse 생성 (필수 인자 모두 포함)
+    resp = LLMResponse(
+        session_id="api_test", 
+        provider=tts_provider, 
+        text=text, 
+        latency_ms=0,
+        ttft_ms=0,
+        finish_reason="stop",
+        grounded=False,
+        error=None
+    )
     
     audio_chunks = []
+    # async generator에 대한 올바른 호출
     async for chunk in service.stream(resp):
         audio_chunks.append(chunk)
         
@@ -52,11 +66,14 @@ async def tts_test(text: str = None):
     }
 
 @app.get("/tts/stream")
-async def tts_stream(text: str = None):
+async def tts_stream(text: str | None = None):
     """
     LLM의 가상 스트림을 문장 단위로 버퍼링하고, 
     각 문장이 완성될 때마다 TTS로 합성하여 오디오 바이트를 스트리밍합니다.
     """
+    if text is None:
+        text = ""
+        
     async def audio_generator():
         # 1. LLM 토큰 스트림 생성
         llm_stream = mock_llm_stream(text)
@@ -64,17 +81,22 @@ async def tts_stream(text: str = None):
         # 2. 문장 단위 Chunker 연결
         sentences = sentence_chunker(llm_stream)
         
-        # 3. TTS 서비스 초기화 (Azure 사용)
-        tts_service = TTSFactory.get_service("azure")
+        # 3. TTS 서비스 초기화
+        tts_provider = os.getenv("TTS_PROVIDER", "openai").strip().lower()
+        tts_service = TTSFactory.get_service(tts_provider)
         
         chunk_index = 0
         async for sentence in sentences:
-            # 임시 LLMResponse 객체 생성
+            # 임시 LLMResponse 객체 생성 (필수 인자 포함)
             resp = LLMResponse(
                 session_id=f"stream_test_{chunk_index}", 
-                provider="azure", 
+                provider=tts_provider, 
                 text=sentence, 
-                latency_ms=0
+                latency_ms=0,
+                ttft_ms=0,
+                finish_reason="stop",
+                grounded=False,
+                error=None
             )
             
             # 4. 문장에 대해 음성 합성 실행 및 오디오 바이트 스트리밍
@@ -95,6 +117,7 @@ async def pipeline_stream(payload: WorkflowRoutingInput):
     pipeline = VoiceAIPipeline()
     
     async def audio_generator():
+        # pipeline.run_workflow_to_tts 는 AsyncIterator를 반환하는 메서드여야 합니다.
         async for chunk in pipeline.run_workflow_to_tts(payload):
             yield chunk.audio_bytes
             

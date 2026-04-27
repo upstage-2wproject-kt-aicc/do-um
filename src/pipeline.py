@@ -53,7 +53,11 @@ class VoiceAIPipeline:
             session_id=workflow_output.session_id,
             provider="workflow",
             text=final_text,
-            latency_ms=0
+            latency_ms=0,
+            ttft_ms=0,
+            finish_reason="stop",
+            grounded=False,
+            error=None
         )
         
         # 3. TTS 스트리밍 반환 (provider fallback)
