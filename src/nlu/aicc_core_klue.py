@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import os
 import shutil
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -260,12 +262,70 @@ class AICC_NLU_Router:
             predicted_id = int(outputs.logits.argmax(dim=-1).item())
         return self.intent_map.get(predicted_id, "분류불가")
 
+    async def _intent_embed_parallel_async(self, stt_text: str) -> tuple[str, Any, float, float, float]:
+        """의도(스레드·로컬 추론)와 임베딩(스레드·네트워크 I/O)을 동시에 수행."""
+
+        async def timed_intent() -> tuple[str, float]:
+            t0 = time.perf_counter()
+            out = await asyncio.to_thread(self.predict_intent, stt_text)
+            return out, time.perf_counter() - t0
+
+        async def timed_embed() -> tuple[Any, float]:
+            t0 = time.perf_counter()
+            out = await asyncio.to_thread(self.embeddings.embed_query, stt_text)
+            return out, time.perf_counter() - t0
+
+        wall0 = time.perf_counter()
+        (intent, intent_sec), (query_vector, embed_sec) = await asyncio.gather(
+            timed_intent(),
+            timed_embed(),
+        )
+        wall_sec = time.perf_counter() - wall0
+        return intent, query_vector, intent_sec, embed_sec, wall_sec
+
+    def _intent_embed_parallel_threadpool(self, stt_text: str) -> tuple[str, Any, float, float, float]:
+        """이미 실행 중인 이벤트 루프 안에서는 asyncio.run 불가 → 스레드 풀로 동일 병렬화."""
+
+        intent_sec_local = 0.0
+        embed_sec_local = 0.0
+
+        def timed_intent() -> str:
+            nonlocal intent_sec_local
+            t0 = time.perf_counter()
+            r = self.predict_intent(stt_text)
+            intent_sec_local = time.perf_counter() - t0
+            return r
+
+        def timed_embed() -> Any:
+            nonlocal embed_sec_local
+            t0 = time.perf_counter()
+            r = self.embeddings.embed_query(stt_text)
+            embed_sec_local = time.perf_counter() - t0
+            return r
+
+        wall0 = time.perf_counter()
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            fut_i = pool.submit(timed_intent)
+            fut_e = pool.submit(timed_embed)
+            intent = fut_i.result()
+            query_vector = fut_e.result()
+        wall_sec = time.perf_counter() - wall0
+        return intent, query_vector, intent_sec_local, embed_sec_local, wall_sec
+
+    def _run_intent_embed_parallel(self, stt_text: str) -> tuple[str, Any, float, float, float]:
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self._intent_embed_parallel_async(stt_text))
+        return self._intent_embed_parallel_threadpool(stt_text)
+
     def process_query(self, stt_text: str) -> dict[str, Any]:
         """STT 텍스트 → 의도·RAG·캐시 상태를 담은 dict. 워크플로우에서 분기용."""
         total_t0 = time.perf_counter()
         timings: dict[str, float | None] = {
             "intent_sec": 0.0,
             "embedding_sec": 0.0,
+            "intent_embed_parallel_wall_sec": 0.0,
             "cache_check_sec": 0.0,
             "rag_search_sec": None,
             "total_sec": 0.0,
@@ -274,15 +334,14 @@ class AICC_NLU_Router:
         print("\n" + "=" * 72)
         print(f"📥 [process_query] 고객 발화: {stt_text!r}")
 
-        t0 = time.perf_counter()
-        intent = self.predict_intent(stt_text)
-        timings["intent_sec"] = time.perf_counter() - t0
-        print(f"  🧠 [1] NLU 의도: {intent!r} (⏱️ {timings['intent_sec']:.3f}s)")
-
-        t0 = time.perf_counter()
-        query_vector = self.embeddings.embed_query(stt_text)
-        timings["embedding_sec"] = time.perf_counter() - t0
-        print(f"  📐 [2] 질의 임베딩 완료 (⏱️ {timings['embedding_sec']:.3f}s)")
+        intent, query_vector, i_sec, e_sec, wall_pe = self._run_intent_embed_parallel(stt_text)
+        timings["intent_sec"] = i_sec
+        timings["embedding_sec"] = e_sec
+        timings["intent_embed_parallel_wall_sec"] = wall_pe
+        print(
+            f"  🧠📐 [1+2] NLU 의도 + 임베딩 (병렬 wall ⏱️ {wall_pe:.3f}s, "
+            f"의도 {i_sec:.3f}s, 임베딩 {e_sec:.3f}s) → intent={intent!r}"
+        )
 
         t0 = time.perf_counter()
         max_sim = 0.0
@@ -340,7 +399,6 @@ class AICC_NLU_Router:
         return {
             "status": "REQUIRE_LLM",
             "intent": intent,
-            "query_vector": list(map(float, query_vector)),
             "retrieved_context": retrieved_context,
             "metadata": metadata,
             "cache_max_similarity": max_sim,
@@ -353,7 +411,4 @@ if __name__ == "__main__":
     demo = router.process_query("햇살론 비대면 신청되나요?")
     print("\n📦 [반환 dict 요약]")
     for k, v in demo.items():
-        if k == "query_vector":
-            print(f"  • {k}: <벡터 길이 {len(v)}>")
-        else:
-            print(f"  • {k}: {v!r}")
+        print(f"  • {k}: {v!r}")

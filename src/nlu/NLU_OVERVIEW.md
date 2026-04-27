@@ -1,19 +1,6 @@
 # NLU 모듈 상세 안내서
 
-이 문서는 `src/nlu` 폴더에서 **초기 스켈레톤 상태에서 현재까지** 어떤 변화가 있었는지,  
-그리고 각 파일이 어떤 역할을 하는지 팀원이 빠르게 이해할 수 있도록 정리한 문서입니다.
-
----
-
 ## 1) 배경: 스켈레톤에서 현재 구조로
-
-프로젝트 루트 `README.md` 기준 초기 상태는 다음과 같았습니다.
-
-- NLU는 `src/nlu/classifier.py`의 **인터페이스 중심 스켈레톤**
-- 실제 비즈니스 로직은 비워두고 `NotImplementedError` 형태
-- 모듈 경계(`common/schemas.py`)와 파이프라인 계약만 정의
-
-현재는 NLU가 아래처럼 확장되었습니다.
 
 - **실행 가능한 KLUE 기반 라우터** 추가 (`aicc_core_klue.py`)
 - `.env` 기반 키 관리 추가 (`load_dotenv`)
@@ -31,7 +18,7 @@
 #### `src/nlu/aicc_core_klue.py`
 - 현재 NLU 모듈의 **메인 실행/연동 파일**
 - 주요 기능:
-  - `.env` 로드 및 `LLM_SOLAR_API_KEY` 검증
+  - `.env` 로드 및 `UPSTAGE_API_KEY` 검증
   - 로컬 KLUE 분류 모델 로드 (`my_aicc_nlu_model_klue:roberta-base`)
   - FAQ CSV(`RAG_FAQ.csv`)를 `Document`로 변환
   - BM25 인덱스 생성 + Chroma 벡터 저장소 적재
@@ -39,7 +26,7 @@
   - `process_query()`에서 워크플로우가 사용할 dict 반환
 - 반환 형태:
   - 캐시 적중: `status="CACHED"` + `final_answer`
-  - 캐시 미적중: `status="REQUIRE_LLM"` + `query_vector`/`retrieved_context`/`metadata`
+  - 캐시 미적중: `status="REQUIRE_LLM"` + `retrieved_context`/`metadata` (질의 임베딩 벡터는 응답에 포함하지 않음; 내부에서만 사용)
   - 공통: `intent`, `timings_sec`
 
 #### `src/nlu/RAG_FAQ.csv`
@@ -125,7 +112,7 @@
 
 1. 저장소 루트에서 `.env` 준비  
    - `cp .env.example .env`
-   - `LLM_SOLAR_API_KEY=...` 입력
+   - `UPSTAGE_API_KEY=...` 입력
 2. 의존성 설치  
    - `pip install -r requirements.txt`
 3. 로컬 모델 폴더 준비  
@@ -143,3 +130,4 @@
 - 로컬 산출물(모델/DB)은 계속 `.gitignore` 유지
 - NLU 출력 스키마(`status`, `intent`, `metadata`, `timings_sec`)는 워크플로우와 계약이므로 변경 시 공유 필수
 - 의도 라벨 순서(`intent_map`)는 학습 체크포인트 라벨 인덱스와 항상 동기화
+

@@ -1,4 +1,4 @@
-"""NLU 벤치: 고정 지표(ms) + 캐시 적중률 + (선택) 라벨 CSV로 정확도·A/B 비교."""
+"""NLU 벤치: 고정 지표(초) + 캐시 적중률 + (선택) 라벨 CSV로 정확도·A/B 비교."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import io
 import json
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean
 from typing import Any
@@ -15,6 +16,9 @@ from typing import Any
 import pandas as pd
 
 from aicc_core_klue import AICC_NLU_Router
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_DEFAULT_REPORTS_DIR = _SCRIPT_DIR / "reports"
 
 DEFAULT_QUERIES = [
     "햇살론 비대면 신청되나요?",
@@ -26,10 +30,11 @@ DEFAULT_QUERIES = [
 ]
 
 
-def _sec_to_ms(sec: float | None) -> float:
-    if sec is None:
+def _timing_sec(value: float | None) -> float:
+    """NLU timings_sec 값을 초 단위 float로 (None → 0.0)."""
+    if value is None:
         return 0.0
-    return float(sec) * 1000.0
+    return float(value)
 
 
 def _parse_gold_faq_ids(raw: Any) -> set[str]:
@@ -84,7 +89,10 @@ def _load_eval_rows(csv_path: Path, limit: int) -> list[dict[str, Any]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="NLU 벤치마크 (부팅 + 질의). A/B는 --run-label 과 동일 조건으로 두 번 실행해 비교하세요."
+        description=(
+            "NLU 벤치마크 (부팅 + 질의). 기본적으로 src/nlu/reports/ 에 요약 jsonl·실행 이력 jsonl·최신 스냅샷 json을 저장합니다. "
+            "A/B는 --run-label 과 동일 조건으로 두 번 실행해 비교하세요."
+        )
     )
     parser.add_argument(
         "--run-label",
@@ -109,10 +117,21 @@ def main() -> None:
         help="process_query 상세 로그 숨김 (대량 질의 시 권장)",
     )
     parser.add_argument(
+        "--reports-dir",
+        type=Path,
+        default=_DEFAULT_REPORTS_DIR,
+        help=f"벤치 결과 저장 폴더 (기본: {_DEFAULT_REPORTS_DIR})",
+    )
+    parser.add_argument(
+        "--no-save",
+        action="store_true",
+        help="파일 저장 생략 (터미널 출력만)",
+    )
+    parser.add_argument(
         "--json-summary",
         type=Path,
         default=None,
-        help="요약 1줄 JSON을 이 경로에 추가 기록 (append)",
+        help="요약 1줄 JSON을 이 경로에도 추가 기록 (append, 기본 reports의 jsonl 외 추가)",
     )
     args = parser.parse_args()
 
@@ -134,10 +153,11 @@ def main() -> None:
     router = AICC_NLU_Router()
     boot_sec = time.perf_counter() - boot_t0
 
-    intent_ms_list: list[float] = []
-    embed_ms_list: list[float] = []
-    rag_ms_list: list[float] = []
-    total_ms_list: list[float] = []
+    intent_sec_list: list[float] = []
+    embed_sec_list: list[float] = []
+    parallel_wall_sec_list: list[float] = []
+    rag_sec_list: list[float] = []
+    total_sec_list: list[float] = []
     cache_hits = 0
 
     faq_checked = 0
@@ -147,32 +167,35 @@ def main() -> None:
     sub_checked = 0
     sub_correct = 0
 
-    print(f"\n⏱️ [벤치] 부팅(초기화): {boot_sec * 1000:.1f} ms")
+    print(f"\n⏱️ [벤치] 부팅(초기화): {boot_sec:.4f} s")
     if router.rag_source_fingerprint_sha256:
         fp = router.rag_source_fingerprint_sha256
         print(f"📌 [벤치] RAG 소스 지문 SHA256: {fp[:16]}…\n")
 
     print("-" * 72)
     print(
-        "고정 컬럼(행별): status | intent_ms | embed_ms | rag_ms | total_ms | "
-        "(평가 CSV 시) faq_hit handoff_ok sub_ok"
+        "고정 컬럼(행별): status | intent_s | embed_s | parallel_wall_s | rag_s | total_s | "
+        "(평가 CSV 시) faq_hit handoff_ok sub_ok  (단위: 초)"
     )
     print("-" * 72)
 
+    per_query: list[dict[str, Any]] = []
     for idx, q in enumerate(queries):
         ctx = contextlib.redirect_stdout(io.StringIO()) if args.quiet else contextlib.nullcontext()
         with ctx:
             out = router.process_query(q)
         t = out.get("timings_sec", {})
-        intent_ms = _sec_to_ms(t.get("intent_sec"))
-        embed_ms = _sec_to_ms(t.get("embedding_sec"))
-        rag_ms = _sec_to_ms(t.get("rag_search_sec"))
-        total_ms = _sec_to_ms(t.get("total_sec"))
+        intent_s = _timing_sec(t.get("intent_sec"))
+        embed_s = _timing_sec(t.get("embedding_sec"))
+        parallel_wall_s = _timing_sec(t.get("intent_embed_parallel_wall_sec"))
+        rag_s = _timing_sec(t.get("rag_search_sec"))
+        total_s = _timing_sec(t.get("total_sec"))
 
-        intent_ms_list.append(intent_ms)
-        embed_ms_list.append(embed_ms)
-        rag_ms_list.append(rag_ms)
-        total_ms_list.append(total_ms)
+        intent_sec_list.append(intent_s)
+        embed_sec_list.append(embed_s)
+        parallel_wall_sec_list.append(parallel_wall_s)
+        rag_sec_list.append(rag_s)
+        total_sec_list.append(total_s)
 
         st = out.get("status", "")
         if st == "CACHED":
@@ -215,24 +238,52 @@ def main() -> None:
         if not args.quiet:
             pass
         print(
-            f"[{st}] intent={intent_ms:.1f} embed={embed_ms:.1f} rag={rag_ms:.1f} "
-            f"total={total_ms:.1f} | faq={faq_hit_s} ho={ho_s} sub={sub_s} | {q[:56]}"
+            f"[{st}] intent={intent_s:.4f}s embed={embed_s:.4f}s "
+            f"parallel_wall={parallel_wall_s:.4f}s rag={rag_s:.4f}s "
+            f"total={total_s:.4f}s | faq={faq_hit_s} ho={ho_s} sub={sub_s} | {q[:56]}"
             + ("…" if len(q) > 56 else "")
+        )
+        per_query.append(
+            {
+                "idx": idx,
+                "query": q,
+                "status": st,
+                "intent": out.get("intent"),
+                "intent_sec": round(intent_s, 6),
+                "embed_sec": round(embed_s, 6),
+                "intent_embed_parallel_wall_sec": round(parallel_wall_s, 6),
+                "rag_sec": round(rag_s, 6),
+                "total_sec": round(total_s, 6),
+                "faq_hit": faq_hit_s,
+                "handoff_ok": ho_s,
+                "subdomain_ok": sub_s,
+            }
         )
 
     n = len(queries)
     cache_rate = cache_hits / n if n else 0.0
-    rag_nonzero = [x for x in rag_ms_list if x > 0]
+    rag_nonzero = [x for x in rag_sec_list if x > 0]
+    saved_at = datetime.now(timezone.utc).isoformat()
+    eval_csv_str = str(args.eval_csv.resolve()) if args.eval_csv is not None else None
+
     summary = {
+        "saved_at_utc": saved_at,
+        "time_unit": "seconds",
         "run_label": args.run_label or None,
+        "eval_csv": eval_csv_str,
+        "eval_limit": args.limit if args.eval_csv is not None else None,
+        "quiet": args.quiet,
         "n_queries": n,
-        "boot_ms": round(boot_sec * 1000, 3),
+        "boot_sec": round(boot_sec, 6),
         "rag_source_sha256_prefix": (router.rag_source_fingerprint_sha256 or "")[:16],
-        "mean_intent_ms": round(mean(intent_ms_list), 3) if intent_ms_list else 0.0,
-        "mean_embed_ms": round(mean(embed_ms_list), 3) if embed_ms_list else 0.0,
-        "mean_rag_ms": round(mean(rag_ms_list), 3) if rag_ms_list else 0.0,
-        "mean_rag_ms_nonzero_only": round(mean(rag_nonzero), 3) if rag_nonzero else 0.0,
-        "mean_total_ms": round(mean(total_ms_list), 3) if total_ms_list else 0.0,
+        "mean_intent_sec": round(mean(intent_sec_list), 6) if intent_sec_list else 0.0,
+        "mean_embed_sec": round(mean(embed_sec_list), 6) if embed_sec_list else 0.0,
+        "mean_intent_embed_parallel_wall_sec": round(mean(parallel_wall_sec_list), 6)
+        if parallel_wall_sec_list
+        else 0.0,
+        "mean_rag_sec": round(mean(rag_sec_list), 6) if rag_sec_list else 0.0,
+        "mean_rag_sec_nonzero_only": round(mean(rag_nonzero), 6) if rag_nonzero else 0.0,
+        "mean_total_sec": round(mean(total_sec_list), 6) if total_sec_list else 0.0,
         "cache_hit_rate": round(cache_rate, 6),
         "faq_acc": round(faq_correct / faq_checked, 6) if faq_checked else None,
         "faq_eval_n": faq_checked,
@@ -246,14 +297,15 @@ def main() -> None:
 
     print("-" * 72)
     print("\n📊 [A/B 고정 요약] run_label=", repr(args.run_label or "(없음)"))
-    print(f"• 부팅_ms: {summary['boot_ms']}")
+    print(f"• 부팅_sec: {summary['boot_sec']}")
     print(
-        f"• mean intent_ms / embed_ms / rag_ms / total_ms: "
-        f"{summary['mean_intent_ms']} / {summary['mean_embed_ms']} / "
-        f"{summary['mean_rag_ms']} / {summary['mean_total_ms']}"
+        f"• mean intent_sec / embed_sec / parallel_wall_sec / rag_sec / total_sec: "
+        f"{summary['mean_intent_sec']} / {summary['mean_embed_sec']} / "
+        f"{summary['mean_intent_embed_parallel_wall_sec']} / {summary['mean_rag_sec']} / "
+        f"{summary['mean_total_sec']}"
     )
     print(
-        f"• mean rag_ms (RAG 호출한 행만): {summary['mean_rag_ms_nonzero_only']} "
+        f"• mean rag_sec (RAG 호출한 행만): {summary['mean_rag_sec_nonzero_only']} "
         f"(캐시 적중 행은 rag=0으로 집계)"
     )
     print(f"• cache_hit_rate: {summary['cache_hit_rate']:.4f} ({cache_hits}/{n})")
@@ -280,12 +332,39 @@ def main() -> None:
         print("• subdomain_acc: (expected_subdomain 없음)")
     print("=" * 72)
 
-    if args.json_summary:
-        line = json.dumps(summary, ensure_ascii=False)
-        args.json_summary.parent.mkdir(parents=True, exist_ok=True)
-        with args.json_summary.open("a", encoding="utf-8") as f:
-            f.write(line + "\n")
-        print(f"\n📝 JSON 요약 append: {args.json_summary}")
+    if not args.no_save:
+        reports_dir = args.reports_dir.resolve()
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        summary_line = json.dumps(summary, ensure_ascii=False)
+        jsonl_path = reports_dir / "nlu_bench_summary.jsonl"
+        with jsonl_path.open("a", encoding="utf-8") as f:
+            f.write(summary_line + "\n")
+
+        last_run = {
+            "saved_at_utc": saved_at,
+            "summary": summary,
+            "per_query": per_query,
+        }
+        runs_jsonl_path = reports_dir / "nlu_bench_runs.jsonl"
+        with runs_jsonl_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(last_run, ensure_ascii=False) + "\n")
+
+        last_path = reports_dir / "nlu_bench_last_run.json"
+        last_path.write_text(
+            json.dumps(last_run, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"\n📝 벤치 결과 저장:")
+        print(f"   • 요약만(누적): {jsonl_path}")
+        print(f"   • 실행 전체(누적, 한 줄=한 번 실행): {runs_jsonl_path}")
+        print(f"   • 최신 실행만(읽기 편한 JSON): {last_path}")
+
+        if args.json_summary is not None:
+            extra = args.json_summary.resolve()
+            extra.parent.mkdir(parents=True, exist_ok=True)
+            with extra.open("a", encoding="utf-8") as f:
+                f.write(summary_line + "\n")
+            print(f"   • 추가 요약 append: {extra}")
 
 
 if __name__ == "__main__":
