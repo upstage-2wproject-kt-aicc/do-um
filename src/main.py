@@ -39,8 +39,10 @@ async def tts_test(text: str = None):
         )
     
     # 2. TTS 서비스 호출 (에러 발생 시 전역 처리기가 자동으로 낚아챔)
-    service = TTSFactory.get_service("azure")
-    resp = LLMResponse(session_id="api_test", provider="azure", text=text, latency_ms=0)
+    import os
+    tts_provider = os.getenv("TTS_PROVIDER", "openai").strip().lower()
+    service = TTSFactory.get_service(tts_provider)
+    resp = LLMResponse(session_id="api_test", provider=tts_provider, text=text, latency_ms=0)
     
     audio_chunks = []
     async for chunk in service.stream(resp):
@@ -64,15 +66,17 @@ async def tts_stream(text: str = None):
         # 2. 문장 단위 Chunker 연결
         sentences = sentence_chunker(llm_stream)
         
-        # 3. TTS 서비스 초기화 (Azure 사용)
-        tts_service = TTSFactory.get_service("azure")
+        # 3. TTS 서비스 초기화
+        import os
+        tts_provider = os.getenv("TTS_PROVIDER", "openai").strip().lower()
+        tts_service = TTSFactory.get_service(tts_provider)
         
         chunk_index = 0
         async for sentence in sentences:
             # 임시 LLMResponse 객체 생성
             resp = LLMResponse(
                 session_id=f"stream_test_{chunk_index}", 
-                provider="azure", 
+                provider=tts_provider, 
                 text=sentence, 
                 latency_ms=0
             )

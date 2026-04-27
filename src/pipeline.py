@@ -14,7 +14,7 @@ class VoiceAIPipeline:
 
     def __init__(self):
         # 팩토리를 통해 TTS 서비스를 동적으로 주입합니다.
-        tts_provider = os.getenv("TTS_PROVIDER", "azure").strip().lower()
+        tts_provider = os.getenv("TTS_PROVIDER", "openai").strip().lower()
         self.tts_service = TTSFactory.get_service(tts_provider)
 
     async def run_workflow_to_tts(self, payload: WorkflowRoutingInput) -> AsyncIterator[TTSChunk]:
