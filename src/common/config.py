@@ -1,16 +1,14 @@
-"""음성 AI 애플리케이션을 위한 중앙 설정 모듈입니다."""
-
 import os
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-# .env 환경변수 로드
-load_dotenv()
+# .env 환경변수 로드 (명시적으로 현재 디렉토리 및 상위 디렉토리 탐색)
+load_dotenv(override=True)
 
 
 class OpenAITTSConfig(BaseModel):
     """OpenAI TTS 설정"""
-    api_key: str = Field(default_factory=lambda: os.environ.get("LLM_GPT_API_KEY", ""))
+    api_key: str = Field(default_factory=lambda: os.environ.get("OPENAI_API_KEY", ""))
     voice: str = Field("alloy", description="OpenAI 음성 모델")
     model: str = Field("tts-1", description="OpenAI TTS 모델 (tts-1, tts-1-hd)")
 

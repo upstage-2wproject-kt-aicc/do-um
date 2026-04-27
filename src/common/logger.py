@@ -39,3 +39,33 @@ logger.add(
 def get_logger():
     """설정된 전역 로거 인스턴스를 반환합니다."""
     return logger
+
+class TTAMetrics:
+    """
+    TTS 성능 지표(TTFA, TTL) 측정을 위한 클래스
+    """
+    def __init__(self, session_id: str):
+        self.session_id = session_id
+        self.start_time = None
+        self.ttfa = None
+        self.ttl = None
+
+    def start(self):
+        import time
+        self.start_time = time.perf_counter()
+
+    def record_first_chunk(self):
+        import time
+        if self.start_time and self.ttfa is None:
+            self.ttfa = (time.perf_counter() - self.start_time) * 1000
+
+    def record_last_chunk(self):
+        import time
+        if self.start_time:
+            self.ttl = (time.perf_counter() - self.start_time) * 1000
+
+    def log_results(self, provider: str):
+        if self.ttfa is not None:
+            logger.info(f"[{provider}] Metrics - Session: {self.session_id} | TTFA: {self.ttfa:.2f}ms | TTL: {self.ttl:.2f}ms")
+        else:
+            logger.warning(f"[{provider}] Metrics - No audio chunks recorded for Session: {self.session_id}")

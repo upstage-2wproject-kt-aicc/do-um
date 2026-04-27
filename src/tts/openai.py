@@ -33,7 +33,7 @@ class OpenAITTSService(BaseTTSService):
         else:
             logger.warning("OpenAI API 키가 설정되지 않았습니다.")
 
-    async def stream(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
+    async def _stream_impl(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
         """
         OpenAI TTS API로부터 오디오를 청크 단위로 직접 스트리밍합니다.
         """
@@ -48,7 +48,6 @@ class OpenAITTSService(BaseTTSService):
             return
 
         normalized_text = self._normalize_financial_text(raw_text)
-        logger.debug("OpenAI TTS 스트리밍을 시작합니다. [Text: {}]", normalized_text[:20] + "...")
 
         try:
             # OpenAI로부터 직접 비동기 스트리밍 수신
