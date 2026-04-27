@@ -6,6 +6,13 @@ import os
 
 from src.common.schemas import LLMRequest, RouteType, WorkflowRoutingInput
 
+ROUTE_MAX_TOKENS: dict[RouteType, int] = {
+    RouteType.FAQ: 512,
+    RouteType.PROCEDURE: 448,
+    RouteType.SECURITY: 320,
+    RouteType.HANDOFF: 160,
+}
+
 
 class ContextBuilder:
     """Builds one consolidated prompt from multi-source workflow context."""
@@ -26,7 +33,7 @@ class ContextBuilder:
         self, payload: WorkflowRoutingInput, route: RouteType, system_prompt: str
     ) -> LLMRequest:
         """Builds an LLM request model from workflow routing input."""
-        max_tokens = int(os.getenv("WORKFLOW_MAX_TOKENS", "220"))
+        max_tokens = int(os.getenv("WORKFLOW_MAX_TOKENS", str(ROUTE_MAX_TOKENS[route])))
         return LLMRequest(
             session_id=payload.session_id,
             prompt=self.build_prompt(payload),

@@ -55,7 +55,7 @@ async def startup_event() -> None:
 async def stt_websocket(websocket: WebSocket):
     """30ms PCM 청크를 수신해 STT+NLU 결과를 JSON으로 반환."""
     await websocket.accept()
-    stt_provider = os.getenv("STT_PROVIDER", "google").strip().lower()
+    stt_provider = os.getenv("STT_PROVIDER", "openai").strip().lower()
     pipeline = StreamingPipeline(
         google_project_id=os.getenv("GOOGLE_PROJECT_ID", ""),
         stt_provider="openai" if stt_provider == "openai" else "google",

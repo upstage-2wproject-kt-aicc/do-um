@@ -13,7 +13,14 @@ except ModuleNotFoundError:  # pragma: no cover - runtime dependency guard
     END = "__end__"
     StateGraph = object  # type: ignore[assignment]
 
-from src.common.schemas import IntentResult, RouteType, Transcript, WorkflowRoutingInput, WorkflowRoutingResult
+from src.common.schemas import (
+    IntentResult,
+    NLUEvidence,
+    RouteType,
+    Transcript,
+    WorkflowRoutingInput,
+    WorkflowRoutingResult,
+)
 from src.common.schemas import WorkflowOutput
 from src.workflow.context_builder import ContextBuilder
 from src.workflow.formatter import format_workflow_output
@@ -33,6 +40,7 @@ SECURITY_KEYWORDS: tuple[str, ...] = (
     "잠김",
     "명의도용",
 )
+LLM_SERVICE = MultiLLMService()
 
 
 def _is_high_risk(value: Any) -> bool:
@@ -69,24 +77,30 @@ async def security_node(state: WorkflowRoutingInput) -> WorkflowRoutingInput:
 
 def route_selector(state: WorkflowRoutingInput) -> RouteType:
     """Selects one of the four workflow routes."""
+    route, _ = _select_route_with_reason(state)
+    return route
+
+
+def _select_route_with_reason(state: WorkflowRoutingInput) -> tuple[RouteType, str]:
+    """Selects route and keeps human-readable decision reason."""
     text_space = " ".join(
         [state.original_query, state.routing_info.subdomain, state.routing_info.domain]
     ).lower()
     if any(keyword in text_space for keyword in SECURITY_KEYWORDS):
-        return RouteType.SECURITY
+        return RouteType.SECURITY, "security_keyword_match"
 
     metadata = state.routing_info.metadata
     if _is_high_risk(metadata.get("risk_level")):
-        return RouteType.HANDOFF
+        return RouteType.HANDOFF, "metadata_risk_level_high"
     if _is_handoff_required(metadata.get("handoff_required")):
-        return RouteType.HANDOFF
+        return RouteType.HANDOFF, "metadata_handoff_required"
 
     intent = state.routing_info.intent.strip()
     if intent == "민원형":
-        return RouteType.HANDOFF
+        return RouteType.HANDOFF, "intent_complaint"
     if intent == "절차형":
-        return RouteType.PROCEDURE
-    return RouteType.FAQ
+        return RouteType.PROCEDURE, "intent_procedure"
+    return RouteType.FAQ, "default_faq"
 
 
 def build_workflow_graph() -> StateGraph:
@@ -171,15 +185,34 @@ def load_and_route_json(path: str | Path) -> list[WorkflowRoutingResult]:
 
 async def execute_workflow_item(payload: WorkflowRoutingInput) -> WorkflowOutput:
     """Executes one workflow item from routing to normalized output."""
-    route = route_selector(payload)
+    route, route_reason = _select_route_with_reason(payload)
     builder = ContextBuilder()
     request = builder.build_request(
         payload=payload,
         route=route,
         system_prompt=build_system_prompt(route),
     )
-    batch = await MultiLLMService().invoke_all(request)
-    return format_workflow_output(batch)
+    batch = await LLM_SERVICE.invoke_all(request)
+    output = format_workflow_output(batch)
+    source_url = str(payload.routing_info.metadata.get("source_url", "")).strip()
+    reference_links = output.reference_links
+    if source_url and not reference_links:
+        reference_links = [source_url]
+    evidence = NLUEvidence(
+        intent=payload.routing_info.intent,
+        domain=payload.routing_info.domain,
+        subdomain=payload.routing_info.subdomain,
+        router_confidence=payload.routing_info.router_confidence,
+        selected_route=route,
+        route_reason=route_reason,
+        metadata=payload.routing_info.metadata,
+    )
+    return output.model_copy(
+        update={
+            "nlu_evidence": evidence,
+            "reference_links": reference_links,
+        }
+    )
 
 
 async def execute_workflow_json(path: str | Path) -> list[WorkflowOutput]:

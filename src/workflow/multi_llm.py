@@ -70,6 +70,8 @@ class MultiLLMService:
         self.reset_timeout_s = 20.0
         self._failure_count: dict[str, int] = {}
         self._opened_at: dict[str, float] = {}
+        self._timeout = httpx.Timeout(connect=3.0, read=8.0, write=8.0, pool=3.0)
+        self._client = httpx.AsyncClient(timeout=self._timeout)
 
     async def call_solar(self, request: LLMRequest) -> LLMResponse:
         """Calls Solar model with a normalized request."""
@@ -188,6 +190,8 @@ class MultiLLMService:
         key = os.getenv(config.key_env, "").strip()
         model = os.getenv(config.model_env, "").strip()
         base_url = os.getenv(config.base_url_env, config.default_base_url).strip()
+        if config.provider == "solar" and base_url.rstrip("/").endswith("/v2"):
+            base_url = "https://api.upstage.ai/v1"
         if not key:
             return self._error_result(request.session_id, config.provider, "MISSING_API_KEY")
         if not model:
@@ -211,22 +215,9 @@ class MultiLLMService:
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
         }
-        timeout = httpx.Timeout(connect=5.0, read=15.0, write=10.0, pool=5.0)
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(url, json=payload, headers=headers)
-            if (
-                config.provider == "solar"
-                and response.status_code == 404
-                and "/v2" in base_url.rstrip("/")
-            ):
-                fallback_url = "https://api.upstage.ai/v1/chat/completions"
-                logger.warning(
-                    "Solar v2 endpoint returned 404. Falling back to v1: %s",
-                    fallback_url,
-                )
-                response = await client.post(fallback_url, json=payload, headers=headers)
-            response.raise_for_status()
-            body = response.json()
+        response = await self._client.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        body = response.json()
         ended = time.perf_counter()
         latency_ms = int((ended - started) * 1000)
 
