@@ -5,7 +5,7 @@ import pytest
 from src.common.schemas import LLMRequest, LLMResponse
 from src.evaluation.clients import (
     AnthropicChatClient,
-    GeminiChatClient,
+    GoogleVertexGeminiChatClient,
     OpenAICompatibleChatClient,
     build_judge_user_prompt,
     parse_judge_json,
@@ -172,50 +172,71 @@ async def test_anthropic_judge_client_uses_candidate_key_fallback(monkeypatch) -
 
 
 @pytest.mark.asyncio
-async def test_gemini_client_generates_response(monkeypatch) -> None:
-    fake = FakeAsyncClient(
-        FakeResponse(
-            {
-                "candidates": [
-                    {"content": {"parts": [{"text": "제미나이 답변"}]}, "finishReason": "STOP"}
-                ],
-                "usageMetadata": {"promptTokenCount": 5, "candidatesTokenCount": 2},
-            }
-        )
+async def test_google_vertex_gemini_client_uses_project_location_and_model(
+    monkeypatch,
+) -> None:
+    calls: dict[str, object] = {}
+
+    class FakeModels:
+        def generate_content(self, **kwargs):
+            calls["generate_content"] = kwargs
+            return type(
+                "FakeVertexResponse",
+                (),
+                {
+                    "text": "버텍스 답변",
+                    "usage_metadata": type(
+                        "FakeUsage",
+                        (),
+                        {
+                            "prompt_token_count": 5,
+                            "candidates_token_count": 2,
+                            "total_token_count": 7,
+                        },
+                    )(),
+                    "candidates": [
+                        type(
+                            "FakeCandidate",
+                            (),
+                            {"finish_reason": "STOP"},
+                        )()
+                    ],
+                },
+            )()
+
+    class FakeGenaiClient:
+        def __init__(self, **kwargs) -> None:
+            calls["client"] = kwargs
+            self.models = FakeModels()
+
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "project-test")
+    monkeypatch.setenv("GOOGLE_CLOUD_LOCATION", "global")
+
+    response = await GoogleVertexGeminiChatClient(
+        client_factory=FakeGenaiClient
+    ).generate(
+        CandidateModel(provider="google", model_id="gemini-2.5-pro"),
+        LLMRequest(
+            session_id="s1",
+            prompt="질문",
+            system_prompt="시스템",
+            max_tokens=64,
+        ),
     )
-    monkeypatch.setenv("JUDGE_GOOGLE_API_KEY", "test-key")
-    monkeypatch.setattr("src.evaluation.clients.httpx.AsyncClient", lambda **_: fake)
 
-    client = GeminiChatClient(api_key_env="JUDGE_GOOGLE_API_KEY")
-    response = await client.generate(
-        CandidateModel(provider="google", model_id="gemini-test"),
-        LLMRequest(session_id="s1", prompt="질문", system_prompt="시스템"),
-    )
-
-    assert response.text == "제미나이 답변"
-    assert response.provider == "google"
-    assert "system_instruction" in fake.requests[0]["json"]
-
-
-@pytest.mark.asyncio
-async def test_gemini_client_uses_llm_gemini_key_fallback(monkeypatch) -> None:
-    fake = FakeAsyncClient(
-        FakeResponse(
-            {
-                "candidates": [{"content": {"parts": [{"text": "제미나이 평가"}]}}],
-            }
-        )
-    )
-    monkeypatch.delenv("JUDGE_GOOGLE_API_KEY", raising=False)
-    monkeypatch.setenv("LLM_GEMINI_API_KEY", "fallback-gemini-key")
-    monkeypatch.setattr("src.evaluation.clients.httpx.AsyncClient", lambda **_: fake)
-
-    await GeminiChatClient(api_key_env=("JUDGE_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY")).generate(
-        CandidateModel(provider="google", model_id="gemini-judge"),
-        LLMRequest(session_id="s1", prompt="질문", system_prompt="시스템"),
-    )
-
-    assert fake.requests[0]["headers"]["x-goog-api-key"] == "fallback-gemini-key"
+    assert calls["client"] == {
+        "vertexai": True,
+        "project": "project-test",
+        "location": "global",
+    }
+    assert calls["generate_content"]["model"] == "gemini-2.5-pro"
+    assert calls["generate_content"]["contents"] == "질문"
+    assert response.text == "버텍스 답변"
+    assert response.token_usage == {
+        "promptTokenCount": 5,
+        "candidatesTokenCount": 2,
+        "totalTokenCount": 7,
+    }
 
 
 def test_parse_judge_json_validates_metric_scores() -> None:

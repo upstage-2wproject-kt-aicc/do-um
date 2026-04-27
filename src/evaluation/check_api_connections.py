@@ -14,7 +14,7 @@ import httpx
 from src.common.schemas import LLMRequest
 from src.evaluation.clients import (
     AnthropicChatClient,
-    GeminiChatClient,
+    GoogleVertexGeminiChatClient,
     OpenAICompatibleChatClient,
 )
 from src.evaluation.env import load_evaluation_env
@@ -29,11 +29,7 @@ async def main() -> None:
         _check_openai_compatible("solar", "LLM_SOLAR_MODEL"),
         _check_openai_compatible("gpt", "LLM_GPT_MODEL"),
         _check_anthropic("claude-sonnet", "LLM_CLAUDE_SONNET_MODEL"),
-        _check_gemini(
-            "google-candidate",
-            ("LLM_GOOGLE_MODEL", "LLM_GEMINI_MODEL"),
-            ("LLM_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY"),
-        ),
+        _check_vertex_gemini("google-candidate", "LLM_GOOGLE_VERTEX_MODEL"),
         _check_openai_compatible(
             "openai",
             (
@@ -45,11 +41,7 @@ async def main() -> None:
         _check_anthropic(
             "anthropic", ("JUDGE_ANTHROPIC_MODEL", "EVALUATION_PROVIDER_CLAUDE_MODEL")
         ),
-        _check_gemini(
-            "google-judge",
-            ("JUDGE_GOOGLE_MODEL", "EVALUATION_PROVIDER_GEMINI_MODEL"),
-            ("JUDGE_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY", "LLM_GOOGLE_API_KEY"),
-        ),
+        _check_vertex_gemini("google-judge", "JUDGE_GOOGLE_VERTEX_MODEL"),
     ]
     results = await asyncio.gather(*checks)
     for result in results:
@@ -92,14 +84,12 @@ async def _check_anthropic(provider: str, model_env: EnvNames) -> str:
         return f"{provider}/{model_id}: FAIL {_format_exception(exc)}"
 
 
-async def _check_gemini(
-    provider: str, model_env: EnvNames, api_key_env: EnvNames
-) -> str:
+async def _check_vertex_gemini(provider: str, model_env: EnvNames) -> str:
     model_id = _first_env(model_env)
     if not model_id:
         return f"{provider}: SKIP missing {_env_label(model_env)}"
     try:
-        response = await GeminiChatClient(api_key_env=api_key_env, timeout_s=10.0).generate(
+        response = await GoogleVertexGeminiChatClient().generate(
             CandidateModel(provider=provider, model_id=model_id),
             _ping_request(provider),
         )
