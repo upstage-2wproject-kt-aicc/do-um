@@ -50,17 +50,16 @@ class AzureTTSService(BaseTTSService):
         </speak>
         """
 
-    async def stream(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
+    async def _stream_impl(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
         raw_text = response.text
         if not raw_text or not raw_text.strip():
             return
             
         normalized_text = self._normalize_financial_text(raw_text)
         
-        # 캐시 확인
+        # 1. 캐시 확인
         cache_key = f"{self.config.voice}:{normalized_text}"
         if cache_key in self.audio_cache:
-            logger.info("캐시된 Azure 오디오를 반환합니다. [Key: {}]", cache_key)
             yield TTSChunk(
                 session_id=response.session_id,
                 chunk_id=0,
@@ -75,34 +74,59 @@ class AzureTTSService(BaseTTSService):
                 error_code="AZURE_CONFIG_ERROR"
             )
 
-        ssml = self._build_ssml(normalized_text)
-        synthesizer = self.speechsdk.SpeechSynthesizer(speech_config=self.speech_config, audio_config=None)
+        # 2. Azure 스트리밍 설정
+        pull_stream = self.speechsdk.audio.PullAudioOutputStream()
+        audio_config = self.speechsdk.audio.AudioOutputConfig(stream=pull_stream)
+        synthesizer = self.speechsdk.SpeechSynthesizer(
+            speech_config=self.speech_config, 
+            audio_config=audio_config
+        )
         
-        def _synthesize():
-            return synthesizer.speak_ssml(ssml)
-
-        logger.debug("Azure TTS 합성을 시작합니다. [Text: {}]", normalized_text[:20] + "...")
-        result = await asyncio.to_thread(_synthesize)
-
-        if result.reason == self.speechsdk.ResultReason.SynthesizingAudioCompleted:
-            audio_data = result.audio_data
-            self.audio_cache[cache_key] = audio_data
+        ssml = self._build_ssml(normalized_text)
+        
+        # 합성을 비동기로 시작 (스레드 풀 활용)
+        result_future = synthesizer.start_speaking_ssml_async(ssml)
+        
+        # 3. 데이터 읽기 및 yield 루프
+        chunk_index = 0
+        all_audio = bytearray()
+        buffer = bytearray(8192) # 8KB 가변 버퍼 (SDK write용)
+        
+        try:
+            while True:
+                # read()는 Blocking이므로 별도 스레드에서 실행
+                filled_size = await asyncio.to_thread(pull_stream.read, buffer)
+                if filled_size == 0:
+                    break
+                
+                chunk_bytes = buffer[:filled_size]
+                all_audio.extend(chunk_bytes)
+                
+                yield TTSChunk(
+                    session_id=response.session_id,
+                    chunk_id=chunk_index,
+                    audio_bytes=chunk_bytes,
+                    is_last=False
+                )
+                chunk_index += 1
             
-            # 현재는 전체 오디오를 한 번에 반환하지만,
-            # 향후 Azure의 스트림 콜백 이벤트를 받아 처리하도록 확장할 수 있습니다.
+            # 스트림 종료 알림
             yield TTSChunk(
                 session_id=response.session_id,
-                chunk_id=0,
-                audio_bytes=audio_data,
+                chunk_id=chunk_index,
+                audio_bytes=b"",
                 is_last=True
             )
-        else:
-            error_detail = "Unknown error"
-            if result.cancellation_details:
-                error_detail = result.cancellation_details.error_details
             
+            # 4. 전체 데이터 캐시 저장
+            self.audio_cache[cache_key] = bytes(all_audio)
+            
+        except Exception as e:
             raise TTSException(
-                message="Azure 음성 합성에 실패했습니다.",
-                error_code="AZURE_TTS_FAILURE",
-                detail=error_detail
+                message="Azure 음성 합성 스트리밍 중 오류 발생",
+                error_code="AZURE_STREAM_FAILURE",
+                detail=str(e)
             )
+        finally:
+            # 리소스 정리
+            synthesizer = None
