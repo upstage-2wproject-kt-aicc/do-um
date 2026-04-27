@@ -97,7 +97,7 @@ def main() -> None:
     parser.add_argument(
         "--run-label",
         default="",
-        help="A/B 구분용 라벨 (예: A, B, baseline, chroma_opt). 요약·JSON에 포함됩니다.",
+        help="A/B 구분용 라벨 (예: A, B, baseline, pinecone_opt). 요약·JSON에 포함됩니다.",
     )
     parser.add_argument(
         "--eval-csv",
@@ -146,7 +146,7 @@ def main() -> None:
     print(
         "💡 A/B: 코드/설정을 바꾼 뒤 동일 --run-label 규칙으로 다시 실행하고, "
         "아래 고정 지표·정확도를 나란히 비교하세요.\n"
-        "💡 RAG 인덱스: FAQ CSV가 바뀌면 SHA256 지문이 달라져 Chroma가 자동 재색인됩니다.\n"
+        "💡 RAG 인덱스: FAQ CSV가 바뀌면 SHA256 지문이 달라져 Pinecone이 자동 재색인됩니다.\n"
     )
 
     boot_t0 = time.perf_counter()
