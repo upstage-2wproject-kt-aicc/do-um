@@ -126,6 +126,10 @@ class AICC_NLU_Router:
         self.semantic_cache: list[dict[str, Any]] = []
         self.rag_source_fingerprint_sha256: str = ""
         self.rag_top_k: int = max(1, int(os.getenv("NLU_RAG_TOP_K", "2")))
+        self.rag_min_relevance: float = float(os.getenv("NLU_RAG_MIN_RELEVANCE", "0.0"))
+        self.rag_secondary_min_ratio: float = float(
+            os.getenv("NLU_RAG_SECONDARY_MIN_RATIO", "0.9")
+        )
         print(f"  🔢 RAG top-k: {self.rag_top_k}")
 
         self._prepare_datasets()
@@ -382,7 +386,7 @@ class AICC_NLU_Router:
         )
 
         t0 = time.perf_counter()
-        vector_res = self.vector_db.similarity_search_by_vector(
+        vector_res_with_score = self.vector_db.similarity_search_by_vector_with_score(
             query_vector, k=self.rag_top_k
         )
         timings["rag_search_sec"] = time.perf_counter() - t0
@@ -391,18 +395,46 @@ class AICC_NLU_Router:
         retrieved_context = ""
         metadata: dict[str, Any] = {}
         retrieved_faq_ids: list[str] = []
-        if vector_res:
+        if vector_res_with_score:
+            top_score = float(vector_res_with_score[0][1])
+            selected: list[tuple[Any, float]] = []
+            for i, (doc, score_raw) in enumerate(vector_res_with_score):
+                score = float(score_raw)
+                if i == 0:
+                    selected.append((doc, score))
+                    continue
+                keep_by_ratio = score >= (top_score * self.rag_secondary_min_ratio)
+                keep_by_min = score >= self.rag_min_relevance
+                if keep_by_ratio and keep_by_min:
+                    selected.append((doc, score))
+
+            # 항상 최소 1개는 유지
+            if not selected:
+                selected = [vector_res_with_score[0]]
+
             # top-1 메타데이터는 기존 워크플로우 라우팅 호환을 위해 유지하고,
-            # retrieved_context/faq_ids는 top-k 전체를 전달한다.
-            top_doc = vector_res[0]
+            # retrieved_context/faq_ids는 점수 조건을 통과한 문서만 전달한다.
+            top_doc = selected[0][0]
             metadata = dict(top_doc.metadata)
-            retrieved_context = "\n\n".join(doc.page_content for doc in vector_res)
+            retrieved_context = "\n\n".join(doc.page_content for doc, _ in selected)
             retrieved_faq_ids = [
                 str(doc.metadata.get("faq_id", "")).strip()
-                for doc in vector_res
+                for doc, _ in selected
                 if str(doc.metadata.get("faq_id", "")).strip()
             ]
-            print(f"  📋 [5] 검색 문서 메타데이터 (top-{len(vector_res)}):")
+            all_scores = [round(float(s), 4) for _, s in vector_res_with_score]
+            selected_scores = [round(float(s), 4) for _, s in selected]
+            print(
+                f"  📋 [5] 검색 문서 메타데이터 "
+                f"(후보 {len(vector_res_with_score)}건 → 채택 {len(selected)}건):"
+            )
+            print(
+                "      • 필터: "
+                f"score >= top1*{self.rag_secondary_min_ratio:.2f} "
+                f"and score >= {self.rag_min_relevance:.2f}"
+            )
+            print(f"      • scores(all): {all_scores}")
+            print(f"      • scores(selected): {selected_scores}")
             print(f"      • faq_ids: {retrieved_faq_ids}")
             print(
                 f"      • top1 domain > subdomain: {metadata.get('domain')} > {metadata.get('subdomain')}"

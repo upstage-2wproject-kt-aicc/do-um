@@ -207,16 +207,19 @@ def main() -> None:
         faq_hit_s = "-"
         ho_s = "-"
         sub_s = "-"
+        got_set: set[str] = set()
 
         gold_ids = gold.get("gold_faq_ids") or set()
-        if gold_ids and st == "REQUIRE_LLM":
-            faq_checked += 1
+        if st == "REQUIRE_LLM":
             got_ids = out.get("retrieved_faq_ids") or []
             if got_ids:
                 got_set = {str(x).strip() for x in got_ids if str(x).strip()}
             else:
                 fallback = str(meta.get("faq_id", "")).strip()
                 got_set = {fallback} if fallback else set()
+
+        if gold_ids and st == "REQUIRE_LLM":
+            faq_checked += 1
             ok = bool(got_set & gold_ids)
             if ok:
                 faq_correct += 1
@@ -242,10 +245,13 @@ def main() -> None:
 
         if not args.quiet:
             pass
+        gold_disp = "[" + ",".join(sorted(gold_ids)) + "]" if gold_ids else "-"
+        got_disp = "[" + ",".join(sorted(got_set)) + "]" if got_set else "-"
         print(
             f"[{st}] intent={intent_s:.4f}s embed={embed_s:.4f}s "
             f"parallel_wall={parallel_wall_s:.4f}s rag={rag_s:.4f}s "
-            f"total={total_s:.4f}s | faq={faq_hit_s} ho={ho_s} sub={sub_s} | {q[:56]}"
+            f"total={total_s:.4f}s | faq={faq_hit_s} ho={ho_s} sub={sub_s} "
+            f"| gold={gold_disp} retrieved={got_disp} | {q[:56]}"
             + ("…" if len(q) > 56 else "")
         )
         per_query.append(
