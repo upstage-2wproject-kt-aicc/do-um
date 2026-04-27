@@ -211,8 +211,13 @@ def main() -> None:
         gold_ids = gold.get("gold_faq_ids") or set()
         if gold_ids and st == "REQUIRE_LLM":
             faq_checked += 1
-            got = str(meta.get("faq_id", "")).strip()
-            ok = got in gold_ids
+            got_ids = out.get("retrieved_faq_ids") or []
+            if got_ids:
+                got_set = {str(x).strip() for x in got_ids if str(x).strip()}
+            else:
+                fallback = str(meta.get("faq_id", "")).strip()
+                got_set = {fallback} if fallback else set()
+            ok = bool(got_set & gold_ids)
             if ok:
                 faq_correct += 1
             faq_hit_s = "1" if ok else "0"
@@ -254,6 +259,7 @@ def main() -> None:
                 "intent_embed_parallel_wall_sec": round(parallel_wall_s, 6),
                 "rag_sec": round(rag_s, 6),
                 "total_sec": round(total_s, 6),
+                "retrieved_faq_ids": out.get("retrieved_faq_ids", []),
                 "faq_hit": faq_hit_s,
                 "handoff_ok": ho_s,
                 "subdomain_ok": sub_s,

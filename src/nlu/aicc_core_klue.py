@@ -125,6 +125,8 @@ class AICC_NLU_Router:
 
         self.semantic_cache: list[dict[str, Any]] = []
         self.rag_source_fingerprint_sha256: str = ""
+        self.rag_top_k: int = max(1, int(os.getenv("NLU_RAG_TOP_K", "2")))
+        print(f"  🔢 RAG top-k: {self.rag_top_k}")
 
         self._prepare_datasets()
         self._warm_up_cache()
@@ -380,22 +382,36 @@ class AICC_NLU_Router:
         )
 
         t0 = time.perf_counter()
-        vector_res = self.vector_db.similarity_search_by_vector(query_vector, k=1)
+        vector_res = self.vector_db.similarity_search_by_vector(
+            query_vector, k=self.rag_top_k
+        )
         timings["rag_search_sec"] = time.perf_counter() - t0
         print(f"  🔎 [4] Pinecone 벡터 검색 (⏱️ {timings['rag_search_sec']:.3f}s)")
 
         retrieved_context = ""
         metadata: dict[str, Any] = {}
+        retrieved_faq_ids: list[str] = []
         if vector_res:
-            res_doc = vector_res[0]
-            retrieved_context = res_doc.page_content
-            metadata = dict(res_doc.metadata)
-            print("  📋 [5] 검색 문서 메타데이터:")
-            print(f"      • faq_id: {metadata.get('faq_id')}")
-            print(f"      • domain > subdomain: {metadata.get('domain')} > {metadata.get('subdomain')}")
-            print(f"      • intent_type: {metadata.get('intent_type')}")
-            print(f"      • source_url: {metadata.get('source_url')}")
-            print(f"      • risk_level / handoff: {metadata.get('risk_level')} / {metadata.get('handoff_required')}")
+            # top-1 메타데이터는 기존 워크플로우 라우팅 호환을 위해 유지하고,
+            # retrieved_context/faq_ids는 top-k 전체를 전달한다.
+            top_doc = vector_res[0]
+            metadata = dict(top_doc.metadata)
+            retrieved_context = "\n\n".join(doc.page_content for doc in vector_res)
+            retrieved_faq_ids = [
+                str(doc.metadata.get("faq_id", "")).strip()
+                for doc in vector_res
+                if str(doc.metadata.get("faq_id", "")).strip()
+            ]
+            print(f"  📋 [5] 검색 문서 메타데이터 (top-{len(vector_res)}):")
+            print(f"      • faq_ids: {retrieved_faq_ids}")
+            print(
+                f"      • top1 domain > subdomain: {metadata.get('domain')} > {metadata.get('subdomain')}"
+            )
+            print(f"      • top1 intent_type: {metadata.get('intent_type')}")
+            print(f"      • top1 source_url: {metadata.get('source_url')}")
+            print(
+                f"      • top1 risk_level / handoff: {metadata.get('risk_level')} / {metadata.get('handoff_required')}"
+            )
             preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
             print(f"      • 본문 미리보기: {preview!r}")
         else:
@@ -410,6 +426,7 @@ class AICC_NLU_Router:
             "intent": intent,
             "retrieved_context": retrieved_context,
             "metadata": metadata,
+            "retrieved_faq_ids": retrieved_faq_ids,
             "cache_max_similarity": max_sim,
             "timings_sec": timings,
         }
