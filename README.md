@@ -14,7 +14,7 @@
 | nlu | 의도 분류, 임베딩, RAG 조회 | `src/nlu/aicc_core_klue.py` |
 | workflow | LangGraph 라우팅, 멀티 LLM 호출, 응답 정규화 | `src/workflow/graph.py`, `src/workflow/multi_llm.py`, `src/workflow/prompt.py` |
 | tts | TTS Provider 추상화 및 스트리밍 출력 | `src/tts/factory.py`, `src/tts/openai.py`, `src/tts/azure.py` |
-| evaluation | 품질/성능 평가 인터페이스 | `src/evaluation/service.py` |
+| evaluation | 품질/성능 평가 실행 및 스코어링 | `src/evaluation/run_evaluation.py`, `src/evaluation/scoring.py` |
 | pipeline | workflow→TTS 오케스트레이션 | `src/pipeline.py`, `src/main.py` |
 
 ## 팀 공통 필수 규칙 (호환성)
@@ -40,10 +40,11 @@
   - `LLM_GPT_API_KEY`
   - `LLM_CLAUDE_SONNET_API_KEY` (사용 시)
   - `LLM_GROK_API_KEY` (사용 시)
-  - `STT_PROVIDER` (`google` 또는 `openai`)
-  - `TTS_PROVIDER` (`azure`, `openai`, `google`, `naver`)
-  - `GOOGLE_PROJECT_ID` (Google STT 사용 시)
-  - `AZURE_SPEECH_KEY`, `AZURE_SERVICE_REGION` (Azure TTS 사용 시)
+  - `STT_PROVIDER` (`openai` 기본, 필요 시 `google`)
+  - `TTS_PROVIDER` (`openai` 기본)
+  - `TTS_FALLBACK_PROVIDERS` (기본: `google,azure`)
+  - `GOOGLE_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS` (Google STT/TTS 사용 시)
+  - `AZURE_SPEECH_KEY`, `AZURE_SERVICE_REGION` (Azure TTS fallback 사용 시)
 
 5. 캐시/로컬 산출물 커밋 금지
 - `.venv/`, `.uv-cache/`, `.hf-cache/`, 실행 결과 오디오/JSON은 커밋하지 않음.
@@ -72,6 +73,7 @@ uv sync --python 3.11
 $env:HF_HOME=".hf-cache"
 $env:STT_PROVIDER="openai"
 $env:TTS_PROVIDER="openai"
+$env:TTS_FALLBACK_PROVIDERS="google,azure"
 $env:UV_CACHE_DIR=".uv-cache"
 uv run python -m src.main
 ```
@@ -85,6 +87,12 @@ UV_CACHE_DIR=.uv-cache uv sync --python 3.11
 ```bash
 HF_HOME=.hf-cache STT_PROVIDER=openai TTS_PROVIDER=openai UV_CACHE_DIR=.uv-cache uv run python -m src.main
 ```
+
+## 현재 기본 실행 기준
+- STT 기본값: `openai` (`src/stt/streaming/websocket_stream.py`)
+- TTS 기본값: `openai` (`src/pipeline.py`)
+- TTS fallback 순서: `google -> azure` (`TTS_FALLBACK_PROVIDERS`)
+- Google 경로 사용 시 ADC 필요: `GOOGLE_APPLICATION_CREDENTIALS`
 
 ## 인터페이스 우선 원칙
 - 모듈 간 I/O는 `src/common/schemas.py`의 Pydantic 모델을 기준으로 교환.
