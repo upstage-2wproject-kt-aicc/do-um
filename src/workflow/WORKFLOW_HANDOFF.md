@@ -17,6 +17,8 @@
   - `execute_workflow_json`
 - 규칙:
   - 보안 키워드 포함 시 `security` 우선
+  - `metadata.risk_level`이 `높음/high/critical`이면 `handoff`
+  - `metadata.handoff_required`가 `Y/YES/TRUE/1/REQUIRED`이면 `handoff`
   - `intent=민원형 -> handoff`
   - `intent=절차형 -> procedure`
   - 그 외 `faq`

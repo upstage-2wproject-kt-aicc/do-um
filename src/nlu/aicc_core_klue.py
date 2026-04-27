@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
+import shutil
 import time
 from pathlib import Path
 from typing import Any
@@ -28,6 +31,42 @@ load_dotenv(_REPO_ROOT / ".env")
 
 # 시맨틱 캐시 적중 임계값 (코사인 유사도)
 _CACHE_SIM_THRESHOLD = 0.75
+
+_FINGERPRINT_FILENAME = "aicc_source_fingerprint.json"
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _read_index_fingerprint(persist_path: Path) -> dict[str, Any] | None:
+    fp = persist_path / _FINGERPRINT_FILENAME
+    if not fp.is_file():
+        return None
+    try:
+        return json.loads(fp.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _write_index_fingerprint(
+    persist_path: Path, *, source_name: str, sha256_hex: str
+) -> None:
+    persist_path.mkdir(parents=True, exist_ok=True)
+    payload = {"source_csv": source_name, "sha256": sha256_hex}
+    (persist_path / _FINGERPRINT_FILENAME).write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _chroma_sqlite_exists(persist_path: Path) -> bool:
+    """로컬 Chroma persist 디렉터리에 SQLite 스토어가 있는지(이미 구축됐는지) 확인."""
+    return persist_path.is_dir() and (persist_path / "chroma.sqlite3").is_file()
 
 
 class AICC_NLU_Router:
@@ -71,6 +110,7 @@ class AICC_NLU_Router:
         print(f"  📎 Upstage Embeddings 준비 (⏱️ {t_emb_factory:.3f}s)")
 
         self.semantic_cache: list[dict[str, Any]] = []
+        self.rag_source_fingerprint_sha256: str = ""
 
         self._prepare_datasets()
         self._warm_up_cache()
@@ -79,9 +119,35 @@ class AICC_NLU_Router:
             f"✅ [NLU Router] 부팅 완료 — 총 소요 ⏱️ {time.perf_counter() - boot_t0:.3f}s\n"
         )
 
+    @staticmethod
+    def _normalize_risk_level(value: Any) -> str:
+        """Normalizes risk level labels for workflow handoff rules."""
+        raw = str(value).strip().lower()
+        if raw in {"high", "높음", "상", "critical", "crit"}:
+            return "high"
+        if raw in {"medium", "보통", "중간", "mid"}:
+            return "medium"
+        if raw in {"low", "낮음", "하"}:
+            return "low"
+        return raw or "low"
+
+    @staticmethod
+    def _normalize_handoff_required(value: Any) -> str:
+        """Normalizes handoff flags to Y/N."""
+        raw = str(value).strip().lower()
+        if raw in {"y", "yes", "true", "1", "required"}:
+            return "Y"
+        if raw in {"n", "no", "false", "0", "optional"}:
+            return "N"
+        return "N"
+
     def _prepare_datasets(self) -> None:
         if not faq_csv.is_file():
             raise FileNotFoundError(f"FAQ CSV가 없습니다: {faq_csv}")
+
+        csv_fp = _sha256_file(faq_csv)
+        self.rag_source_fingerprint_sha256 = csv_fp
+        print(f"   ↳ FAQ 소스 지문(SHA256): {csv_fp[:16]}… (전체 {len(csv_fp)} hex)")
 
         t0 = time.perf_counter()
         df = pd.read_csv(faq_csv).fillna("")
@@ -93,8 +159,12 @@ class AICC_NLU_Router:
                     "domain": str(row["domain"]),
                     "subdomain": str(row["subdomain"]),
                     "intent_type": str(row["intent_type"]),
-                    "risk_level": str(row["risk_level"]),
-                    "handoff_required": str(row["handoff_required"]),
+                    "keywords": str(row["keywords"]),
+                    "source_url": str(row.get("source_url", "")).strip(),
+                    "risk_level": self._normalize_risk_level(row["risk_level"]),
+                    "handoff_required": self._normalize_handoff_required(
+                        row["handoff_required"]
+                    ),
                 }
                 self.docs.append(
                     Document(page_content=str(row["embedding_text"]), metadata=metadata)
@@ -109,14 +179,57 @@ class AICC_NLU_Router:
         print(f"   ↳ BM25 인덱스 구축 (⏱️ {t_bm25:.3f}s)")
 
         t0 = time.perf_counter()
-        print("   ↳ Chroma Vector DB 적재 중...")
-        self.vector_db = Chroma.from_documents(
-            documents=self.docs,
-            embedding=self.embeddings,
-            persist_directory=persist_dir,
+        persist_path = Path(persist_dir)
+        stored = _read_index_fingerprint(persist_path)
+        index_matches_csv = bool(
+            stored
+            and stored.get("sha256") == csv_fp
+            and stored.get("source_csv") == faq_csv.name
         )
-        t_chroma = time.perf_counter() - t0
-        print(f"   ↳ Chroma 적재 완료 (⏱️ {t_chroma:.3f}s)")
+        if not index_matches_csv:
+            if stored:
+                print(
+                    "   ↳ 저장된 Chroma 지문과 FAQ CSV 불일치 — 재색인이 필요합니다."
+                )
+            else:
+                print(
+                    "   ↳ Chroma 지문 파일 없음(구버전 포함) — 필요 시 재색인합니다."
+                )
+
+        loaded = False
+        if index_matches_csv and _chroma_sqlite_exists(persist_path):
+            try:
+                print("   ↳ Chroma: 동일 지문 확인, persist에서 로드 시도...")
+                candidate = Chroma(
+                    persist_directory=persist_dir,
+                    embedding_function=self.embeddings,
+                )
+                probe = candidate.get(limit=1, include=[])
+                if probe.get("ids"):
+                    self.vector_db = candidate
+                    loaded = True
+                    print(
+                        f"   ↳ Chroma 로드 완료 (재임베딩 없음, ⏱️ {time.perf_counter() - t0:.3f}s)"
+                    )
+                else:
+                    print("   ↳ Chroma persist는 있으나 문서가 없어 재구축합니다.")
+            except Exception as e:
+                print(f"   ⚠️ Chroma 로드 실패, 재구축합니다: {e}")
+
+        if not loaded:
+            if persist_path.is_dir():
+                print("   ↳ 기존 Chroma persist 디렉터리를 비우고 재구축합니다…")
+                shutil.rmtree(persist_path)
+            print("   ↳ Chroma Vector DB 적재 중(최초 구축 또는 재구축)...")
+            self.vector_db = Chroma.from_documents(
+                documents=self.docs,
+                embedding=self.embeddings,
+                persist_directory=persist_dir,
+            )
+            _write_index_fingerprint(
+                persist_path, source_name=faq_csv.name, sha256_hex=csv_fp
+            )
+            print(f"   ↳ Chroma 적재 및 지문 저장 완료 (⏱️ {time.perf_counter() - t0:.3f}s)")
 
     def _warm_up_cache(self) -> None:
         t0 = time.perf_counter()
@@ -213,6 +326,7 @@ class AICC_NLU_Router:
             print(f"      • faq_id: {metadata.get('faq_id')}")
             print(f"      • domain > subdomain: {metadata.get('domain')} > {metadata.get('subdomain')}")
             print(f"      • intent_type: {metadata.get('intent_type')}")
+            print(f"      • source_url: {metadata.get('source_url')}")
             print(f"      • risk_level / handoff: {metadata.get('risk_level')} / {metadata.get('handoff_required')}")
             preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
             print(f"      • 본문 미리보기: {preview!r}")
