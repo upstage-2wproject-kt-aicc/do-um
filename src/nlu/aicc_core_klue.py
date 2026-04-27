@@ -160,6 +160,7 @@ class AICC_NLU_Router:
                     "subdomain": str(row["subdomain"]),
                     "intent_type": str(row["intent_type"]),
                     "keywords": str(row["keywords"]),
+                    "source_url": str(row.get("source_url", "")).strip(),
                     "risk_level": self._normalize_risk_level(row["risk_level"]),
                     "handoff_required": self._normalize_handoff_required(
                         row["handoff_required"]
@@ -325,6 +326,7 @@ class AICC_NLU_Router:
             print(f"      • faq_id: {metadata.get('faq_id')}")
             print(f"      • domain > subdomain: {metadata.get('domain')} > {metadata.get('subdomain')}")
             print(f"      • intent_type: {metadata.get('intent_type')}")
+            print(f"      • source_url: {metadata.get('source_url')}")
             print(f"      • risk_level / handoff: {metadata.get('risk_level')} / {metadata.get('handoff_required')}")
             preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
             print(f"      • 본문 미리보기: {preview!r}")
