@@ -211,6 +211,22 @@ class LLMBatchResponse(BaseModel):
     )
 
 
+class NLUEvidence(BaseModel):
+    """Captures NLU evidence that influenced workflow answer generation."""
+
+    intent: str = Field(..., description="NLU predicted intent label.")
+    domain: str = Field(..., description="NLU predicted domain label.")
+    subdomain: str = Field(..., description="NLU predicted subdomain label.")
+    router_confidence: float = Field(
+        ..., ge=0.0, le=1.0, description="NLU router confidence score."
+    )
+    selected_route: RouteType = Field(..., description="Final workflow route.")
+    route_reason: str = Field(..., description="Human-readable route decision reason.")
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Raw NLU metadata passed from upstream."
+    )
+
+
 class WorkflowOutput(BaseModel):
     """Defines workflow output contract passed to the next stage."""
 
@@ -219,12 +235,16 @@ class WorkflowOutput(BaseModel):
         default_factory=list, description="Provider result rows."
     )
     final_answer_text: str = Field("", description="Selected final answer text.")
+    pre_tts_text: str = Field("", description="Exact text that should be used before TTS.")
     is_handoff_decided: bool = Field(False, description="Whether handoff is decided.")
     reference_links: list[str] = Field(
         default_factory=list, description="Reference links for final answer."
     )
     llm_token_usage: dict[str, int] = Field(
         default_factory=dict, description="Aggregated token usage."
+    )
+    nlu_evidence: NLUEvidence | None = Field(
+        None, description="NLU evidence used for routing and answer generation."
     )
 
 

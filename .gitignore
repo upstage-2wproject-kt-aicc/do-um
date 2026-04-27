@@ -75,9 +75,11 @@ src/nlu/archive/
 src/nlu/my_aicc_nlu_model_klue*
 
 # NLU Local Model & DB
-src/nlu/my_aicc_nlu_model_klue:roberta-base/
+src/nlu/my_aicc_nlu_model_klue/
 src/nlu/aicc_chroma_db/
 src/nlu/__pycache__/
+# NLU 벤치 결과 (test_bench.py 기본 저장)
+src/nlu/reports/
 
 # Personal Backup
 src/nlu/archive/

@@ -1,23 +1,10 @@
 # NLU 모듈 상세 안내서
 
-이 문서는 `src/nlu` 폴더에서 **초기 스켈레톤 상태에서 현재까지** 어떤 변화가 있었는지,  
-그리고 각 파일이 어떤 역할을 하는지 팀원이 빠르게 이해할 수 있도록 정리한 문서입니다.
-
----
-
 ## 1) 배경: 스켈레톤에서 현재 구조로
-
-프로젝트 루트 `README.md` 기준 초기 상태는 다음과 같았습니다.
-
-- NLU는 `src/nlu/classifier.py`의 **인터페이스 중심 스켈레톤**
-- 실제 비즈니스 로직은 비워두고 `NotImplementedError` 형태
-- 모듈 경계(`common/schemas.py`)와 파이프라인 계약만 정의
-
-현재는 NLU가 아래처럼 확장되었습니다.
 
 - **실행 가능한 KLUE 기반 라우터** 추가 (`aicc_core_klue.py`)
 - `.env` 기반 키 관리 추가 (`load_dotenv`)
-- FAQ CSV 기반 **BM25 + Chroma 인덱싱** 및 시맨틱 캐시
+- FAQ CSV 기반 **BM25 + Pinecone 인덱싱** 및 시맨틱 캐시
 - `process_query()` 반환형 인터페이스로 워크플로우 연동 준비
 - 운영 확인용 터미널 로그/단계별 소요 시간(`timings_sec`) 제공
 - 과거 실험 코드는 `archive/`로 이동해 레포를 정리
@@ -31,15 +18,17 @@
 #### `src/nlu/aicc_core_klue.py`
 - 현재 NLU 모듈의 **메인 실행/연동 파일**
 - 주요 기능:
-  - `.env` 로드 및 `LLM_SOLAR_API_KEY` 검증
-  - 로컬 KLUE 분류 모델 로드 (`my_aicc_nlu_model_klue:roberta-base`)
+  - `.env` 로드 및 `UPSTAGE_API_KEY` 검증
+  - Pinecone 연결 정보(`PINECONE_API_KEY`, `PINECONE_INDEX_NAME`) 검증
+  - 로컬 KLUE 분류 모델 로드 (`my_aicc_nlu_model_klue`)
   - FAQ CSV(`RAG_FAQ.csv`)를 `Document`로 변환
-  - BM25 인덱스 생성 + Chroma 벡터 저장소 적재
+  - BM25 인덱스 생성 + Pinecone 벡터 저장소 연결/적재
+  - CSV SHA256 지문 기반 재색인(FAQ 변경 시에만 재업로드)
   - 시맨틱 캐시 검사 후 결과 반환
   - `process_query()`에서 워크플로우가 사용할 dict 반환
 - 반환 형태:
   - 캐시 적중: `status="CACHED"` + `final_answer`
-  - 캐시 미적중: `status="REQUIRE_LLM"` + `query_vector`/`retrieved_context`/`metadata`
+  - 캐시 미적중: `status="REQUIRE_LLM"` + `retrieved_context`/`metadata` (질의 임베딩 벡터는 응답에 포함하지 않음; 내부에서만 사용)
   - 공통: `intent`, `timings_sec`
 
 #### `src/nlu/RAG_FAQ.csv`
@@ -55,14 +44,14 @@
 
 ### B. 로컬 산출물(버전관리 제외 대상)
 
-#### `src/nlu/my_aicc_nlu_model_klue:roberta-base/`
+#### `src/nlu/my_aicc_nlu_model_klue/`
 - 로컬 파인튜닝 모델 아티팩트
 - 예: `model.safetensors`, `tokenizer.json`, `config.json`
 - `.gitignore`에서 제외되어 Git에 올라가지 않음
 
 #### `src/nlu/aicc_chroma_db/`
-- Chroma 로컬 퍼시스트 DB 파일
-- 실행 시 FAQ 임베딩/인덱스 결과 저장
+- 로컬 지문(fingerprint) 관리 폴더
+- Pinecone 자체 데이터는 클라우드에 저장되며, 이 폴더에는 CSV 해시 메타만 저장
 - 재생성 가능 산출물이라 `.gitignore` 제외 대상
 
 ---
@@ -95,7 +84,7 @@
 2. 입력 텍스트 임베딩 생성
 3. 시맨틱 캐시 유사도 검사
 4. 캐시 적중 시 즉시 반환 (`CACHED`)
-5. 미적중 시 Chroma 벡터 검색
+5. 미적중 시 Pinecone 벡터 검색
 6. 검색 컨텍스트/메타데이터와 함께 `REQUIRE_LLM` 반환
 
 즉, 현재 NLU는 워크플로우 입장에서:
@@ -125,11 +114,11 @@
 
 1. 저장소 루트에서 `.env` 준비  
    - `cp .env.example .env`
-   - `LLM_SOLAR_API_KEY=...` 입력
+   - `LLM_SOLAR_API_KEY=...`, `PINECONE_API_KEY=...`, `PINECONE_INDEX_NAME=...` 입력
 2. 의존성 설치  
    - `pip install -r requirements.txt`
 3. 로컬 모델 폴더 준비  
-   - `src/nlu/my_aicc_nlu_model_klue:roberta-base/` 존재 확인
+   - `src/nlu/my_aicc_nlu_model_klue/` 존재 확인
 4. FAQ 데이터 확인  
    - `src/nlu/RAG_FAQ.csv` 존재 확인
 5. 실행  
@@ -143,3 +132,4 @@
 - 로컬 산출물(모델/DB)은 계속 `.gitignore` 유지
 - NLU 출력 스키마(`status`, `intent`, `metadata`, `timings_sec`)는 워크플로우와 계약이므로 변경 시 공유 필수
 - 의도 라벨 순서(`intent_map`)는 학습 체크포인트 라벨 인덱스와 항상 동기화
+

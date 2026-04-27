@@ -49,7 +49,7 @@ class GoogleTTSService(BaseTTSService):
         except Exception as e:
             logger.warning("Google TTS 초기화 실패 (인증 문제일 수 있음): {}", str(e))
 
-    async def stream(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
+    async def _stream_impl(self, response: LLMResponse) -> AsyncIterator[TTSChunk]:
         if not self.client:
             raise TTSException(
                 message="Google TTS 클라이언트가 활성화되지 않았습니다.",
@@ -63,9 +63,9 @@ class GoogleTTSService(BaseTTSService):
                 input=synthesis_input, voice=self.voice, audio_config=self.audio_config
             )
 
-        logger.debug("Google TTS 합성을 시작합니다. [Text: {}]", response.text[:20] + "...")
         try:
             res = await asyncio.to_thread(_call_api)
+            # 동기 SDK이므로 전체를 하나의 청크로 반환
             yield TTSChunk(
                 session_id=response.session_id, 
                 chunk_id=0, 

@@ -30,6 +30,7 @@ def build_workflow_input(scenario: EvaluationScenario) -> WorkflowRoutingInput:
                 "domain": scenario.domain,
                 "subdomain": scenario.subdomain,
                 "router_confidence": scenario.router_confidence,
+                "metadata": scenario.metadata,
             },
             "internal_context": internal_context,
             "policy_rules": scenario.policy_rules,

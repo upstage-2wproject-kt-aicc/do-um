@@ -31,6 +31,7 @@ def format_workflow_output(batch: LLMBatchResponse) -> WorkflowOutput:
         session_id=batch.session_id,
         results=results,
         final_answer_text=final_answer,
+        pre_tts_text=final_answer,
         is_handoff_decided=is_handoff,
         reference_links=references,
         llm_token_usage=usage,
@@ -76,4 +77,3 @@ def _aggregate_token_usage(results: list[ProviderResult]) -> dict[str, int]:
         for key, value in item.token_usage.items():
             output[key] = output.get(key, 0) + int(value)
     return output
-
