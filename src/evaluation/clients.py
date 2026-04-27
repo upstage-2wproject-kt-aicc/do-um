@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import os
+import asyncio
 import time
 from pathlib import Path
-from typing import Any, TypeAlias
+from typing import Any, Callable, TypeAlias
 
 import httpx
 
@@ -165,58 +166,58 @@ class AnthropicChatClient:
         )
 
 
-class GeminiChatClient:
-    """Calls Gemini generateContent REST API."""
+class GoogleVertexGeminiChatClient:
+    """Calls Gemini through Vertex AI using Google ADC credentials."""
 
     def __init__(
         self,
-        api_key_env: EnvName = "JUDGE_GOOGLE_API_KEY",
-        base_url_env: EnvName = "JUDGE_GOOGLE_BASE_URL",
-        timeout_s: float = 20.0,
+        project_env: EnvName = "GOOGLE_CLOUD_PROJECT",
+        location_env: EnvName = "GOOGLE_CLOUD_LOCATION",
+        default_location: str = "global",
+        client_factory: Callable[..., Any] | None = None,
     ) -> None:
-        self.api_key_env = api_key_env
-        self.base_url_env = base_url_env
-        self.timeout_s = timeout_s
+        self.project_env = project_env
+        self.location_env = location_env
+        self.default_location = default_location
+        self.client_factory = client_factory
 
     async def generate(
         self, model: CandidateModel | JudgeModel, request: LLMRequest
     ) -> LLMResponse:
-        api_key = _get_required_env(self.api_key_env)
-        base_url = _get_env(
-            self.base_url_env, "https://generativelanguage.googleapis.com/v1beta"
-        )
+        project = _get_required_env(self.project_env)
+        location = _get_env(self.location_env, self.default_location)
         started = time.perf_counter()
-        payload = {
-            "system_instruction": {"parts": [{"text": request.system_prompt or ""}]},
-            "contents": [
-                {
-                    "role": "user",
-                    "parts": [{"text": request.prompt}],
-                }
-            ],
-            "generationConfig": {
-                "temperature": request.temperature,
-                "maxOutputTokens": request.max_tokens,
-            },
-        }
-        headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
-        async with httpx.AsyncClient(timeout=self.timeout_s) as client:
-            response = await client.post(
-                f"{base_url.rstrip('/')}/models/{model.model_id}:generateContent",
-                json=payload,
-                headers=headers,
-            )
-            response.raise_for_status()
-            body = response.json()
+        response = await asyncio.to_thread(
+            self._generate_content,
+            project,
+            location,
+            model.model_id,
+            request,
+        )
         latency_ms = int((time.perf_counter() - started) * 1000)
         return LLMResponse(
             session_id=request.session_id,
             provider=model.provider,
-            text=_gemini_content(body),
+            text=_vertex_text(response),
             latency_ms=latency_ms,
             ttft_ms=latency_ms,
-            finish_reason=_gemini_finish_reason(body),
-            token_usage=_int_dict(body.get("usageMetadata", {})),
+            finish_reason=_vertex_finish_reason(response),
+            token_usage=_vertex_usage(response),
+        )
+
+    def _generate_content(
+        self,
+        project: str,
+        location: str,
+        model_id: str,
+        request: LLMRequest,
+    ) -> Any:
+        client_factory = self.client_factory or _load_genai_client
+        client = client_factory(vertexai=True, project=project, location=location)
+        return client.models.generate_content(
+            model=model_id,
+            contents=request.prompt,
+            config=_build_vertex_config(request),
         )
 
 
@@ -226,9 +227,7 @@ class CompositeCandidateClient:
     def __init__(self) -> None:
         self.openai_compatible = OpenAICompatibleChatClient()
         self.anthropic = AnthropicChatClient()
-        self.gemini = GeminiChatClient(
-            api_key_env=("LLM_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY")
-        )
+        self.vertex_gemini = GoogleVertexGeminiChatClient()
 
     async def generate(self, model: CandidateModel, request: LLMRequest) -> LLMResponse:
         if model.provider in {"solar", "gpt", "openai", "grok"}:
@@ -236,7 +235,7 @@ class CompositeCandidateClient:
         if model.provider in {"claude-sonnet", "anthropic"}:
             return await self.anthropic.generate(model, request)
         if model.provider == "google":
-            return await self.gemini.generate(model, request)
+            return await self.vertex_gemini.generate(model, request)
         raise ValueError(f"Unsupported candidate provider: {model.provider}")
 
 
@@ -249,9 +248,7 @@ class CompositeJudgeClient:
         self.anthropic = AnthropicChatClient(
             api_key_env=("JUDGE_ANTHROPIC_API_KEY", "LLM_CLAUDE_SONNET_API_KEY")
         )
-        self.gemini = GeminiChatClient(
-            api_key_env=("JUDGE_GOOGLE_API_KEY", "LLM_GEMINI_API_KEY", "LLM_GOOGLE_API_KEY")
-        )
+        self.vertex_gemini = GoogleVertexGeminiChatClient()
 
     async def evaluate(
         self,
@@ -271,7 +268,7 @@ class CompositeJudgeClient:
         elif judge.provider in {"anthropic", "claude"}:
             response = await self.anthropic.generate(judge, request)
         elif judge.provider in {"google", "gemini"}:
-            response = await self.gemini.generate(judge, request)
+            response = await self.vertex_gemini.generate(judge, request)
         else:
             raise ValueError(f"Unsupported judge provider: {judge.provider}")
         return parse_judge_json(judge.model_id, response.text)
@@ -356,6 +353,22 @@ def _uses_max_completion_tokens(model_id: str) -> bool:
     return normalized.startswith(("gpt-5", "o1", "o3", "o4"))
 
 
+def _load_genai_client(**kwargs: Any) -> Any:
+    from google import genai
+
+    return genai.Client(**kwargs)
+
+
+def _build_vertex_config(request: LLMRequest) -> Any:
+    from google.genai import types
+
+    return types.GenerateContentConfig(
+        system_instruction=request.system_prompt or None,
+        temperature=request.temperature,
+        max_output_tokens=request.max_tokens,
+    )
+
+
 def _openai_content(body: dict[str, Any]) -> str:
     choices = body.get("choices", [])
     if not choices:
@@ -374,19 +387,32 @@ def _anthropic_content(body: dict[str, Any]) -> str:
     return "".join(texts)
 
 
-def _gemini_content(body: dict[str, Any]) -> str:
-    candidates = body.get("candidates", [])
-    if not candidates:
-        return ""
-    parts = candidates[0].get("content", {}).get("parts", [])
-    return "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
+def _vertex_text(response: Any) -> str:
+    return str(getattr(response, "text", "") or "")
 
 
-def _gemini_finish_reason(body: dict[str, Any]) -> str | None:
-    candidates = body.get("candidates", [])
+def _vertex_finish_reason(response: Any) -> str | None:
+    candidates = getattr(response, "candidates", None) or []
     if not candidates:
         return None
-    return candidates[0].get("finishReason")
+    reason = getattr(candidates[0], "finish_reason", None)
+    return str(reason) if reason is not None else None
+
+
+def _vertex_usage(response: Any) -> dict[str, int]:
+    usage = getattr(response, "usage_metadata", None)
+    if usage is None:
+        return {}
+    fields = {
+        "promptTokenCount": getattr(usage, "prompt_token_count", None),
+        "candidatesTokenCount": getattr(usage, "candidates_token_count", None),
+        "totalTokenCount": getattr(usage, "total_token_count", None),
+    }
+    return {
+        key: int(value)
+        for key, value in fields.items()
+        if isinstance(value, (int, float))
+    }
 
 
 def _int_dict(raw: object) -> dict[str, int]:

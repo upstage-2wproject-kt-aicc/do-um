@@ -26,13 +26,13 @@ _CANDIDATE_MODEL_ENVS: tuple[tuple[str, EnvNames], ...] = (
     ("solar", "LLM_SOLAR_MODEL"),
     ("gpt", "LLM_GPT_MODEL"),
     ("claude-sonnet", "LLM_CLAUDE_SONNET_MODEL"),
-    ("google", ("LLM_GOOGLE_MODEL", "LLM_GEMINI_MODEL")),
+    ("google", "LLM_GOOGLE_VERTEX_MODEL"),
 )
 
 _JUDGE_MODEL_ENVS: tuple[tuple[str, EnvNames], ...] = (
     ("openai", ("JUDGE_OPENAI_MODEL", "EVALUATION_PROVIDER_OPENAI_MODEL", "EVALUATION_PROVIDER_GPT_MODEL")),
     ("anthropic", ("JUDGE_ANTHROPIC_MODEL", "EVALUATION_PROVIDER_CLAUDE_MODEL")),
-    ("google", ("JUDGE_GOOGLE_MODEL", "EVALUATION_PROVIDER_GEMINI_MODEL")),
+    ("google", "JUDGE_GOOGLE_VERTEX_MODEL"),
 )
 
 

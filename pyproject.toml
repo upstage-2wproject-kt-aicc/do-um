@@ -51,6 +51,7 @@ dependencies = [
     "protobuf<6.0.0",
     "ragas>=0.3.0",
     "datasets>=3.0.0",
+    "google-genai>=1.0.0",
 ]
 
 [tool.uv]

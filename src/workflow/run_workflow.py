@@ -29,6 +29,11 @@ def main() -> None:
         default="data/workflow_output_generated.json",
         help="Path to save workflow output JSON file.",
     )
+    parser.add_argument(
+        "--print-json",
+        action="store_true",
+        help="Print full JSON payload to stdout.",
+    )
     args = parser.parse_args()
     if args.input_type == "workflow":
         outputs = asyncio.run(execute_workflow_json(args.input))
@@ -39,7 +44,10 @@ def main() -> None:
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(text, encoding="utf-8")
-    print(text)
+    if args.print_json:
+        print(text)
+    else:
+        print(f"Processed items: {len(payload)}")
     print(f"\nSaved: {output_path}")
 
 

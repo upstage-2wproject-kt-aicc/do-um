@@ -35,13 +35,11 @@ def test_default_models_from_env_skip_missing(monkeypatch) -> None:
     monkeypatch.setenv("LLM_SOLAR_MODEL", "solar-pro")
     monkeypatch.delenv("LLM_GPT_MODEL", raising=False)
     monkeypatch.delenv("LLM_CLAUDE_SONNET_MODEL", raising=False)
-    monkeypatch.delenv("LLM_GOOGLE_MODEL", raising=False)
-    monkeypatch.delenv("LLM_GEMINI_MODEL", raising=False)
+    monkeypatch.delenv("LLM_GOOGLE_VERTEX_MODEL", raising=False)
     monkeypatch.setenv("JUDGE_OPENAI_MODEL", "gpt-judge")
     monkeypatch.delenv("JUDGE_ANTHROPIC_MODEL", raising=False)
-    monkeypatch.delenv("JUDGE_GOOGLE_MODEL", raising=False)
+    monkeypatch.delenv("JUDGE_GOOGLE_VERTEX_MODEL", raising=False)
     monkeypatch.delenv("EVALUATION_PROVIDER_CLAUDE_MODEL", raising=False)
-    monkeypatch.delenv("EVALUATION_PROVIDER_GEMINI_MODEL", raising=False)
 
     assert [(model.provider, model.model_id) for model in default_candidate_models_from_env()] == [
         ("solar", "solar-pro")
@@ -56,24 +54,23 @@ def test_default_models_from_env_use_aliases(monkeypatch) -> None:
         "LLM_SOLAR_MODEL",
         "LLM_GPT_MODEL",
         "LLM_CLAUDE_SONNET_MODEL",
-        "LLM_GOOGLE_MODEL",
         "JUDGE_OPENAI_MODEL",
         "JUDGE_ANTHROPIC_MODEL",
-        "JUDGE_GOOGLE_MODEL",
+        "JUDGE_GOOGLE_VERTEX_MODEL",
     ]:
         monkeypatch.delenv(name, raising=False)
-    monkeypatch.setenv("LLM_GEMINI_MODEL", "gemini-candidate")
+    monkeypatch.setenv("LLM_GOOGLE_VERTEX_MODEL", "gemini-vertex-candidate")
     monkeypatch.setenv("EVALUATION_PROVIDER_GPT_MODEL", "gpt-judge")
     monkeypatch.setenv("EVALUATION_PROVIDER_CLAUDE_MODEL", "claude-judge")
-    monkeypatch.setenv("EVALUATION_PROVIDER_GEMINI_MODEL", "gemini-judge")
+    monkeypatch.setenv("JUDGE_GOOGLE_VERTEX_MODEL", "gemini-vertex-judge")
 
     assert [(model.provider, model.model_id) for model in default_candidate_models_from_env()] == [
-        ("google", "gemini-candidate")
+        ("google", "gemini-vertex-candidate")
     ]
     assert [(model.provider, model.model_id) for model in default_judge_models_from_env()] == [
         ("openai", "gpt-judge"),
         ("anthropic", "claude-judge"),
-        ("google", "gemini-judge"),
+        ("google", "gemini-vertex-judge"),
     ]
 
 
