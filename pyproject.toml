@@ -19,7 +19,6 @@ dependencies = [
     "jiwer>=4.0.0",
     "sounddevice>=0.5.1",
     "psutil>=6.1.1",
-
     # --- NLU & Workflow (LangChain) ---
     "langchain>=0.3.0",
     "langchain-core",
@@ -34,7 +33,6 @@ dependencies = [
     "transformers",
     "huggingface-hub",
     "onnxruntime",
-
     # --- API & TTS ---
     "fastapi>=0.115.0",
     "uvicorn>=0.45.0",
@@ -52,6 +50,7 @@ dependencies = [
     "ragas>=0.3.0",
     "datasets>=3.0.0",
     "google-genai>=1.0.0",
+    "langchain-pinecone>=0.2.13",
 ]
 
 [tool.uv]
