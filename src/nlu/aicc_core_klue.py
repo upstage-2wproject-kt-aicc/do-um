@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
+import shutil
 import time
 from pathlib import Path
 from typing import Any
@@ -28,6 +31,37 @@ load_dotenv(_REPO_ROOT / ".env")
 
 # 시맨틱 캐시 적중 임계값 (코사인 유사도)
 _CACHE_SIM_THRESHOLD = 0.75
+
+_FINGERPRINT_FILENAME = "aicc_source_fingerprint.json"
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _read_index_fingerprint(persist_path: Path) -> dict[str, Any] | None:
+    fp = persist_path / _FINGERPRINT_FILENAME
+    if not fp.is_file():
+        return None
+    try:
+        return json.loads(fp.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _write_index_fingerprint(
+    persist_path: Path, *, source_name: str, sha256_hex: str
+) -> None:
+    persist_path.mkdir(parents=True, exist_ok=True)
+    payload = {"source_csv": source_name, "sha256": sha256_hex}
+    (persist_path / _FINGERPRINT_FILENAME).write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _chroma_sqlite_exists(persist_path: Path) -> bool:
@@ -76,6 +110,7 @@ class AICC_NLU_Router:
         print(f"  📎 Upstage Embeddings 준비 (⏱️ {t_emb_factory:.3f}s)")
 
         self.semantic_cache: list[dict[str, Any]] = []
+        self.rag_source_fingerprint_sha256: str = ""
 
         self._prepare_datasets()
         self._warm_up_cache()
@@ -110,6 +145,10 @@ class AICC_NLU_Router:
         if not faq_csv.is_file():
             raise FileNotFoundError(f"FAQ CSV가 없습니다: {faq_csv}")
 
+        csv_fp = _sha256_file(faq_csv)
+        self.rag_source_fingerprint_sha256 = csv_fp
+        print(f"   ↳ FAQ 소스 지문(SHA256): {csv_fp[:16]}… (전체 {len(csv_fp)} hex)")
+
         t0 = time.perf_counter()
         df = pd.read_csv(faq_csv).fillna("")
         self.docs: list[Document] = []
@@ -140,10 +179,26 @@ class AICC_NLU_Router:
 
         t0 = time.perf_counter()
         persist_path = Path(persist_dir)
+        stored = _read_index_fingerprint(persist_path)
+        index_matches_csv = bool(
+            stored
+            and stored.get("sha256") == csv_fp
+            and stored.get("source_csv") == faq_csv.name
+        )
+        if not index_matches_csv:
+            if stored:
+                print(
+                    "   ↳ 저장된 Chroma 지문과 FAQ CSV 불일치 — 재색인이 필요합니다."
+                )
+            else:
+                print(
+                    "   ↳ Chroma 지문 파일 없음(구버전 포함) — 필요 시 재색인합니다."
+                )
+
         loaded = False
-        if _chroma_sqlite_exists(persist_path):
+        if index_matches_csv and _chroma_sqlite_exists(persist_path):
             try:
-                print("   ↳ Chroma: 기존 persist에서 로드 시도...")
+                print("   ↳ Chroma: 동일 지문 확인, persist에서 로드 시도...")
                 candidate = Chroma(
                     persist_directory=persist_dir,
                     embedding_function=self.embeddings,
@@ -161,13 +216,19 @@ class AICC_NLU_Router:
                 print(f"   ⚠️ Chroma 로드 실패, 재구축합니다: {e}")
 
         if not loaded:
+            if persist_path.is_dir():
+                print("   ↳ 기존 Chroma persist 디렉터리를 비우고 재구축합니다…")
+                shutil.rmtree(persist_path)
             print("   ↳ Chroma Vector DB 적재 중(최초 구축 또는 재구축)...")
             self.vector_db = Chroma.from_documents(
                 documents=self.docs,
                 embedding=self.embeddings,
                 persist_directory=persist_dir,
             )
-            print(f"   ↳ Chroma 적재 완료 (⏱️ {time.perf_counter() - t0:.3f}s)")
+            _write_index_fingerprint(
+                persist_path, source_name=faq_csv.name, sha256_hex=csv_fp
+            )
+            print(f"   ↳ Chroma 적재 및 지문 저장 완료 (⏱️ {time.perf_counter() - t0:.3f}s)")
 
     def _warm_up_cache(self) -> None:
         t0 = time.perf_counter()
