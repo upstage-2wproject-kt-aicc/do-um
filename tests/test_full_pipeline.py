@@ -24,43 +24,72 @@ def get_audio_from_mic(duration=5, sample_rate=16000):
     sd.wait()
     return audio_data.tobytes()
 
-async def send_mic_streaming(websocket, duration=7, sample_rate=16000):
+async def send_mic_streaming(websocket, duration=15, sample_rate=16000):
     """
-    마이크 입력을 실시간으로 쪼개서 서버로 스트리밍합니다.
+    마이크 입력을 실시간으로 서버로 스트리밍하고, 서버가 발화 완료를 알리면 즉시 종료합니다.
     """
     import sounddevice as sd
-    print(f"🎤 [실시간 마이크] 입력을 시작합니다. ({duration}초 동안 말씀해주세요!)")
+    print(f"🎤 [실시간 마이크] 말씀을 시작하세요! (최대 {duration}초 대기, 말을 멈추면 자동 분석)")
     
     chunk_samples = 480  # 30ms @ 16kHz
     loop = asyncio.get_event_loop()
     queue = asyncio.Queue()
+    stop_event = asyncio.Event()
 
     def callback(indata, frames, time, status):
         if status:
-            print(f"SoundDevice Status: {status}", file=sys.stderr)
-        # indata는 (frames, channels) 형태의 numpy 배열 (int16)
-        # 이를 bytes로 변환하여 큐에 넣음 (1채널이므로 flatten 효과)
-        loop.call_soon_threadsafe(queue.put_nowait, bytes(indata))
+            pass # 불필요한 경고 숨김
+        if not stop_event.is_set():
+            loop.call_soon_threadsafe(queue.put_nowait, bytes(indata))
+
+    async def receive_from_server():
+        """서버 응답을 기다리다가 최종 결과가 오면 스트리밍을 중단시킴"""
+        try:
+            while not stop_event.is_set():
+                response = await websocket.recv()
+                result = json.loads(response)
+                
+                # 서버가 발화 종료(is_final)를 판단하고 NLU 결과를 보냈을 때
+                if result.get("is_final") and "nlu_analysis" in result:
+                    print(f"\n  ✅ 서버 감지 완료! 텍스트: {result.get('transcript')}")
+                    stop_event.set()  # 마이크 녹음 중지 신호
+                    return result
+        except websockets.exceptions.ConnectionClosed:
+            print("  ❌ 서버 연결 종료")
+        except Exception as e:
+            print(f"  ❌ 수신 오류: {e}")
+        return None
 
     # 스트림 시작
     try:
+        # 서버 응답 수신 태스크를 백그라운드로 실행
+        recv_task = asyncio.create_task(receive_from_server())
+        
         with sd.InputStream(samplerate=sample_rate, channels=1, dtype='int16', 
                             blocksize=chunk_samples, callback=callback):
             start_time = time.time()
-            while time.time() - start_time < duration:
+            while time.time() - start_time < duration and not stop_event.is_set():
                 try:
-                    # 큐에서 데이터를 가져오되, 0.1초 이상 안 들어오면 무시하고 루프 계속
+                    # 큐에서 데이터를 가져와서 전송
                     data = await asyncio.wait_for(queue.get(), timeout=0.1)
-                    # 서버가 정확히 960바이트를 요구하므로 맞춰줌
-                    if len(data) == 960:
+                    if len(data) == 960 and not stop_event.is_set():
                         await websocket.send(data)
-                        await asyncio.sleep(0.001)
                 except asyncio.TimeoutError:
                     continue
+                except websockets.exceptions.ConnectionClosed:
+                    break
+                    
+        # 루프를 빠져나왔다면(사용자가 말을 멈췄다면), 서버 응답을 마저 기다림
+        if not stop_event.is_set():
+             print("\n  ⏳ 최대 입력 시간 초과. 서버 분석을 기다립니다...")
+             
+        final_result = await recv_task
+        print("  [마이크 입력 종료]")
+        return final_result
+        
     except Exception as e:
         print(f"  ❌ 마이크 스트리밍 중 오류: {e}")
-        
-    print("  [마이크 입력 종료] 서버 분석을 기다립니다...")
+        return None
 
 async def send_audio_to_stt_nlu(mode="file", audio_file_path="0424.MP3"):
     """
@@ -94,24 +123,25 @@ async def send_audio_to_stt_nlu(mode="file", audio_file_path="0424.MP3"):
                         chunk = chunk + b'\x00' * (chunk_size - len(chunk))
                     await websocket.send(chunk)
                     await asyncio.sleep(0.005)
-            else:
-                # 마이크 스트리밍 모드
-                await send_mic_streaming(websocket, duration=7)
 
-            print("  [전송 완료] 서버 VAD 종료 트리거를 위해 무음(Silence) 데이터를 보냅니다...")
-            silence_chunk = b'\x00' * 960
-            for _ in range(25):
-                await websocket.send(silence_chunk)
-                await asyncio.sleep(0.03)
-            
-            print("  [대기 중] 서버에서 분석 결과가 나올 때까지 기다립니다...")
-            
-            try:
-                response = await asyncio.wait_for(websocket.recv(), timeout=30.0)
-                result = json.loads(response)
-            except asyncio.TimeoutError:
-                print("  ❌ 타임아웃: 서버가 응답을 보내지 않았습니다.")
-                return None
+                print("  [전송 완료] 서버 VAD 종료 트리거를 위해 무음(Silence) 데이터를 보냅니다...")
+                silence_chunk = b'\x00' * 960
+                for _ in range(25):
+                    await websocket.send(silence_chunk)
+                    await asyncio.sleep(0.03)
+                
+                print("  [대기 중] 서버에서 분석 결과가 나올 때까지 기다립니다...")
+                try:
+                    response = await asyncio.wait_for(websocket.recv(), timeout=30.0)
+                    result = json.loads(response)
+                except asyncio.TimeoutError:
+                    print("  ❌ 타임아웃: 서버가 응답을 보내지 않았습니다.")
+                    return None
+            else:
+                # 마이크 스트리밍 모드는 내부에서 이미 결과를 받아서 반환함
+                result = await send_mic_streaming(websocket, duration=15)
+                if not result:
+                    return None
             
             if "error" in result:
                 print(f"  ❌ 서버 에러: {result['error']}")
