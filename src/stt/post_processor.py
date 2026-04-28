@@ -1,7 +1,39 @@
 import re
+from stt.streaming.vocabulary import get_financial_vocabulary
+
+_ONSET = list("ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ")
+_VOWEL = list("ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ")
+_CODA  = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
+
+def _decompose(text: str) -> str:
+    out = []
+    for ch in text:
+        code = ord(ch)
+        if 0xAC00 <= code <= 0xD7A3:
+            offset = code - 0xAC00
+            out.append(_ONSET[offset // 588])
+            out.append(_VOWEL[(offset % 588) // 28])
+            coda = _CODA[offset % 28]
+            if coda:
+                out.append(coda)
+        else:
+            out.append(ch)
+    return ''.join(out)
+
+def _jamo_distance(a: str, b: str) -> int:
+    ja, jb = _decompose(a), _decompose(b)
+    m, n = len(ja), len(jb)
+    dp = list(range(n + 1))
+    for i in range(1, m + 1):
+        prev, dp[0] = dp[0], i
+        for j in range(1, n + 1):
+            prev, dp[j] = dp[j], prev if ja[i-1] == jb[j-1] else 1 + min(prev, dp[j], dp[j-1])
+    return dp[n]
 
 class STTPostProcessor:
     def __init__(self):
+        self._vocab = get_financial_vocabulary()
+
         # 한글 숫자 매핑 (가상 지도 생성용)
         self.num_map = {
             "공": "0", "영": "0", "일": "1", "하나": "1", "이": "2", "둘": "2",
@@ -26,6 +58,25 @@ class STTPostProcessor:
         for wrong, right in self.domain_dict.items():
             text = text.replace(wrong, right)
         return text
+
+    def correct_with_vocabulary(self, text: str, max_jamo_dist: int = 2) -> str:
+        tokens = text.split()
+        result = []
+        for token in tokens:
+            m = re.search(r'[^가-힣a-zA-Z0-9]+$', token)
+            suffix = m.group() if m else ''
+            core = token[:m.start()] if m else token
+
+            best, best_dist = None, max_jamo_dist + 1
+            for word in self._vocab:
+                if abs(len(core) - len(word)) > 1:
+                    continue
+                dist = _jamo_distance(core, word)
+                if dist < best_dist:
+                    best_dist, best = dist, word
+
+            result.append((best if best else core) + suffix)
+        return ' '.join(result)
 
     def mask_pii(self, text):
         """정교한 PII 마스킹: 4자리 비밀번호 및 파편화된 번호 대응"""
@@ -90,12 +141,12 @@ class STTPostProcessor:
 
     def process(self, raw_text):
         if not raw_text: return ""
-        
-        # 순서 주의: 도메인 교정 및 간투어 제거 후 마스킹 수행
+
         text = self.remove_fillers(raw_text)
         text = self.correct_domain_terms(text)
+        text = self.correct_with_vocabulary(text)
         text = self.mask_pii(text)
-        
+
         return text
 
 if __name__ == "__main__":

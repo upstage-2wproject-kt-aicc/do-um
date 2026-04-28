@@ -8,7 +8,7 @@ STT 백엔드 선택:
 import os
 import time
 import uuid
-import queue
+from collections import deque
 from dataclasses import dataclass, field
 from typing import Literal, Generator
 
@@ -16,8 +16,12 @@ import webrtcvad
 from dotenv import load_dotenv
 
 from common.schemas import Transcript
+from stt.streaming.vocabulary import get_financial_vocabulary
 
 load_dotenv()
+
+_FINANCE_VOCAB = get_financial_vocabulary()
+_WHISPER_PROMPT = ", ".join(_FINANCE_VOCAB)
 
 SAMPLE_RATE = 16000
 FRAME_MS = 30
@@ -31,12 +35,13 @@ class StreamingPipeline:
     """webrtcvad로 발화 구간 감지 → Google Streaming STT or OpenAI."""
 
     google_project_id: str = ""
-    stt_provider: Literal["google", "openai"] = "google"
+    stt_provider: Literal["google", "openai"] = "openai"
     session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    vad_aggressiveness: int = 3
+    vad_aggressiveness: int = 2
     silence_limit: int = SILENCE_LIMIT_FRAMES
 
     _speech_buffer: list[bytes] = field(default_factory=list, init=False, repr=False)
+    _pre_roll_buffer: deque = field(default_factory=lambda: deque(maxlen=10), init=False, repr=False)
     _silent_frames: int = field(default=0, init=False, repr=False)
     _is_speaking: bool = field(default=False, init=False, repr=False)
     _vad: webrtcvad.Vad = field(init=False, repr=False)
@@ -53,9 +58,12 @@ class StreamingPipeline:
                 language_code="ko-KR",
                 model="telephony",
                 use_enhanced=True,
+                speech_contexts=[
+                    speech.SpeechContext(phrases=_FINANCE_VOCAB, boost=5.0)
+                ],
             )
             self._streaming_config = speech.StreamingRecognitionConfig(
-                config=self._google_config, 
+                config=self._google_config,
                 interim_results=False
             )
             
@@ -73,6 +81,11 @@ class StreamingPipeline:
         is_speech = self._vad.is_speech(frame, SAMPLE_RATE)
 
         if is_speech:
+            if not self._is_speaking:
+                # 무음 -> 유음 전환 시: 링 버퍼에 모아둔 앞부분(Pre-roll) 오디오를 먼저 버퍼에 넣음
+                self._speech_buffer.extend(self._pre_roll_buffer)
+                self._pre_roll_buffer.clear()
+                
             self._speech_buffer.append(frame)
             self._silent_frames = 0
             self._is_speaking = True
@@ -83,11 +96,15 @@ class StreamingPipeline:
                 result = self._flush()
                 self._reset()
                 return result
+        else:
+            # 말을 하고 있지 않을 때는 항상 최근 N개의 프레임을 링 버퍼에 보관
+            self._pre_roll_buffer.append(frame)
 
         return None
 
     def _reset(self):
         self._speech_buffer = []
+        self._pre_roll_buffer.clear()
         self._silent_frames = 0
         self._is_speaking = False
 
@@ -158,6 +175,7 @@ class StreamingPipeline:
                 model="whisper-1",
                 file=("audio.wav", io.BytesIO(wav_bytes), "audio/wav"),
                 language="ko",
+                prompt=_WHISPER_PROMPT,
             )
             text = response.text
             if not text:
