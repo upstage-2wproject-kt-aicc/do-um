@@ -82,9 +82,29 @@ def _load_eval_rows(csv_path: Path, limit: int) -> list[dict[str, Any]]:
             "gold_subdomain": str(r["expected_subdomain"]).strip()
             if "expected_subdomain" in df.columns and str(r["expected_subdomain"]).strip()
             else None,
+            "gold_intent": str(r["expected_intent"]).strip()
+            if "expected_intent" in df.columns and str(r["expected_intent"]).strip()
+            else None,
         }
         rows.append(row)
     return rows
+
+
+def _weighted_faq_score(
+    *,
+    gold_ids: set[str],
+    got_ids: set[str],
+    extra_penalty: float,
+) -> tuple[float, list[str], list[str]]:
+    """정답 포함 보상 + 불필요 문서 패널티 기반 점수."""
+    if not gold_ids:
+        return 0.0, [], []
+    hits = gold_ids & got_ids
+    missed = sorted(gold_ids - got_ids)
+    extras = sorted(got_ids - gold_ids)
+    recall = len(hits) / len(gold_ids)
+    score = max(0.0, recall - (extra_penalty * len(extras)))
+    return score, missed, extras
 
 
 def main() -> None:
@@ -103,7 +123,31 @@ def main() -> None:
         "--eval-csv",
         type=Path,
         default=None,
-        help="평가용 CSV (user_query 필수, 선택: gold_faq_ids, should_handoff, expected_subdomain)",
+        help="평가용 CSV (user_query 필수, 선택: gold_faq_ids, should_handoff, expected_subdomain, expected_intent)",
+    )
+    parser.add_argument(
+        "--intent-model-dir",
+        type=Path,
+        default=_SCRIPT_DIR / "my_aicc_nlu_model_klue",
+        help="Intent 분류 모델 디렉터리 (기본: my_aicc_nlu_model_klue)",
+    )
+    parser.add_argument(
+        "--subdomain-model-dir",
+        type=Path,
+        default=None,
+        help="Subdomain 분류 모델 디렉터리 (선택)",
+    )
+    parser.add_argument(
+        "--ab-intent-model-dir",
+        type=Path,
+        default=None,
+        help="A/B 비교용 Intent 모델 디렉터리(B). 지정 시 A와 B를 연속 실행합니다.",
+    )
+    parser.add_argument(
+        "--ab-subdomain-model-dir",
+        type=Path,
+        default=None,
+        help="A/B 비교용 Subdomain 모델 디렉터리(B).",
     )
     parser.add_argument(
         "--limit",
@@ -133,6 +177,23 @@ def main() -> None:
         default=None,
         help="요약 1줄 JSON을 이 경로에도 추가 기록 (append, 기본 reports의 jsonl 외 추가)",
     )
+    parser.add_argument(
+        "--disable-cache-for-eval",
+        action="store_true",
+        help="eval-csv 실행 시 캐시를 비활성화해 RAG 검색 품질만 측정",
+    )
+    parser.add_argument(
+        "--eval-scoring",
+        choices=["binary", "weighted"],
+        default="binary",
+        help="FAQ 평가 방식 (binary=기존 hit, weighted=정답보상-불필요패널티)",
+    )
+    parser.add_argument(
+        "--extra-penalty",
+        type=float,
+        default=0.15,
+        help="weighted 평가 시 불필요 FAQ 1건당 패널티 (기본 0.15)",
+    )
     args = parser.parse_args()
 
     if args.eval_csv is not None:
@@ -149,221 +210,345 @@ def main() -> None:
         "💡 RAG 인덱스: FAQ CSV가 바뀌면 SHA256 지문이 달라져 Pinecone이 자동 재색인됩니다.\n"
     )
 
-    boot_t0 = time.perf_counter()
-    router = AICC_NLU_Router()
-    boot_sec = time.perf_counter() - boot_t0
+    def run_once(
+        *,
+        variant: str,
+        intent_model_dir: Path,
+        subdomain_model_dir: Path | None,
+    ) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
+        boot_t0 = time.perf_counter()
+        router = AICC_NLU_Router(
+            intent_model_dir=intent_model_dir,
+            subdomain_model_dir=subdomain_model_dir,
+        )
+        boot_sec = time.perf_counter() - boot_t0
 
-    intent_sec_list: list[float] = []
-    embed_sec_list: list[float] = []
-    parallel_wall_sec_list: list[float] = []
-    rag_sec_list: list[float] = []
-    total_sec_list: list[float] = []
-    cache_hits = 0
+        intent_sec_list: list[float] = []
+        subdomain_sec_list: list[float] = []
+        embed_sec_list: list[float] = []
+        parallel_wall_sec_list: list[float] = []
+        rag_sec_list: list[float] = []
+        total_sec_list: list[float] = []
+        cache_hits = 0
 
-    faq_checked = 0
-    faq_correct = 0
-    handoff_checked = 0
-    handoff_correct = 0
-    sub_checked = 0
-    sub_correct = 0
+        faq_checked = 0
+        faq_correct = 0
+        handoff_checked = 0
+        handoff_correct = 0
+        sub_checked = 0
+        sub_correct = 0
+        intent_checked = 0
+        intent_correct = 0
+        weighted_scores: list[float] = []
 
-    print(f"\n⏱️ [벤치] 부팅(초기화): {boot_sec:.4f} s")
-    if router.rag_source_fingerprint_sha256:
-        fp = router.rag_source_fingerprint_sha256
-        print(f"📌 [벤치] RAG 소스 지문 SHA256: {fp[:16]}…\n")
+        print(f"\n🧪 [Variant {variant}] intent_model={intent_model_dir}")
+        print(f"🧪 [Variant {variant}] subdomain_model={subdomain_model_dir}")
+        print(f"⏱️ [벤치] 부팅(초기화): {boot_sec:.4f} s")
+        if router.rag_source_fingerprint_sha256:
+            fp = router.rag_source_fingerprint_sha256
+            print(f"📌 [벤치] RAG 소스 지문 SHA256: {fp[:16]}…\n")
 
-    print("-" * 72)
-    print(
-        "고정 컬럼(행별): status | intent_s | embed_s | parallel_wall_s | rag_s | total_s | "
-        "(평가 CSV 시) faq_hit handoff_ok sub_ok  (단위: 초)"
+        print("-" * 72)
+        print(
+            "고정 컬럼(행별): status | intent_s | subdomain_s | embed_s | parallel_wall_s | rag_s | total_s | "
+            "(평가 CSV 시) faq_hit handoff_ok sub_ok intent_ok  (단위: 초)"
+        )
+        print("-" * 72)
+
+        per_query: list[dict[str, Any]] = []
+        for idx, q in enumerate(queries):
+            ctx = contextlib.redirect_stdout(io.StringIO()) if args.quiet else contextlib.nullcontext()
+            with ctx:
+                out = router.process_query(
+                    q,
+                    disable_cache=(args.disable_cache_for_eval and args.eval_csv is not None),
+                )
+            t = out.get("timings_sec", {})
+            intent_s = _timing_sec(t.get("intent_sec"))
+            subdomain_s = _timing_sec(t.get("subdomain_sec"))
+            embed_s = _timing_sec(t.get("embedding_sec"))
+            parallel_wall_s = _timing_sec(t.get("intent_embed_parallel_wall_sec"))
+            rag_s = _timing_sec(t.get("rag_search_sec"))
+            total_s = _timing_sec(t.get("total_sec"))
+
+            intent_sec_list.append(intent_s)
+            subdomain_sec_list.append(subdomain_s)
+            embed_sec_list.append(embed_s)
+            parallel_wall_sec_list.append(parallel_wall_s)
+            rag_sec_list.append(rag_s)
+            total_sec_list.append(total_s)
+
+            st = out.get("status", "")
+            if st == "CACHED":
+                cache_hits += 1
+
+            meta = out.get("metadata") or {}
+            gold = bench_rows[idx] if idx < len(bench_rows) else {}
+
+            faq_hit_s = "-"
+            ho_s = "-"
+            sub_s = "-"
+            intent_ok_s = "-"
+            missed_ids: list[str] = []
+            extra_ids: list[str] = []
+            weighted_faq_score: float | None = None
+            got_set: set[str] = set()
+
+            gold_ids_raw = gold.get("gold_faq_ids")
+            gold_ids: set[str] = gold_ids_raw if isinstance(gold_ids_raw, set) else set()
+            if st == "REQUIRE_LLM":
+                got_ids = out.get("retrieved_faq_ids") or []
+                if got_ids:
+                    got_set = {str(x).strip() for x in got_ids if str(x).strip()}
+                else:
+                    fallback = str(meta.get("faq_id", "")).strip()
+                    got_set = {fallback} if fallback else set()
+
+            if gold_ids and st == "REQUIRE_LLM":
+                faq_checked += 1
+                ok = bool(got_set & gold_ids)
+                if ok:
+                    faq_correct += 1
+                faq_hit_s = "1" if ok else "0"
+                weighted_faq_score, missed_ids, extra_ids = _weighted_faq_score(
+                    gold_ids=gold_ids,
+                    got_ids=got_set,
+                    extra_penalty=args.extra_penalty,
+                )
+                weighted_scores.append(weighted_faq_score)
+
+            gh = gold.get("gold_handoff")
+            if gh is not None and st == "REQUIRE_LLM":
+                pred = str(meta.get("handoff_required", "N")).strip().upper()
+                handoff_checked += 1
+                ok = pred == gh
+                if ok:
+                    handoff_correct += 1
+                ho_s = "1" if ok else "0"
+
+            gs = gold.get("gold_subdomain")
+            pred_sub = str(out.get("subdomain_pred") or "").strip()
+            if gs and pred_sub:
+                sub_checked += 1
+                ok = pred_sub == gs
+                if ok:
+                    sub_correct += 1
+                sub_s = "1" if ok else "0"
+
+            gi = gold.get("gold_intent")
+            pred_intent = str(out.get("intent", "")).strip()
+            if gi and pred_intent:
+                intent_checked += 1
+                ok = pred_intent == gi
+                if ok:
+                    intent_correct += 1
+                intent_ok_s = "1" if ok else "0"
+
+            if not args.quiet:
+                pass
+            gold_disp = "[" + ",".join(sorted(gold_ids)) + "]" if gold_ids else "-"
+            got_disp = "[" + ",".join(sorted(got_set)) + "]" if got_set else "-"
+            print(
+                f"[{variant}|{st}] intent={intent_s:.4f}s subdomain={subdomain_s:.4f}s "
+                f"embed={embed_s:.4f}s parallel_wall={parallel_wall_s:.4f}s rag={rag_s:.4f}s "
+                f"total={total_s:.4f}s | faq={faq_hit_s} ho={ho_s} sub={sub_s} intent_ok={intent_ok_s} "
+                f"| gold={gold_disp} retrieved={got_disp} | {q[:56]}"
+                + ("…" if len(q) > 56 else "")
+            )
+            if args.eval_scoring == "weighted" and weighted_faq_score is not None:
+                print(
+                    f"      ↳ weighted={weighted_faq_score:.4f} "
+                    f"missed={missed_ids or '-'} extra={extra_ids or '-'}"
+                )
+            per_query.append(
+                {
+                    "idx": idx,
+                    "query": q,
+                    "status": st,
+                    "intent": out.get("intent"),
+                    "subdomain_pred": out.get("subdomain_pred"),
+                    "intent_sec": round(intent_s, 6),
+                    "subdomain_sec": round(subdomain_s, 6),
+                    "embed_sec": round(embed_s, 6),
+                    "intent_embed_parallel_wall_sec": round(parallel_wall_s, 6),
+                    "rag_sec": round(rag_s, 6),
+                    "total_sec": round(total_s, 6),
+                    "retrieved_faq_ids": out.get("retrieved_faq_ids", []),
+                    "faq_hit": faq_hit_s,
+                    "faq_weighted": round(weighted_faq_score, 6)
+                    if weighted_faq_score is not None
+                    else None,
+                    "faq_missed_ids": missed_ids,
+                    "faq_extra_ids": extra_ids,
+                    "handoff_ok": ho_s,
+                    "subdomain_ok": sub_s,
+                    "intent_ok": intent_ok_s,
+                }
+            )
+
+        n = len(queries)
+        cache_rate = cache_hits / n if n else 0.0
+        rag_nonzero = [x for x in rag_sec_list if x > 0]
+        saved_at = datetime.now(timezone.utc).isoformat()
+        eval_csv_str = str(args.eval_csv.resolve()) if args.eval_csv is not None else None
+
+        summary = {
+            "saved_at_utc": saved_at,
+            "variant": variant,
+            "time_unit": "seconds",
+            "run_label": args.run_label or None,
+            "eval_csv": eval_csv_str,
+            "eval_limit": args.limit if args.eval_csv is not None else None,
+            "quiet": args.quiet,
+            "intent_model_dir": str(intent_model_dir),
+            "subdomain_model_dir": str(subdomain_model_dir) if subdomain_model_dir else None,
+            "n_queries": n,
+            "boot_sec": round(boot_sec, 6),
+            "rag_source_sha256_prefix": (router.rag_source_fingerprint_sha256 or "")[:16],
+            "mean_intent_sec": round(mean(intent_sec_list), 6) if intent_sec_list else 0.0,
+            "mean_subdomain_sec": round(mean(subdomain_sec_list), 6) if subdomain_sec_list else 0.0,
+            "mean_embed_sec": round(mean(embed_sec_list), 6) if embed_sec_list else 0.0,
+            "mean_intent_embed_parallel_wall_sec": round(mean(parallel_wall_sec_list), 6)
+            if parallel_wall_sec_list
+            else 0.0,
+            "mean_rag_sec": round(mean(rag_sec_list), 6) if rag_sec_list else 0.0,
+            "mean_rag_sec_nonzero_only": round(mean(rag_nonzero), 6) if rag_nonzero else 0.0,
+            "mean_total_sec": round(mean(total_sec_list), 6) if total_sec_list else 0.0,
+            "cache_hit_rate": round(cache_rate, 6),
+            "cache_disabled_for_eval": bool(args.disable_cache_for_eval and args.eval_csv is not None),
+            "eval_scoring": args.eval_scoring,
+            "extra_penalty": args.extra_penalty if args.eval_scoring == "weighted" else None,
+            "faq_acc": round(faq_correct / faq_checked, 6) if faq_checked else None,
+            "faq_eval_n": faq_checked,
+            "faq_weighted_mean": round(mean(weighted_scores), 6) if weighted_scores else None,
+            "handoff_acc": round(handoff_correct / handoff_checked, 6)
+            if handoff_checked
+            else None,
+            "handoff_eval_n": handoff_checked,
+            "subdomain_acc": round(sub_correct / sub_checked, 6) if sub_checked else None,
+            "subdomain_eval_n": sub_checked,
+            "intent_acc": round(intent_correct / intent_checked, 6) if intent_checked else None,
+            "intent_eval_n": intent_checked,
+        }
+
+        print("-" * 72)
+        print(f"\n📊 [요약 {variant}] run_label={args.run_label or '(없음)'}")
+        print(f"• 부팅_sec: {summary['boot_sec']}")
+        print(
+            f"• mean intent_sec / subdomain_sec / embed_sec / parallel_wall_sec / rag_sec / total_sec: "
+            f"{summary['mean_intent_sec']} / {summary['mean_subdomain_sec']} / {summary['mean_embed_sec']} / "
+            f"{summary['mean_intent_embed_parallel_wall_sec']} / {summary['mean_rag_sec']} / "
+            f"{summary['mean_total_sec']}"
+        )
+        print(
+            f"• mean rag_sec (RAG 호출한 행만): {summary['mean_rag_sec_nonzero_only']} "
+            f"(캐시 적중 행은 rag=0으로 집계)"
+        )
+        print(f"• cache_hit_rate: {summary['cache_hit_rate']:.4f} ({cache_hits}/{n})")
+        if faq_checked:
+            print(
+                f"• faq_acc (gold_faq_ids, REQUIRE_LLM만): {summary['faq_acc']} "
+                f"({faq_correct}/{faq_checked})"
+            )
+            if args.eval_scoring == "weighted":
+                print(
+                    f"• faq_weighted_mean (정답보상-불필요패널티): "
+                    f"{summary['faq_weighted_mean']} (penalty={args.extra_penalty})"
+                )
+        else:
+            print("• faq_acc: (평가 CSV·gold_faq_ids 없음 또는 해당 없음)")
+        if handoff_checked:
+            print(
+                f"• handoff_acc (메타 handoff vs should_handoff): {summary['handoff_acc']} "
+                f"({handoff_correct}/{handoff_checked})"
+            )
+        else:
+            print("• handoff_acc: (should_handoff 컬럼 없음 또는 REQUIRE_LLM 없음)")
+        if sub_checked:
+            print(
+                f"• subdomain_acc: {summary['subdomain_acc']} "
+                f"({sub_correct}/{sub_checked})"
+            )
+        else:
+            print("• subdomain_acc: (expected_subdomain 없음 또는 subdomain 모델 미사용)")
+        if intent_checked:
+            print(
+                f"• intent_acc: {summary['intent_acc']} "
+                f"({intent_correct}/{intent_checked})"
+            )
+        else:
+            print("• intent_acc: (expected_intent 없음)")
+        print("=" * 72)
+
+        return summary, per_query, {
+            "cache_hits": cache_hits,
+            "n_queries": n,
+        }
+
+    summary_a, per_query_a, stats_a = run_once(
+        variant="A",
+        intent_model_dir=args.intent_model_dir.resolve(),
+        subdomain_model_dir=args.subdomain_model_dir.resolve() if args.subdomain_model_dir else None,
     )
-    print("-" * 72)
-
-    per_query: list[dict[str, Any]] = []
-    for idx, q in enumerate(queries):
-        ctx = contextlib.redirect_stdout(io.StringIO()) if args.quiet else contextlib.nullcontext()
-        with ctx:
-            out = router.process_query(q)
-        t = out.get("timings_sec", {})
-        intent_s = _timing_sec(t.get("intent_sec"))
-        embed_s = _timing_sec(t.get("embedding_sec"))
-        parallel_wall_s = _timing_sec(t.get("intent_embed_parallel_wall_sec"))
-        rag_s = _timing_sec(t.get("rag_search_sec"))
-        total_s = _timing_sec(t.get("total_sec"))
-
-        intent_sec_list.append(intent_s)
-        embed_sec_list.append(embed_s)
-        parallel_wall_sec_list.append(parallel_wall_s)
-        rag_sec_list.append(rag_s)
-        total_sec_list.append(total_s)
-
-        st = out.get("status", "")
-        if st == "CACHED":
-            cache_hits += 1
-
-        meta = out.get("metadata") or {}
-        gold = bench_rows[idx] if idx < len(bench_rows) else {}
-
-        faq_hit_s = "-"
-        ho_s = "-"
-        sub_s = "-"
-        got_set: set[str] = set()
-
-        gold_ids = gold.get("gold_faq_ids") or set()
-        if st == "REQUIRE_LLM":
-            got_ids = out.get("retrieved_faq_ids") or []
-            if got_ids:
-                got_set = {str(x).strip() for x in got_ids if str(x).strip()}
-            else:
-                fallback = str(meta.get("faq_id", "")).strip()
-                got_set = {fallback} if fallback else set()
-
-        if gold_ids and st == "REQUIRE_LLM":
-            faq_checked += 1
-            ok = bool(got_set & gold_ids)
-            if ok:
-                faq_correct += 1
-            faq_hit_s = "1" if ok else "0"
-
-        gh = gold.get("gold_handoff")
-        if gh is not None and st == "REQUIRE_LLM":
-            pred = str(meta.get("handoff_required", "N")).strip().upper()
-            handoff_checked += 1
-            ok = pred == gh
-            if ok:
-                handoff_correct += 1
-            ho_s = "1" if ok else "0"
-
-        gs = gold.get("gold_subdomain")
-        if gs and st == "REQUIRE_LLM":
-            pred_sub = str(meta.get("subdomain", "")).strip()
-            sub_checked += 1
-            ok = pred_sub == gs
-            if ok:
-                sub_correct += 1
-            sub_s = "1" if ok else "0"
-
-        if not args.quiet:
-            pass
-        gold_disp = "[" + ",".join(sorted(gold_ids)) + "]" if gold_ids else "-"
-        got_disp = "[" + ",".join(sorted(got_set)) + "]" if got_set else "-"
+    has_ab = args.ab_intent_model_dir is not None
+    summary_b: dict[str, Any] | None = None
+    per_query_b: list[dict[str, Any]] | None = None
+    if has_ab:
+        summary_b, per_query_b, _ = run_once(
+            variant="B",
+            intent_model_dir=args.ab_intent_model_dir.resolve(),
+            subdomain_model_dir=args.ab_subdomain_model_dir.resolve()
+            if args.ab_subdomain_model_dir
+            else None,
+        )
+        print("\n🆚 [A/B 비교 핵심]")
         print(
-            f"[{st}] intent={intent_s:.4f}s embed={embed_s:.4f}s "
-            f"parallel_wall={parallel_wall_s:.4f}s rag={rag_s:.4f}s "
-            f"total={total_s:.4f}s | faq={faq_hit_s} ho={ho_s} sub={sub_s} "
-            f"| gold={gold_disp} retrieved={got_disp} | {q[:56]}"
-            + ("…" if len(q) > 56 else "")
+            f"• mean_total_sec A/B: {summary_a['mean_total_sec']} / {summary_b['mean_total_sec']}"
         )
-        per_query.append(
-            {
-                "idx": idx,
-                "query": q,
-                "status": st,
-                "intent": out.get("intent"),
-                "intent_sec": round(intent_s, 6),
-                "embed_sec": round(embed_s, 6),
-                "intent_embed_parallel_wall_sec": round(parallel_wall_s, 6),
-                "rag_sec": round(rag_s, 6),
-                "total_sec": round(total_s, 6),
-                "retrieved_faq_ids": out.get("retrieved_faq_ids", []),
-                "faq_hit": faq_hit_s,
-                "handoff_ok": ho_s,
-                "subdomain_ok": sub_s,
-            }
-        )
-
-    n = len(queries)
-    cache_rate = cache_hits / n if n else 0.0
-    rag_nonzero = [x for x in rag_sec_list if x > 0]
-    saved_at = datetime.now(timezone.utc).isoformat()
-    eval_csv_str = str(args.eval_csv.resolve()) if args.eval_csv is not None else None
-
-    summary = {
-        "saved_at_utc": saved_at,
-        "time_unit": "seconds",
-        "run_label": args.run_label or None,
-        "eval_csv": eval_csv_str,
-        "eval_limit": args.limit if args.eval_csv is not None else None,
-        "quiet": args.quiet,
-        "n_queries": n,
-        "boot_sec": round(boot_sec, 6),
-        "rag_source_sha256_prefix": (router.rag_source_fingerprint_sha256 or "")[:16],
-        "mean_intent_sec": round(mean(intent_sec_list), 6) if intent_sec_list else 0.0,
-        "mean_embed_sec": round(mean(embed_sec_list), 6) if embed_sec_list else 0.0,
-        "mean_intent_embed_parallel_wall_sec": round(mean(parallel_wall_sec_list), 6)
-        if parallel_wall_sec_list
-        else 0.0,
-        "mean_rag_sec": round(mean(rag_sec_list), 6) if rag_sec_list else 0.0,
-        "mean_rag_sec_nonzero_only": round(mean(rag_nonzero), 6) if rag_nonzero else 0.0,
-        "mean_total_sec": round(mean(total_sec_list), 6) if total_sec_list else 0.0,
-        "cache_hit_rate": round(cache_rate, 6),
-        "faq_acc": round(faq_correct / faq_checked, 6) if faq_checked else None,
-        "faq_eval_n": faq_checked,
-        "handoff_acc": round(handoff_correct / handoff_checked, 6)
-        if handoff_checked
-        else None,
-        "handoff_eval_n": handoff_checked,
-        "subdomain_acc": round(sub_correct / sub_checked, 6) if sub_checked else None,
-        "subdomain_eval_n": sub_checked,
-    }
-
-    print("-" * 72)
-    print("\n📊 [A/B 고정 요약] run_label=", repr(args.run_label or "(없음)"))
-    print(f"• 부팅_sec: {summary['boot_sec']}")
-    print(
-        f"• mean intent_sec / embed_sec / parallel_wall_sec / rag_sec / total_sec: "
-        f"{summary['mean_intent_sec']} / {summary['mean_embed_sec']} / "
-        f"{summary['mean_intent_embed_parallel_wall_sec']} / {summary['mean_rag_sec']} / "
-        f"{summary['mean_total_sec']}"
-    )
-    print(
-        f"• mean rag_sec (RAG 호출한 행만): {summary['mean_rag_sec_nonzero_only']} "
-        f"(캐시 적중 행은 rag=0으로 집계)"
-    )
-    print(f"• cache_hit_rate: {summary['cache_hit_rate']:.4f} ({cache_hits}/{n})")
-    if faq_checked:
+        print(f"• intent_acc A/B: {summary_a['intent_acc']} / {summary_b['intent_acc']}")
         print(
-            f"• faq_acc (gold_faq_ids, REQUIRE_LLM만): {summary['faq_acc']} "
-            f"({faq_correct}/{faq_checked})"
+            f"• subdomain_acc A/B: {summary_a['subdomain_acc']} / {summary_b['subdomain_acc']}"
         )
-    else:
-        print("• faq_acc: (평가 CSV·gold_faq_ids 없음 또는 해당 없음)")
-    if handoff_checked:
-        print(
-            f"• handoff_acc (메타 handoff vs should_handoff): {summary['handoff_acc']} "
-            f"({handoff_correct}/{handoff_checked})"
-        )
-    else:
-        print("• handoff_acc: (should_handoff 컬럼 없음 또는 REQUIRE_LLM 없음)")
-    if sub_checked:
-        print(
-            f"• subdomain_acc: {summary['subdomain_acc']} "
-            f"({sub_correct}/{sub_checked})"
-        )
-    else:
-        print("• subdomain_acc: (expected_subdomain 없음)")
-    print("=" * 72)
 
     if not args.no_save:
         reports_dir = args.reports_dir.resolve()
         reports_dir.mkdir(parents=True, exist_ok=True)
-        summary_line = json.dumps(summary, ensure_ascii=False)
+        summary_line = json.dumps(summary_a, ensure_ascii=False)
         jsonl_path = reports_dir / "nlu_bench_summary.jsonl"
         with jsonl_path.open("a", encoding="utf-8") as f:
             f.write(summary_line + "\n")
+            if summary_b is not None:
+                f.write(json.dumps(summary_b, ensure_ascii=False) + "\n")
 
         last_run = {
-            "saved_at_utc": saved_at,
-            "summary": summary,
-            "per_query": per_query,
+            "saved_at_utc": datetime.now(timezone.utc).isoformat(),
+            "summary": summary_a,
+            "per_query": per_query_a,
         }
         runs_jsonl_path = reports_dir / "nlu_bench_runs.jsonl"
         with runs_jsonl_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(last_run, ensure_ascii=False) + "\n")
+        if summary_b is not None and per_query_b is not None:
+            run_b = {
+                "saved_at_utc": datetime.now(timezone.utc).isoformat(),
+                "summary": summary_b,
+                "per_query": per_query_b,
+            }
+            with runs_jsonl_path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(run_b, ensure_ascii=False) + "\n")
 
         last_path = reports_dir / "nlu_bench_last_run.json"
+        last_payload: dict[str, Any] = last_run
+        if summary_b is not None and per_query_b is not None:
+            last_payload = {
+                "saved_at_utc": datetime.now(timezone.utc).isoformat(),
+                "ab": {
+                    "A": {"summary": summary_a, "per_query": per_query_a},
+                    "B": {"summary": summary_b, "per_query": per_query_b},
+                },
+            }
         last_path.write_text(
-            json.dumps(last_run, ensure_ascii=False, indent=2) + "\n",
+            json.dumps(last_payload, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
         print(f"\n📝 벤치 결과 저장:")
@@ -376,6 +561,8 @@ def main() -> None:
             extra.parent.mkdir(parents=True, exist_ok=True)
             with extra.open("a", encoding="utf-8") as f:
                 f.write(summary_line + "\n")
+                if summary_b is not None:
+                    f.write(json.dumps(summary_b, ensure_ascii=False) + "\n")
             print(f"   • 추가 요약 append: {extra}")
 
 
