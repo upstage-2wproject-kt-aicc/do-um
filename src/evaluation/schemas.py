@@ -119,6 +119,7 @@ class ModelEvaluationRecord(BaseModel):
     review_required: bool = Field(False)
     latency_ms: int = Field(0, ge=0)
     token_usage: dict[str, int] = Field(default_factory=dict)
+    finish_reason: str | None = None
     error: str | None = None
 
 

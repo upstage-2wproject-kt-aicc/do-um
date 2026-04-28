@@ -106,6 +106,7 @@ class EvaluationRunner:
                             review_required=requires_review(aggregated),
                             latency_ms=answer.latency_ms,
                             token_usage=answer.token_usage,
+                            finish_reason=answer.finish_reason,
                             error=answer.error,
                         )
                     )

@@ -225,6 +225,7 @@ class GoogleVertexGeminiChatClient:
             config=_build_vertex_config(
                 request,
                 json_response=json_response,
+                thinking_budget=_vertex_thinking_budget(model_id),
             ),
         )
 
@@ -367,7 +368,11 @@ def _load_genai_client(**kwargs: Any) -> Any:
     return genai.Client(**kwargs)
 
 
-def _build_vertex_config(request: LLMRequest, json_response: bool = False) -> Any:
+def _build_vertex_config(
+    request: LLMRequest,
+    json_response: bool = False,
+    thinking_budget: int | None = None,
+) -> Any:
     from google.genai import types
 
     kwargs: dict[str, Any] = {
@@ -377,9 +382,28 @@ def _build_vertex_config(request: LLMRequest, json_response: bool = False) -> An
     }
     if json_response:
         kwargs["response_mime_type"] = "application/json"
+    if thinking_budget is not None:
+        kwargs["thinking_config"] = types.ThinkingConfig(
+            thinking_budget=thinking_budget
+        )
     return types.GenerateContentConfig(
         **kwargs,
     )
+
+
+def _vertex_thinking_budget(model_id: str) -> int | None:
+    """Returns a small thinking budget for Gemini reasoning models.
+
+    Gemini 2.5+ counts hidden thinking tokens against max output tokens. Keeping
+    the budget bounded prevents short customer-facing answers from being cut off.
+    """
+    normalized = model_id.lower()
+    if not normalized.startswith(("gemini-2.5", "gemini-3")):
+        return None
+    raw = os.getenv("GOOGLE_VERTEX_THINKING_BUDGET", "128").strip().lower()
+    if raw in {"", "none", "off", "disabled"}:
+        return None
+    return int(raw)
 
 
 def _openai_content(body: dict[str, Any]) -> str:

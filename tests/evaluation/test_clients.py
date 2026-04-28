@@ -257,6 +257,7 @@ async def test_google_vertex_gemini_client_uses_project_location_and_model(
         "candidatesTokenCount": 2,
         "totalTokenCount": 7,
     }
+    assert getattr(calls["generate_content"]["config"], "thinking_config").thinking_budget == 128
 
 
 @pytest.mark.asyncio
@@ -284,11 +285,12 @@ async def test_google_vertex_judge_client_requests_json_response(monkeypatch) ->
     monkeypatch.setenv("GOOGLE_CLOUD_LOCATION", "global")
 
     await GoogleVertexGeminiChatClient(client_factory=FakeGenaiClient).generate(
-        JudgeModel(provider="google", model_id="gemini-judge"),
+        JudgeModel(provider="google", model_id="gemini-3.1-pro-preview"),
         LLMRequest(session_id="s1", prompt="질문", system_prompt="시스템"),
     )
 
     assert getattr(calls["generate_content"]["config"], "response_mime_type") == "application/json"
+    assert getattr(calls["generate_content"]["config"], "thinking_config").thinking_budget == 128
 
 
 def test_parse_judge_json_validates_metric_scores() -> None:

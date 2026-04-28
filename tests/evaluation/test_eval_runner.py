@@ -21,6 +21,7 @@ class FakeCandidateClient:
             provider=model.provider,
             text=f"{model.model_id} answer for {request.session_id}",
             latency_ms=123,
+            finish_reason="stop",
             token_usage={"prompt_tokens": 10, "completion_tokens": 5},
         )
 
@@ -113,4 +114,5 @@ async def _run_runner_aggregation_assertions() -> None:
     assert first.aggregated_judge.metrics["answer_accuracy"].disagreement == 2
     assert first.primary_score == pytest.approx(1.0)
     assert first.review_required is True
+    assert first.finish_reason == "stop"
     assert "Route=FAQ" in (first.llm_request.system_prompt or "")
