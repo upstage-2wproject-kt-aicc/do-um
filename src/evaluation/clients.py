@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import asyncio
+import re
 import time
 from pathlib import Path
 from typing import Any, Callable, TypeAlias
@@ -85,6 +86,8 @@ class OpenAICompatibleChatClient:
         else:
             payload["temperature"] = request.temperature
             payload["max_tokens"] = request.max_tokens
+        if isinstance(model, JudgeModel) and model.provider in {"openai", "gpt"}:
+            payload["response_format"] = {"type": "json_object"}
         headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         async with httpx.AsyncClient(timeout=self.timeout_s) as client:
             response = await client.post(
@@ -193,6 +196,7 @@ class GoogleVertexGeminiChatClient:
             location,
             model.model_id,
             request,
+            isinstance(model, JudgeModel),
         )
         latency_ms = int((time.perf_counter() - started) * 1000)
         return LLMResponse(
@@ -211,13 +215,17 @@ class GoogleVertexGeminiChatClient:
         location: str,
         model_id: str,
         request: LLMRequest,
+        json_response: bool,
     ) -> Any:
         client_factory = self.client_factory or _load_genai_client
         client = client_factory(vertexai=True, project=project, location=location)
         return client.models.generate_content(
             model=model_id,
             contents=request.prompt,
-            config=_build_vertex_config(request),
+            config=_build_vertex_config(
+                request,
+                json_response=json_response,
+            ),
         )
 
 
@@ -261,7 +269,7 @@ class CompositeJudgeClient:
             system_prompt=Path(self.prompt_path).read_text(encoding="utf-8"),
             prompt=build_judge_user_prompt(scenario, answer),
             temperature=0.0,
-            max_tokens=1200,
+            max_tokens=2400,
         )
         if judge.provider in {"openai", "gpt"}:
             response = await self.openai.generate(judge, request)
@@ -304,7 +312,7 @@ def build_judge_user_prompt(
 
 def parse_judge_json(judge_model: str, text: str) -> JudgeEvaluation:
     """Parses judge JSON and validates the required metric keys."""
-    data = json.loads(_strip_json_fence(text))
+    data = _load_judge_json(text)
     metrics: dict[str, JudgeMetricScore] = {}
     for metric_name in JUDGE_METRIC_NAMES:
         raw_metric = data.get(metric_name)
@@ -359,13 +367,18 @@ def _load_genai_client(**kwargs: Any) -> Any:
     return genai.Client(**kwargs)
 
 
-def _build_vertex_config(request: LLMRequest) -> Any:
+def _build_vertex_config(request: LLMRequest, json_response: bool = False) -> Any:
     from google.genai import types
 
+    kwargs: dict[str, Any] = {
+        "system_instruction": request.system_prompt or None,
+        "temperature": request.temperature,
+        "max_output_tokens": request.max_tokens,
+    }
+    if json_response:
+        kwargs["response_mime_type"] = "application/json"
     return types.GenerateContentConfig(
-        system_instruction=request.system_prompt or None,
-        temperature=request.temperature,
-        max_output_tokens=request.max_tokens,
+        **kwargs,
     )
 
 
@@ -425,9 +438,32 @@ def _strip_json_fence(text: str) -> str:
     stripped = text.strip()
     if stripped.startswith("```"):
         lines = stripped.splitlines()
-        if lines and lines[0].startswith("```"):
+        if lines and lines[0].strip().startswith("```"):
             lines = lines[1:]
-        if lines and lines[-1].startswith("```"):
+        if lines and lines[-1].strip().startswith("```"):
             lines = lines[:-1]
         return "\n".join(lines).strip()
     return stripped
+
+
+def _load_judge_json(text: str) -> dict[str, Any]:
+    stripped = _extract_json_object(_strip_json_fence(text))
+    try:
+        data = json.loads(stripped)
+    except json.JSONDecodeError:
+        data = json.loads(_remove_trailing_json_commas(stripped))
+    if not isinstance(data, dict):
+        raise ValueError("Judge response must be a JSON object.")
+    return data
+
+
+def _extract_json_object(text: str) -> str:
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end < start:
+        return text.strip()
+    return text[start : end + 1].strip()
+
+
+def _remove_trailing_json_commas(text: str) -> str:
+    return re.sub(r",\s*([}\]])", r"\1", text)

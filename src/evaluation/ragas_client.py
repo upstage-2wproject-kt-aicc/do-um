@@ -5,10 +5,11 @@ from __future__ import annotations
 import asyncio
 import math
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol
 
 from src.common.schemas import LLMResponse
+from src.evaluation.env import load_evaluation_env
 from src.evaluation.schemas import EvaluationScenario, RagasEvaluation
 
 
@@ -27,6 +28,7 @@ class RagasDependencies:
     evaluate_fn: Callable[..., Any]
     dataset_factory: DatasetFactory
     metrics: list[Any]
+    evaluate_kwargs: dict[str, Any] = field(default_factory=dict)
 
 
 def build_ragas_row(
@@ -77,17 +79,25 @@ class RagasClient:
         dataset = deps.dataset_factory.from_dict(
             {column: [value] for column, value in row.items()}
         )
+        has_context = bool(scenario.retrieved_context.strip())
+        metrics = _metrics_for_context(deps.metrics, has_context)
         result = await asyncio.to_thread(
             deps.evaluate_fn,
             dataset=dataset,
-            metrics=deps.metrics,
+            metrics=metrics,
             raise_exceptions=False,
             show_progress=False,
+            **deps.evaluate_kwargs,
         )
+        details = {"status": "ok"}
+        if not has_context:
+            details["faithfulness_status"] = "not_applicable_no_context"
         return RagasEvaluation(
-            faithfulness=_optional_float(_metric_value(result, "faithfulness")),
+            faithfulness=None
+            if not has_context
+            else _optional_float(_metric_value(result, "faithfulness")),
             answer_relevancy=_optional_float(_metric_value(result, "answer_relevancy")),
-            details={"status": "ok"},
+            details=details,
         )
 
     def _dependencies(self) -> RagasDependencies:
@@ -104,18 +114,47 @@ def load_ragas_dependencies() -> RagasDependencies:
     """Imports RAGAS dependencies lazily so tests can run without provider calls."""
     configure_ragas_openai_env()
     from datasets import Dataset
+    from langchain_openai import ChatOpenAI, OpenAIEmbeddings
     from ragas import evaluate
-    from ragas.metrics import Faithfulness, ResponseRelevancy
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from ragas.llms import LangchainLLMWrapper
 
+    try:
+        from ragas.metrics.collections import Faithfulness, ResponseRelevancy
+    except ImportError:  # pragma: no cover - older ragas fallback
+        from ragas.metrics import Faithfulness, ResponseRelevancy
+
+    llm = LangchainLLMWrapper(
+        ChatOpenAI(
+            model=_first_env(
+                (
+                    "RAGAS_OPENAI_MODEL",
+                    "LLM_GPT_MODEL",
+                )
+            )
+            or "gpt-4o-mini",
+            temperature=0,
+        )
+    )
+    embeddings = LangchainEmbeddingsWrapper(
+        OpenAIEmbeddings(
+            model=_first_env(("RAGAS_OPENAI_EMBEDDING_MODEL",))
+            or "text-embedding-3-small"
+        )
+    )
     return RagasDependencies(
         evaluate_fn=evaluate,
         dataset_factory=Dataset,
-        metrics=[Faithfulness(), ResponseRelevancy()],
+        metrics=[
+            Faithfulness(llm=llm),
+            ResponseRelevancy(llm=llm, embeddings=embeddings),
+        ],
     )
 
 
 def configure_ragas_openai_env() -> None:
     """Fills OpenAI env names expected by RAGAS from project-specific aliases."""
+    load_evaluation_env()
     if not os.getenv("OPENAI_API_KEY"):
         api_key = _first_env(
             ("JUDGE_OPENAI_API_KEY", "LLM_GPT_API_KEY", "OPENAI_API_KEY")
@@ -155,7 +194,27 @@ def _metric_value(result: Any, key: str) -> Any:
 def _optional_float(value: Any) -> float | None:
     if value is None:
         return None
+    if isinstance(value, (list, tuple)):
+        scores = [
+            score
+            for item in value
+            if (score := _optional_float(item)) is not None
+        ]
+        if not scores:
+            return None
+        return sum(scores) / len(scores)
     score = float(value)
     if math.isnan(score):
         return None
     return score
+
+
+def _metrics_for_context(metrics: list[Any], has_context: bool) -> list[Any]:
+    if has_context:
+        return metrics
+    return [metric for metric in metrics if not _is_faithfulness_metric(metric)]
+
+
+def _is_faithfulness_metric(metric: Any) -> bool:
+    name = metric if isinstance(metric, str) else getattr(metric, "name", "")
+    return "faithfulness" in str(name)

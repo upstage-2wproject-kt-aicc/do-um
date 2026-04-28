@@ -10,7 +10,7 @@ from src.evaluation.clients import (
     build_judge_user_prompt,
     parse_judge_json,
 )
-from src.evaluation.schemas import CandidateModel, EvaluationScenario, JudgeMetricScore
+from src.evaluation.schemas import CandidateModel, EvaluationScenario, JudgeMetricScore, JudgeModel
 
 
 class FakeResponse:
@@ -119,6 +119,26 @@ async def test_openai_judge_client_uses_gpt_key_fallback(monkeypatch) -> None:
     )
 
     assert fake.requests[0]["headers"]["Authorization"] == "Bearer fallback-gpt-key"
+
+
+@pytest.mark.asyncio
+async def test_openai_judge_client_requests_json_object(monkeypatch) -> None:
+    fake = FakeAsyncClient(
+        FakeResponse(
+            {
+                "choices": [{"message": {"content": "{}"}, "finish_reason": "stop"}],
+            }
+        )
+    )
+    monkeypatch.setenv("JUDGE_OPENAI_API_KEY", "judge-key")
+    monkeypatch.setattr("src.evaluation.clients.httpx.AsyncClient", lambda **_: fake)
+
+    await OpenAICompatibleChatClient().generate(
+        JudgeModel(provider="openai", model_id="gpt-judge"),
+        LLMRequest(session_id="s1", prompt="질문", system_prompt="시스템"),
+    )
+
+    assert fake.requests[0]["json"]["response_format"] == {"type": "json_object"}
 
 
 @pytest.mark.asyncio
@@ -239,6 +259,38 @@ async def test_google_vertex_gemini_client_uses_project_location_and_model(
     }
 
 
+@pytest.mark.asyncio
+async def test_google_vertex_judge_client_requests_json_response(monkeypatch) -> None:
+    calls: dict[str, object] = {}
+
+    class FakeModels:
+        def generate_content(self, **kwargs):
+            calls["generate_content"] = kwargs
+            return type(
+                "FakeVertexResponse",
+                (),
+                {
+                    "text": "{}",
+                    "usage_metadata": None,
+                    "candidates": [],
+                },
+            )()
+
+    class FakeGenaiClient:
+        def __init__(self, **kwargs) -> None:
+            self.models = FakeModels()
+
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "project-test")
+    monkeypatch.setenv("GOOGLE_CLOUD_LOCATION", "global")
+
+    await GoogleVertexGeminiChatClient(client_factory=FakeGenaiClient).generate(
+        JudgeModel(provider="google", model_id="gemini-judge"),
+        LLMRequest(session_id="s1", prompt="질문", system_prompt="시스템"),
+    )
+
+    assert getattr(calls["generate_content"]["config"], "response_mime_type") == "application/json"
+
+
 def test_parse_judge_json_validates_metric_scores() -> None:
     evaluation = parse_judge_json(
         judge_model="judge-a",
@@ -256,6 +308,27 @@ def test_parse_judge_json_validates_metric_scores() -> None:
 
     assert isinstance(evaluation.metrics["answer_accuracy"], JudgeMetricScore)
     assert evaluation.metrics["answer_accuracy"].score == 5
+    assert evaluation.summary == {"risks": []}
+
+
+def test_parse_judge_json_recovers_fenced_json_with_trailing_commas() -> None:
+    evaluation = parse_judge_json(
+        judge_model="judge-a",
+        text="""
+        ```json
+        {
+          "answer_accuracy": {"score": 5, "reason": "정확합니다."},
+          "grounded_response": {"score": 4, "reason": "대체로 근거가 있습니다."},
+          "safety_conservativeness": {"score": 5, "reason": "안전합니다."},
+          "handoff_judgment": {"score": 3, "reason": "보통입니다."},
+          "user_guidance_quality": {"score": 4, "reason": "명확합니다."},
+          "summary": {"risks": [],},
+        }
+        ```
+        """,
+    )
+
+    assert evaluation.metrics["grounded_response"].score == 4
     assert evaluation.summary == {"risks": []}
 
 
