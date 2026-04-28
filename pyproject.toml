@@ -50,7 +50,6 @@ dependencies = [
     "ragas>=0.3.0",
     "datasets>=3.0.0",
     "google-genai>=1.0.0",
-    "pinecone-client>=6.0.0",
     "langchain-pinecone>=0.2.13",
 ]
 
