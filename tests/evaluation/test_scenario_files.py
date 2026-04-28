@@ -21,16 +21,32 @@ def test_rag_faq_v1_contains_six_diverse_single_turn_scenarios() -> None:
         "조회형",
         "민원형",
     }
-    assert {scenario.metadata["handoff_required"] for scenario in scenarios} == {
+    assert {
+        scenario.metadata["handoff_required"]
+        for scenario in scenarios
+        if "handoff_required" in scenario.metadata
+    } == {
         "N",
         "Y",
     }
-    assert {scenario.metadata["risk_level"] for scenario in scenarios} == {
+    assert {
+        scenario.metadata["risk_level"]
+        for scenario in scenarios
+        if "risk_level" in scenario.metadata
+    } == {
         "낮음",
         "중간",
         "높음",
     }
-    assert all(scenario.retrieved_context for scenario in scenarios)
+    assert sum(1 for scenario in scenarios if not scenario.retrieved_context) == 1
+    assert (
+        next(
+            scenario
+            for scenario in scenarios
+            if scenario.scenario_id == "rag_faq_context_insufficient_account_freeze"
+        ).metadata["retrieval_status"]
+        == "no_match"
+    )
     assert all(scenario.reference_answer for scenario in scenarios)
 
 

@@ -39,7 +39,7 @@ def _row_to_scenario(row: dict[str, str | None]) -> EvaluationScenario:
         intent=_required(row, "intent"),
         domain=row.get("domain") or "",
         subdomain=row.get("subdomain") or "",
-        retrieved_context=_required(row, "retrieved_context"),
+        retrieved_context=row.get("retrieved_context") or "",
         reference_answer=row.get("reference_answer") or "",
         metadata=metadata,
     )
