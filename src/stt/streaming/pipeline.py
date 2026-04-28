@@ -16,8 +16,12 @@ import webrtcvad
 from dotenv import load_dotenv
 
 from common.schemas import Transcript
+from stt.streaming.vocabulary import get_financial_vocabulary
 
 load_dotenv()
+
+_FINANCE_VOCAB = get_financial_vocabulary()
+_WHISPER_PROMPT = ", ".join(_FINANCE_VOCAB)
 
 SAMPLE_RATE = 16000
 FRAME_MS = 30
@@ -54,9 +58,12 @@ class StreamingPipeline:
                 language_code="ko-KR",
                 model="telephony",
                 use_enhanced=True,
+                speech_contexts=[
+                    speech.SpeechContext(phrases=_FINANCE_VOCAB, boost=5.0)
+                ],
             )
             self._streaming_config = speech.StreamingRecognitionConfig(
-                config=self._google_config, 
+                config=self._google_config,
                 interim_results=False
             )
             
@@ -168,6 +175,7 @@ class StreamingPipeline:
                 model="whisper-1",
                 file=("audio.wav", io.BytesIO(wav_bytes), "audio/wav"),
                 language="ko",
+                prompt=_WHISPER_PROMPT,
             )
             text = response.text
             if not text:

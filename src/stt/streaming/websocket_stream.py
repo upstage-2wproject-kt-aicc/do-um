@@ -39,13 +39,18 @@ router = APIRouter()
 nlu_router: AICC_NLU_Router | None = None
 
 
+_nlu_loaded = False
+
 @router.on_event("startup")
 async def startup_event() -> None:
     """Loads heavy NLU resources once at service startup."""
-    global nlu_router
+    global nlu_router, _nlu_loaded
+    if _nlu_loaded:
+        return
     try:
         nlu_router = AICC_NLU_Router()
-        print("✅ [STT->NLU] NLU 라우터 로드 완료")
+        print("✅ [STT->NLU] NLU 라우터 연동 완료")
+        _nlu_loaded = True
     except Exception as e:
         nlu_router = None
         print(f"❌ [STT->NLU] NLU 라우터 로드 실패: {e}")

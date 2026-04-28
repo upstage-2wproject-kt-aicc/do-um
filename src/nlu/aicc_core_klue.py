@@ -76,12 +76,23 @@ def _pinecone_total_vector_count(stats: Any) -> int:
 class AICC_NLU_Router:
     """KLUE 기반 의도분류 + BM25/Pinecone RAG + 시맨틱 캐시."""
 
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(AICC_NLU_Router, cls).__new__(cls)
+        return cls._instance
+
     def __init__(
         self,
         *,
         intent_model_dir: str | Path | None = None,
         subdomain_model_dir: str | Path | None = None,
     ) -> None:
+        if AICC_NLU_Router._initialized:
+            return
+            
         if not os.environ.get("LLM_SOLAR_API_KEY"):
             raise RuntimeError(
                 "LLM_SOLAR_API_KEY가 없습니다. 저장소 루트에 .env를 두고 "
@@ -186,6 +197,7 @@ class AICC_NLU_Router:
         print(
             f"✅ [NLU Router] 부팅 완료 — 총 소요 ⏱️ {time.perf_counter() - boot_t0:.3f}s\n"
         )
+        AICC_NLU_Router._initialized = True
 
     @staticmethod
     def _normalize_risk_level(value: Any) -> str:
