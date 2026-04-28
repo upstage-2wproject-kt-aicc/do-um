@@ -35,7 +35,7 @@ class StreamingPipeline:
     """webrtcvad로 발화 구간 감지 → Google Streaming STT or OpenAI."""
 
     google_project_id: str = ""
-    stt_provider: Literal["google", "openai"] = "google"
+    stt_provider: Literal["google", "openai"] = "openai"
     session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     vad_aggressiveness: int = 2
     silence_limit: int = SILENCE_LIMIT_FRAMES
