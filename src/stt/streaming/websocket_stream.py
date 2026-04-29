@@ -39,18 +39,13 @@ router = APIRouter()
 nlu_router: AICC_NLU_Router | None = None
 
 
-_nlu_loaded = False
-
 @router.on_event("startup")
 async def startup_event() -> None:
     """Loads heavy NLU resources once at service startup."""
-    global nlu_router, _nlu_loaded
-    if _nlu_loaded:
-        return
+    global nlu_router
     try:
         nlu_router = AICC_NLU_Router()
-        print("✅ [STT->NLU] NLU 라우터 연동 완료")
-        _nlu_loaded = True
+        print("✅ [STT->NLU] NLU 라우터 로드 완료")
     except Exception as e:
         nlu_router = None
         print(f"❌ [STT->NLU] NLU 라우터 로드 실패: {e}")
@@ -95,12 +90,17 @@ async def stt_websocket(websocket: WebSocket):
                     "intent": nlu_result.get("intent"),
                     "final_answer": nlu_result.get("final_answer"),
                     "metadata": nlu_result.get("metadata"),
+                    "handoff_reason": nlu_result.get("handoff_reason"),
+                    "handoff_confidence": nlu_result.get("handoff_confidence"),
+                    "transfer_action": nlu_result.get("transfer_action"),
                     "timings_sec": nlu_result.get("timings_sec"),
                 }
 
                 workflow_payload = None
                 workflow_output = None
-                if nlu_result.get("status") == "REQUIRE_LLM":
+                if nlu_result.get("status") == "HANDOFF_DIRECT":
+                    workflow_output = None
+                elif nlu_result.get("status") == "REQUIRE_LLM":
                     workflow_payload = workflow_input_from_nlu_dict(
                         {
                             "session_id": transcript.session_id,
@@ -121,6 +121,7 @@ async def stt_websocket(websocket: WebSocket):
                             if workflow_output
                             else None
                         ),
+                        "action": nlu_result.get("transfer_action"),
                     }
                 )
     except WebSocketDisconnect:

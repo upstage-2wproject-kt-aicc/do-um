@@ -78,23 +78,12 @@ def _pinecone_total_vector_count(stats: Any) -> int:
 class AICC_NLU_Router:
     """KLUE 기반 의도분류 + BM25/Pinecone RAG + 시맨틱 캐시."""
 
-    _instance = None
-    _initialized = False
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(AICC_NLU_Router, cls).__new__(cls)
-        return cls._instance
-
     def __init__(
         self,
         *,
         intent_model_dir: str | Path | None = None,
         subdomain_model_dir: str | Path | None = None,
     ) -> None:
-        if AICC_NLU_Router._initialized:
-            return
-            
         if not os.environ.get("LLM_SOLAR_API_KEY"):
             raise RuntimeError(
                 "LLM_SOLAR_API_KEY가 없습니다. 저장소 루트에 .env를 두고 "
@@ -212,12 +201,46 @@ class AICC_NLU_Router:
         self.rrf_k: int = max(1, int(os.getenv("NLU_RAG_RRF_K", "60")))
         self.rag_fusion_pool_mult: int = max(1, int(os.getenv("NLU_RAG_FUSION_POOL_MULT", "2")))
         self.subdomain_source: str = os.getenv("NLU_SUBDOMAIN_SOURCE", "rag").strip().lower()
+        self.direct_handoff_on_high_risk: bool = os.getenv(
+            "NLU_DIRECT_HANDOFF_ON_HIGH_RISK", "1"
+        ).strip().lower() not in ("0", "false", "no", "off")
+        self.direct_handoff_on_required: bool = os.getenv(
+            "NLU_DIRECT_HANDOFF_ON_REQUIRED", "1"
+        ).strip().lower() not in ("0", "false", "no", "off")
+        raw_keywords = os.getenv(
+            "NLU_DIRECT_HANDOFF_KEYWORDS",
+            "보이스피싱,피싱,사기,명의도용,해킹,도난,분실,신고,긴급,112",
+        ).strip()
+        self.direct_handoff_keywords: tuple[str, ...] = tuple(
+            item.strip().lower() for item in raw_keywords.split(",") if item.strip()
+        )
+        self.direct_handoff_message: str = os.getenv(
+            "NLU_DIRECT_HANDOFF_MESSAGE",
+            "해당 문의는 개인정보 확인 또는 안전 조치가 필요하여 상담사에게 연결해 드리겠습니다.",
+        ).strip()
+        self.direct_handoff_on_missing_customer_context: bool = os.getenv(
+            "NLU_DIRECT_HANDOFF_ON_MISSING_CUSTOMER_CONTEXT", "1"
+        ).strip().lower() not in ("0", "false", "no", "off")
+        raw_ctx_keywords = os.getenv(
+            "NLU_CUSTOMER_CONTEXT_REQUIRED_KEYWORDS",
+            "내 명의,내 계좌,내 카드,내 대출,거래내역,조회해,확인해,환불,승인 결과,한도 조회",
+        ).strip()
+        self.customer_context_required_keywords: tuple[str, ...] = tuple(
+            item.strip().lower() for item in raw_ctx_keywords.split(",") if item.strip()
+        )
         print(f"  🔢 RAG top-k: {self.rag_top_k}")
         print(
             f"  🔀 RAG hybrid(BM25+벡터 RRF): {'ON' if self.rag_hybrid else 'OFF'} "
             f"(RRF_K={self.rrf_k}, pool×{self.rag_fusion_pool_mult})"
         )
         print(f"  🏷️ 서브도메인(주제) 출처: {self.subdomain_source} (rag=검색 상위 메타, model=KLUE 서브모델)")
+        print(
+            "  🚨 Direct handoff: "
+            f"high_risk={'ON' if self.direct_handoff_on_high_risk else 'OFF'}, "
+            f"required={'ON' if self.direct_handoff_on_required else 'OFF'}, "
+            f"risk_keywords={len(self.direct_handoff_keywords)}개, "
+            f"missing_ctx={'ON' if self.direct_handoff_on_missing_customer_context else 'OFF'}"
+        )
 
         self._prepare_datasets()
         self._warm_up_cache()
@@ -225,7 +248,6 @@ class AICC_NLU_Router:
         print(
             f"✅ [NLU Router] 부팅 완료 — 총 소요 ⏱️ {time.perf_counter() - boot_t0:.3f}s\n"
         )
-        AICC_NLU_Router._initialized = True
 
     @staticmethod
     def _normalize_risk_level(value: Any) -> str:
@@ -363,6 +385,86 @@ class AICC_NLU_Router:
         best = max(risks, key=self._risk_rank_value)
         any_ho = "Y" if any(h == "Y" for h in hands) else "N"
         return best, any_ho
+
+    def _find_direct_handoff_keyword(self, text: str) -> str | None:
+        q = text.strip().lower()
+        if not q:
+            return None
+        for keyword in self.direct_handoff_keywords:
+            if keyword and keyword in q:
+                return keyword
+        return None
+
+    def _has_customer_context(self, customer_context: dict[str, Any] | None) -> bool:
+        if not isinstance(customer_context, dict):
+            return False
+        for v in customer_context.values():
+            if isinstance(v, str) and v.strip():
+                return True
+            if isinstance(v, (int, float, bool)):
+                return True
+        return False
+
+    def _find_customer_context_required_keyword(self, text: str) -> str | None:
+        q = text.strip().lower()
+        if not q:
+            return None
+        for keyword in self.customer_context_required_keywords:
+            if keyword and keyword in q:
+                return keyword
+        return None
+
+    def _should_direct_handoff(
+        self,
+        *,
+        risk_level: str,
+        handoff_required: str,
+        keyword_hit: str | None,
+        missing_customer_context_reason: str | None,
+    ) -> tuple[bool, list[str]]:
+        reasons: list[str] = []
+        if self.direct_handoff_on_high_risk and risk_level in {"high", "critical"}:
+            reasons.append("risk_level_high")
+        if self.direct_handoff_on_required and handoff_required == "Y":
+            reasons.append("handoff_required_Y")
+        if keyword_hit:
+            reasons.append(f"keyword:{keyword_hit}")
+        if missing_customer_context_reason:
+            reasons.append(missing_customer_context_reason)
+        return bool(reasons), reasons
+
+    def _build_direct_handoff_response(
+        self,
+        *,
+        intent: str,
+        subdomain_pred: str | None,
+        metadata: dict[str, Any],
+        retrieved_context: str,
+        retrieved_faq_ids: list[str],
+        routing_signals: dict[str, Any],
+        cache_max_similarity: float,
+        timings: dict[str, float | None],
+        reasons: list[str],
+    ) -> dict[str, Any]:
+        return {
+            "status": "HANDOFF_DIRECT",
+            "intent": intent,
+            "subdomain_pred": subdomain_pred,
+            "final_answer": self.direct_handoff_message,
+            "metadata": metadata,
+            "retrieved_context": retrieved_context,
+            "retrieved_faq_ids": retrieved_faq_ids,
+            "routing_signals": routing_signals,
+            "handoff_reason": reasons,
+            "handoff_confidence": 1.0 if reasons else 0.0,
+            "transfer_action": {
+                "type": "TRANSFER_CALL",
+                "required": True,
+                "reason": reasons,
+            },
+            "cache_max_similarity": cache_max_similarity,
+            "timings_sec": timings,
+        }
 
     def _vector_scores_by_faq(
         self, vector_res_with_score: list[tuple[Any, Any]]
@@ -738,7 +840,13 @@ class AICC_NLU_Router:
             return asyncio.run(self._intent_embed_parallel_async(stt_text))
         return self._intent_embed_parallel_threadpool(stt_text)
 
-    def process_query(self, stt_text: str, *, disable_cache: bool = False) -> dict[str, Any]:
+    def process_query(
+        self,
+        stt_text: str,
+        *,
+        disable_cache: bool = False,
+        customer_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """STT 텍스트 → 의도·RAG·캐시 상태를 담은 dict. 워크플로우에서 분기용."""
         total_t0 = time.perf_counter()
         timings: dict[str, float | None] = {
@@ -841,11 +949,55 @@ class AICC_NLU_Router:
             selected = self._vector_only_select(vector_res_with_score)
             fusion_note = "vector_only"
 
+        keyword_hit = self._find_direct_handoff_keyword(stt_text)
+        context_required_keyword = self._find_customer_context_required_keyword(stt_text)
+        customer_context_present = self._has_customer_context(customer_context)
+        missing_customer_context_reason: str | None = None
+        if (
+            self.direct_handoff_on_missing_customer_context
+            and context_required_keyword is not None
+            and not customer_context_present
+        ):
+            missing_customer_context_reason = (
+                f"missing_customer_context:{context_required_keyword}"
+            )
         if not selected:
             print(
                 "  ⚠️ [5] RAG 채택 문서 없음 "
                 "(top1 연관도 미달, 하이브리드 게이트, 또는 검색 결과 없음)"
             )
+            if keyword_hit or missing_customer_context_reason:
+                reasons: list[str] = []
+                if keyword_hit:
+                    reasons.append(f"keyword:{keyword_hit}")
+                if missing_customer_context_reason:
+                    reasons.append(missing_customer_context_reason)
+                reasons.append("no_rag_but_direct_handoff")
+                timings["total_sec"] = time.perf_counter() - total_t0
+                print(f"  🚨 [H] Direct handoff 발동 (reason={reasons})")
+                print("=" * 72)
+                return self._build_direct_handoff_response(
+                    intent=intent,
+                    subdomain_pred=subdomain_pred,
+                    metadata={
+                        "risk_level": "high",
+                        "handoff_required": "Y",
+                        "direct_handoff_keyword": keyword_hit,
+                        "customer_context_present": customer_context_present,
+                        "customer_context_required_keyword": context_required_keyword,
+                        "rag_fusion": fusion_note,
+                    },
+                    retrieved_context="",
+                    retrieved_faq_ids=[],
+                    routing_signals={
+                        "routing_mode": "risk_first",
+                        "risk_level": "high",
+                        "handoff_required": "Y",
+                    },
+                    cache_max_similarity=max_sim,
+                    timings=timings,
+                    reasons=reasons,
+                )
             timings["total_sec"] = time.perf_counter() - total_t0
             print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 단계로 전달)")
             print("=" * 72)
@@ -913,6 +1065,29 @@ class AICC_NLU_Router:
         )
         preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
         print(f"      • 본문 미리보기: {preview!r}")
+
+        should_direct, direct_reasons = self._should_direct_handoff(
+            risk_level=str(metadata.get("risk_level", "low")).strip().lower(),
+            handoff_required=str(metadata.get("handoff_required", "N")).strip().upper(),
+            keyword_hit=keyword_hit,
+            missing_customer_context_reason=missing_customer_context_reason,
+        )
+        if should_direct:
+            timings["total_sec"] = time.perf_counter() - total_t0
+            print(f"  🚨 [H] Direct handoff 발동 (reason={direct_reasons})")
+            print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 우회)")
+            print("=" * 72)
+            return self._build_direct_handoff_response(
+                intent=intent,
+                subdomain_pred=subdomain_pred,
+                metadata=metadata,
+                retrieved_context=retrieved_context,
+                retrieved_faq_ids=retrieved_faq_ids,
+                routing_signals=routing_signals,
+                cache_max_similarity=max_sim,
+                timings=timings,
+                reasons=direct_reasons,
+            )
 
         timings["total_sec"] = time.perf_counter() - total_t0
         print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 단계로 전달)")
