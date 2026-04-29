@@ -208,8 +208,11 @@ class AICC_NLU_Router:
             "NLU_DIRECT_HANDOFF_ON_REQUIRED", "1"
         ).strip().lower() not in ("0", "false", "no", "off")
         raw_keywords = os.getenv(
-            "NLU_DIRECT_HANDOFF_KEYWORDS",
-            "보이스피싱,피싱,사기,명의도용,해킹,도난,분실,신고,긴급,112",
+            "NLU_GUARDRAIL_SENSITIVE_KEYWORDS",
+            os.getenv(
+                "NLU_DIRECT_HANDOFF_KEYWORDS",
+                "보이스피싱,피싱,사기,명의도용,해킹,도난,분실,신고,긴급,112",
+            ),
         ).strip()
         self.direct_handoff_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_keywords.split(",") if item.strip()
@@ -218,6 +221,58 @@ class AICC_NLU_Router:
             "NLU_DIRECT_HANDOFF_MESSAGE",
             "해당 문의는 개인정보 확인 또는 안전 조치가 필요하여 상담사에게 연결해 드리겠습니다.",
         ).strip()
+        self.guardrail_limit_message: str = os.getenv(
+            "NLU_GUARDRAIL_LIMIT_MESSAGE",
+            "개인별 조건 확인이 필요한 문의일 수 있어 확정 답변을 피하고, 약관/공식 채널 확인을 안내하세요.",
+        ).strip()
+        self.guardrail_reject_message: str = os.getenv(
+            "NLU_GUARDRAIL_REJECT_MESSAGE",
+            "금융 관련 문의에 한해 답변드릴 수 있습니다. 금융 상담 질문으로 다시 요청해 주세요.",
+        ).strip()
+        self.guardrail_enable_keyword: bool = os.getenv(
+            "NLU_GUARDRAIL_ENABLE_KEYWORD", "1"
+        ).strip().lower() not in ("0", "false", "no", "off")
+        self.guardrail_enable_ood_reject: bool = os.getenv(
+            "NLU_GUARDRAIL_ENABLE_OOD_REJECT", "1"
+        ).strip().lower() not in ("0", "false", "no", "off")
+        self.guardrail_score_meta_high: int = int(os.getenv("NLU_GUARDRAIL_SCORE_META_HIGH", "60"))
+        self.guardrail_score_meta_required: int = int(
+            os.getenv("NLU_GUARDRAIL_SCORE_META_REQUIRED", "40")
+        )
+        self.guardrail_score_keyword_sensitive: int = int(
+            os.getenv("NLU_GUARDRAIL_SCORE_KEYWORD_SENSITIVE", "50")
+        )
+        self.guardrail_score_keyword_abusive: int = int(
+            os.getenv("NLU_GUARDRAIL_SCORE_KEYWORD_ABUSIVE", "100")
+        )
+        self.guardrail_score_missing_customer_context: int = int(
+            os.getenv("NLU_GUARDRAIL_SCORE_MISSING_CUSTOMER_CONTEXT", "40")
+        )
+        self.guardrail_score_ood: int = int(os.getenv("NLU_GUARDRAIL_SCORE_OOD", "30"))
+        self.guardrail_meta_cap: int = int(os.getenv("NLU_GUARDRAIL_META_CAP", "70"))
+        self.guardrail_handoff_threshold: int = int(
+            os.getenv("NLU_GUARDRAIL_HANDOFF_THRESHOLD", "80")
+        )
+        self.guardrail_limit_threshold: int = int(
+            os.getenv("NLU_GUARDRAIL_LIMIT_THRESHOLD", "50")
+        )
+        self.guardrail_reject_threshold: int = int(
+            os.getenv("NLU_GUARDRAIL_REJECT_THRESHOLD", "30")
+        )
+        raw_abusive = os.getenv(
+            "NLU_GUARDRAIL_ABUSIVE_KEYWORDS",
+            "씨발,병신,개새끼,좆같,죽여버리,살인,테러",
+        ).strip()
+        self.guardrail_abusive_keywords: tuple[str, ...] = tuple(
+            item.strip().lower() for item in raw_abusive.split(",") if item.strip()
+        )
+        raw_finance = os.getenv(
+            "NLU_FINANCE_DOMAIN_KEYWORDS",
+            "금융,대출,금리,이자,카드,계좌,예금,적금,환불,수수료,보이스피싱,명의도용,상담",
+        ).strip()
+        self.finance_domain_keywords: tuple[str, ...] = tuple(
+            item.strip().lower() for item in raw_finance.split(",") if item.strip()
+        )
         self.direct_handoff_on_missing_customer_context: bool = os.getenv(
             "NLU_DIRECT_HANDOFF_ON_MISSING_CUSTOMER_CONTEXT", "1"
         ).strip().lower() not in ("0", "false", "no", "off")
@@ -240,6 +295,13 @@ class AICC_NLU_Router:
             f"required={'ON' if self.direct_handoff_on_required else 'OFF'}, "
             f"risk_keywords={len(self.direct_handoff_keywords)}개, "
             f"missing_ctx={'ON' if self.direct_handoff_on_missing_customer_context else 'OFF'}"
+        )
+        print(
+            "  🛡️ Guardrail: "
+            f"handoff>={self.guardrail_handoff_threshold}, "
+            f"limit>={self.guardrail_limit_threshold}, "
+            f"reject>={self.guardrail_reject_threshold}, "
+            f"ood_reject={'ON' if self.guardrail_enable_ood_reject else 'OFF'}"
         )
 
         self._prepare_datasets()
@@ -414,24 +476,103 @@ class AICC_NLU_Router:
                 return keyword
         return None
 
-    def _should_direct_handoff(
+    def _contains_finance_keyword(self, text: str) -> bool:
+        q = text.strip().lower()
+        if not q:
+            return False
+        return any(kw in q for kw in self.finance_domain_keywords if kw)
+
+    def _find_abusive_keyword(self, text: str) -> str | None:
+        q = text.strip().lower()
+        if not q:
+            return None
+        for keyword in self.guardrail_abusive_keywords:
+            if keyword and keyword in q:
+                return keyword
+        return None
+
+    def _compute_guardrail(
         self,
         *,
         risk_level: str,
         handoff_required: str,
-        keyword_hit: str | None,
+        sensitive_keyword_hit: str | None,
+        abusive_keyword_hit: str | None,
         missing_customer_context_reason: str | None,
-    ) -> tuple[bool, list[str]]:
+        rag_miss: bool,
+        query_text: str,
+    ) -> dict[str, Any]:
         reasons: list[str] = []
+
+        # 1) Post-RAG 메타 점수 (중복가산 상한 적용)
+        meta_score_raw = 0
         if self.direct_handoff_on_high_risk and risk_level in {"high", "critical"}:
-            reasons.append("risk_level_high")
+            meta_score_raw += self.guardrail_score_meta_high
+            reasons.append(f"meta_risk_high(+{self.guardrail_score_meta_high})")
         if self.direct_handoff_on_required and handoff_required == "Y":
-            reasons.append("handoff_required_Y")
-        if keyword_hit:
-            reasons.append(f"keyword:{keyword_hit}")
+            meta_score_raw += self.guardrail_score_meta_required
+            reasons.append(f"meta_handoff_required(+{self.guardrail_score_meta_required})")
+        meta_score = min(meta_score_raw, self.guardrail_meta_cap)
+        if meta_score_raw > self.guardrail_meta_cap:
+            reasons.append(f"meta_cap_applied({meta_score_raw}->{meta_score})")
+
+        # 2) Pre-RAG 키워드 점수 (욕설 우선)
+        keyword_score = 0
+        if self.guardrail_enable_keyword:
+            if abusive_keyword_hit:
+                keyword_score = self.guardrail_score_keyword_abusive
+                reasons.append(
+                    f"keyword_abusive:{abusive_keyword_hit}(+{self.guardrail_score_keyword_abusive})"
+                )
+            elif sensitive_keyword_hit:
+                keyword_score = self.guardrail_score_keyword_sensitive
+                reasons.append(
+                    f"keyword_sensitive:{sensitive_keyword_hit}(+{self.guardrail_score_keyword_sensitive})"
+                )
+
+        # 3) 고객정보 부재 점수
+        missing_ctx_score = 0
         if missing_customer_context_reason:
-            reasons.append(missing_customer_context_reason)
-        return bool(reasons), reasons
+            missing_ctx_score = self.guardrail_score_missing_customer_context
+            reasons.append(
+                f"{missing_customer_context_reason}(+{self.guardrail_score_missing_customer_context})"
+            )
+
+        # 4) OOD/RAG 미적중 점수
+        ood_score = 0
+        if rag_miss:
+            ood_score = self.guardrail_score_ood
+            reasons.append(f"rag_miss(+{self.guardrail_score_ood})")
+
+        total_score = meta_score + keyword_score + missing_ctx_score + ood_score
+        finance_related = self._contains_finance_keyword(query_text)
+
+        decision = "ALLOW"
+        if total_score >= self.guardrail_handoff_threshold:
+            decision = "HANDOFF"
+        elif (
+            self.guardrail_enable_ood_reject
+            and rag_miss
+            and not finance_related
+            and total_score >= self.guardrail_reject_threshold
+        ):
+            decision = "REJECT"
+        elif total_score >= self.guardrail_limit_threshold:
+            decision = "LIMIT"
+
+        return {
+            "decision": decision,
+            "score": float(total_score),
+            "reasons": reasons,
+            "components": {
+                "meta": meta_score,
+                "keyword": keyword_score,
+                "missing_customer_context": missing_ctx_score,
+                "ood": ood_score,
+            },
+            "finance_related": finance_related,
+            "rag_miss": rag_miss,
+        }
 
     def _build_direct_handoff_response(
         self,
@@ -445,6 +586,8 @@ class AICC_NLU_Router:
         cache_max_similarity: float,
         timings: dict[str, float | None],
         reasons: list[str],
+        guardrail_score: float,
+        guardrail_components: dict[str, int] | None = None,
     ) -> dict[str, Any]:
         return {
             "status": "HANDOFF_DIRECT",
@@ -457,8 +600,54 @@ class AICC_NLU_Router:
             "routing_signals": routing_signals,
             "handoff_reason": reasons,
             "handoff_confidence": 1.0 if reasons else 0.0,
+            "guardrail_decision": "HANDOFF",
+            "guardrail_score": guardrail_score,
+            "guardrail_reasons": reasons,
+            "guardrail_components": guardrail_components or {},
             "transfer_action": {
                 "type": "TRANSFER_CALL",
+                "required": True,
+                "reason": reasons,
+            },
+            "action": {
+                "type": "TRANSFER_CALL",
+                "required": True,
+                "reason": reasons,
+            },
+            "cache_max_similarity": cache_max_similarity,
+            "timings_sec": timings,
+        }
+
+    def _build_reject_response(
+        self,
+        *,
+        intent: str,
+        subdomain_pred: str | None,
+        metadata: dict[str, Any],
+        retrieved_context: str,
+        retrieved_faq_ids: list[str],
+        routing_signals: dict[str, Any],
+        cache_max_similarity: float,
+        timings: dict[str, float | None],
+        reasons: list[str],
+        guardrail_score: float,
+        guardrail_components: dict[str, int] | None = None,
+    ) -> dict[str, Any]:
+        return {
+            "status": "REJECT_DIRECT",
+            "intent": intent,
+            "subdomain_pred": subdomain_pred,
+            "final_answer": self.guardrail_reject_message,
+            "metadata": metadata,
+            "retrieved_context": retrieved_context,
+            "retrieved_faq_ids": retrieved_faq_ids,
+            "routing_signals": routing_signals,
+            "guardrail_decision": "REJECT",
+            "guardrail_score": guardrail_score,
+            "guardrail_reasons": reasons,
+            "guardrail_components": guardrail_components or {},
+            "action": {
+                "type": "REJECT_QUERY",
                 "required": True,
                 "reason": reasons,
             },
@@ -949,7 +1138,8 @@ class AICC_NLU_Router:
             selected = self._vector_only_select(vector_res_with_score)
             fusion_note = "vector_only"
 
-        keyword_hit = self._find_direct_handoff_keyword(stt_text)
+        sensitive_keyword_hit = self._find_direct_handoff_keyword(stt_text)
+        abusive_keyword_hit = self._find_abusive_keyword(stt_text)
         context_required_keyword = self._find_customer_context_required_keyword(stt_text)
         customer_context_present = self._has_customer_context(customer_context)
         missing_customer_context_reason: str | None = None
@@ -966,49 +1156,98 @@ class AICC_NLU_Router:
                 "  ⚠️ [5] RAG 채택 문서 없음 "
                 "(top1 연관도 미달, 하이브리드 게이트, 또는 검색 결과 없음)"
             )
-            if keyword_hit or missing_customer_context_reason:
-                reasons: list[str] = []
-                if keyword_hit:
-                    reasons.append(f"keyword:{keyword_hit}")
-                if missing_customer_context_reason:
-                    reasons.append(missing_customer_context_reason)
-                reasons.append("no_rag_but_direct_handoff")
+            guardrail = self._compute_guardrail(
+                risk_level="low",
+                handoff_required="N",
+                sensitive_keyword_hit=sensitive_keyword_hit,
+                abusive_keyword_hit=abusive_keyword_hit,
+                missing_customer_context_reason=missing_customer_context_reason,
+                rag_miss=True,
+                query_text=stt_text,
+            )
+            guardrail_meta = {
+                "risk_level": "low",
+                "handoff_required": "N",
+                "direct_handoff_keyword": sensitive_keyword_hit,
+                "abusive_keyword": abusive_keyword_hit,
+                "customer_context_present": customer_context_present,
+                "customer_context_required_keyword": context_required_keyword,
+                "rag_fusion": fusion_note,
+            }
+            if guardrail["decision"] == "HANDOFF":
                 timings["total_sec"] = time.perf_counter() - total_t0
-                print(f"  🚨 [H] Direct handoff 발동 (reason={reasons})")
+                print(f"  🚨 [H] Direct handoff 발동 (reason={guardrail['reasons']})")
                 print("=" * 72)
                 return self._build_direct_handoff_response(
                     intent=intent,
                     subdomain_pred=subdomain_pred,
-                    metadata={
-                        "risk_level": "high",
-                        "handoff_required": "Y",
-                        "direct_handoff_keyword": keyword_hit,
-                        "customer_context_present": customer_context_present,
-                        "customer_context_required_keyword": context_required_keyword,
-                        "rag_fusion": fusion_note,
-                    },
+                    metadata=guardrail_meta,
                     retrieved_context="",
                     retrieved_faq_ids=[],
                     routing_signals={
                         "routing_mode": "risk_first",
-                        "risk_level": "high",
-                        "handoff_required": "Y",
+                        "risk_level": "low",
+                        "handoff_required": "N",
+                        "guardrail_decision": guardrail["decision"],
                     },
                     cache_max_similarity=max_sim,
                     timings=timings,
-                    reasons=reasons,
+                    reasons=guardrail["reasons"],
+                    guardrail_score=guardrail["score"],
+                    guardrail_components=guardrail.get("components"),
+                )
+            if guardrail["decision"] == "REJECT":
+                timings["total_sec"] = time.perf_counter() - total_t0
+                print(f"  ⛔ [G] Guardrail REJECT 발동 (reason={guardrail['reasons']})")
+                print("=" * 72)
+                return self._build_reject_response(
+                    intent=intent,
+                    subdomain_pred=subdomain_pred,
+                    metadata=guardrail_meta,
+                    retrieved_context="",
+                    retrieved_faq_ids=[],
+                    routing_signals={
+                        "routing_mode": "risk_first",
+                        "risk_level": "low",
+                        "handoff_required": "N",
+                        "guardrail_decision": guardrail["decision"],
+                    },
+                    cache_max_similarity=max_sim,
+                    timings=timings,
+                    reasons=guardrail["reasons"],
+                    guardrail_score=guardrail["score"],
+                    guardrail_components=guardrail.get("components"),
                 )
             timings["total_sec"] = time.perf_counter() - total_t0
             print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 단계로 전달)")
             print("=" * 72)
+            policy_rules_miss: list[dict[str, Any]] = []
+            if guardrail["decision"] == "LIMIT":
+                policy_rules_miss = [
+                    {
+                        "rule_id": "guardrail_limit",
+                        "title": "안전 축소 답변",
+                        "description": self.guardrail_limit_message,
+                    }
+                ]
             return {
                 "status": "REQUIRE_LLM",
                 "intent": intent,
                 "subdomain_pred": subdomain_pred,
                 "retrieved_context": "",
-                "metadata": {},
+                "metadata": guardrail_meta,
                 "retrieved_faq_ids": [],
-                "routing_signals": {},
+                "routing_signals": {
+                    "routing_mode": "risk_first",
+                    "risk_level": "low",
+                    "handoff_required": "N",
+                    "guardrail_decision": guardrail["decision"],
+                },
+                "guardrail_decision": guardrail["decision"],
+                "guardrail_score": guardrail["score"],
+                "guardrail_reasons": guardrail["reasons"],
+                "guardrail_components": guardrail.get("components", {}),
+                "policy_rules": policy_rules_miss,
                 "cache_max_similarity": max_sim,
                 "timings_sec": timings,
             }
@@ -1086,12 +1325,41 @@ class AICC_NLU_Router:
                 routing_signals=routing_signals,
                 cache_max_similarity=max_sim,
                 timings=timings,
-                reasons=direct_reasons,
+                reasons=guardrail["reasons"],
+                guardrail_score=guardrail["score"],
+                guardrail_components=guardrail.get("components"),
+            )
+        if guardrail["decision"] == "REJECT":
+            timings["total_sec"] = time.perf_counter() - total_t0
+            print(f"  ⛔ [G] Guardrail REJECT 발동 (reason={guardrail['reasons']})")
+            print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 우회)")
+            print("=" * 72)
+            return self._build_reject_response(
+                intent=intent,
+                subdomain_pred=subdomain_pred,
+                metadata=metadata,
+                retrieved_context=retrieved_context,
+                retrieved_faq_ids=retrieved_faq_ids,
+                routing_signals=routing_signals,
+                cache_max_similarity=max_sim,
+                timings=timings,
+                reasons=guardrail["reasons"],
+                guardrail_score=guardrail["score"],
+                guardrail_components=guardrail.get("components"),
             )
 
         timings["total_sec"] = time.perf_counter() - total_t0
         print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 단계로 전달)")
         print("=" * 72)
+        policy_rules: list[dict[str, Any]] = []
+        if guardrail["decision"] == "LIMIT":
+            policy_rules = [
+                {
+                    "rule_id": "guardrail_limit",
+                    "title": "안전 축소 답변",
+                    "description": self.guardrail_limit_message,
+                }
+            ]
 
         return {
             "status": "REQUIRE_LLM",
@@ -1101,6 +1369,11 @@ class AICC_NLU_Router:
             "metadata": metadata,
             "retrieved_faq_ids": retrieved_faq_ids,
             "routing_signals": routing_signals,
+            "guardrail_decision": guardrail["decision"],
+            "guardrail_score": guardrail["score"],
+            "guardrail_reasons": guardrail["reasons"],
+            "guardrail_components": guardrail.get("components", {}),
+            "policy_rules": policy_rules,
             "cache_max_similarity": max_sim,
             "timings_sec": timings,
         }

@@ -17,6 +17,7 @@
   - `execute_workflow_json`
 - 규칙:
   - 보안 키워드 포함 시 `security` 우선
+
   - `metadata.risk_level`이 `높음/high/critical`이면 `handoff` (NLU는 채택 RAG 문서들에서 리스크를 집계해 메타에 반영)
   - `metadata.handoff_required`가 `Y/YES/TRUE/1/REQUIRED`이면 `handoff` (채택 문서 중 하나라도 이관이면 `Y`)
   - `intent=절차형 -> procedure` (의도만 절차/FAQ 분기에 사용; 민원형만으로는 이관하지 않음)

@@ -92,15 +92,22 @@ async def stt_websocket(websocket: WebSocket):
                     "metadata": nlu_result.get("metadata"),
                     "handoff_reason": nlu_result.get("handoff_reason"),
                     "handoff_confidence": nlu_result.get("handoff_confidence"),
+                    "guardrail_decision": nlu_result.get("guardrail_decision"),
+                    "guardrail_score": nlu_result.get("guardrail_score"),
+                    "guardrail_reasons": nlu_result.get("guardrail_reasons"),
+                    "guardrail_components": nlu_result.get("guardrail_components"),
+                    "transfer_action": nlu_result.get("transfer_action"),
+                    "action": nlu_result.get("action"),
                     "transfer_action": nlu_result.get("transfer_action"),
                     "timings_sec": nlu_result.get("timings_sec"),
                 }
 
                 workflow_payload = None
                 workflow_output = None
-                if nlu_result.get("status") == "HANDOFF_DIRECT":
+                if nlu_result.get("status") in {"HANDOFF_DIRECT", "REJECT_DIRECT"}:
                     workflow_output = None
                 elif nlu_result.get("status") == "REQUIRE_LLM":
+
                     workflow_payload = workflow_input_from_nlu_dict(
                         {
                             "session_id": transcript.session_id,
@@ -121,7 +128,8 @@ async def stt_websocket(websocket: WebSocket):
                             if workflow_output
                             else None
                         ),
-                        "action": nlu_result.get("transfer_action"),
+                        "action": nlu_result.get("action") or nlu_result.get("transfer_action"),
+
                     }
                 )
     except WebSocketDisconnect:
