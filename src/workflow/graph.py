@@ -96,8 +96,6 @@ def _select_route_with_reason(state: WorkflowRoutingInput) -> tuple[RouteType, s
         return RouteType.HANDOFF, "metadata_handoff_required"
 
     intent = state.routing_info.intent.strip()
-    if intent == "민원형":
-        return RouteType.HANDOFF, "intent_complaint"
     if intent == "절차형":
         return RouteType.PROCEDURE, "intent_procedure"
     return RouteType.FAQ, "default_faq"
