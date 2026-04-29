@@ -31,6 +31,10 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from src.nlu.aicc_core_klue import AICC_NLU_Router
 from src.workflow.graph import execute_workflow_item, workflow_input_from_nlu_dict
+from src.workflow.online_evaluation import (
+    OnlineEvaluationService,
+    build_workflow_result_event,
+)
 from .pipeline import StreamingPipeline
 
 load_dotenv()
@@ -98,12 +102,12 @@ async def stt_websocket(websocket: WebSocket):
                     "guardrail_components": nlu_result.get("guardrail_components"),
                     "transfer_action": nlu_result.get("transfer_action"),
                     "action": nlu_result.get("action"),
-                    "transfer_action": nlu_result.get("transfer_action"),
                     "timings_sec": nlu_result.get("timings_sec"),
                 }
 
-                workflow_payload = None
                 workflow_output = None
+                evaluation_task = None
+                evaluation_status = "skipped"
                 if nlu_result.get("status") in {"HANDOFF_DIRECT", "REJECT_DIRECT"}:
                     workflow_output = None
                 elif nlu_result.get("status") == "REQUIRE_LLM":
@@ -115,22 +119,44 @@ async def stt_websocket(websocket: WebSocket):
                             **nlu_result,
                         }
                     )
-                    workflow_output = await execute_workflow_item(workflow_payload)
+                    if _online_evaluation_enabled():
+                        try:
+                            online_run = await OnlineEvaluationService().start(workflow_payload)
+                            workflow_output = online_run.workflow_output
+                            evaluation_task = online_run.evaluation_task
+                            evaluation_status = "running"
+                        except Exception as exc:
+                            print(f"⚠️ [OnlineEvaluation] 시작 실패, 기존 workflow로 대체: {exc}")
+                            workflow_output = await execute_workflow_item(workflow_payload)
+                            evaluation_status = "unavailable"
+                    else:
+                        workflow_output = await execute_workflow_item(workflow_payload)
 
                 await websocket.send_json(
-                    {
-                        "session_id": transcript.session_id,
-                        "transcript": transcript_text,
-                        "is_final": True,
-                        "nlu_analysis": nlu_payload,
-                        "workflow": (
-                            workflow_output.model_dump(mode="json")
-                            if workflow_output
-                            else None
-                        ),
-                        "action": nlu_result.get("action") or nlu_result.get("transfer_action"),
-
-                    }
+                    build_workflow_result_event(
+                        session_id=transcript.session_id,
+                        transcript_text=transcript_text,
+                        nlu_payload=nlu_payload,
+                        workflow_output=workflow_output,
+                        action=nlu_result.get("action") or nlu_result.get("transfer_action"),
+                        evaluation_status=evaluation_status,
+                    )
                 )
+                if evaluation_task is not None:
+                    try:
+                        await websocket.send_json(await evaluation_task)
+                    except Exception as exc:
+                        await websocket.send_json(
+                            {
+                                "type": "evaluation_error",
+                                "session_id": transcript.session_id,
+                                "error": exc.__class__.__name__,
+                            }
+                        )
     except WebSocketDisconnect:
         pass
+
+
+def _online_evaluation_enabled() -> bool:
+    value = os.getenv("ONLINE_EVALUATION_ENABLED", "1").strip().lower()
+    return value not in {"0", "false", "no", "off"}

@@ -411,6 +411,9 @@ def parse_judge_json(
                 f"{score_min} and {score_max}: {metric.score}"
             )
         metrics[metric_name] = metric
+    flags = data.get("flags", {})
+    if not isinstance(flags, dict):
+        flags = {}
     summary = data.get("summary", {})
     if not isinstance(summary, dict):
         summary = {}
@@ -418,6 +421,7 @@ def parse_judge_json(
         judge_model=judge_model,
         metrics=metrics,
         summary=summary,
+        flags={str(key): bool(value) for key, value in flags.items()},
         token_usage=token_usage or {},
     )
 
