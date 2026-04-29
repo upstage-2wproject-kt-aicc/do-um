@@ -1,139 +1,184 @@
-# NLU 모듈 상세 안내서
+# NLU 모듈 상세 안내서 (최신 분리 구조)
 
-## 1) 배경: 스켈레톤에서 현재 구조로
-
-- **실행 가능한 KLUE 기반 라우터** 추가 (`aicc_core_klue.py`)
-- `.env` 기반 키 관리 추가 (`load_dotenv`)
-- FAQ CSV 기반 **BM25 + Pinecone 인덱싱** 및 시맨틱 캐시
-- `process_query()` 반환형 인터페이스로 워크플로우 연동 준비
-- 운영 확인용 터미널 로그/단계별 소요 시간(`timings_sec`) 제공
-- 과거 실험 코드는 `archive/`로 이동해 레포를 정리
+이 문서는 `src/nlu`의 현재 구조와 처리 단계를 설명합니다.
+민감/보안 정보(키 값, 내부 운영 정책의 구체 값)는 제외했습니다.
 
 ---
 
-## 2) 현재 `src/nlu` 파일 구조와 역할
+## 1) NLU의 역할
 
-### A. 현재 운영(Active) 파일
+현재 NLU(2단계)는 다음을 수행합니다.
 
-#### `src/nlu/aicc_core_klue.py`
-- 현재 NLU 모듈의 **메인 실행/연동 파일**
-- 주요 기능:
-  - `.env` 로드 및 `UPSTAGE_API_KEY` 검증
-  - Pinecone 연결 정보(`PINECONE_API_KEY`, `PINECONE_INDEX_NAME`) 검증
-  - 로컬 KLUE 분류 모델 로드 (`my_aicc_nlu_model_klue`)
-  - FAQ CSV(`RAG_FAQ.csv`)를 `Document`로 변환
-  - BM25 인덱스 생성 + Pinecone 벡터 저장소 연결/적재
-  - CSV SHA256 지문 기반 재색인(FAQ 변경 시에만 재업로드)
-  - 시맨틱 캐시 검사 후 결과 반환
-  - **하이브리드 RAG(기본 ON)**: BM25 키워드 순위와 Pinecone 벡터 순위를 RRF로 병합
-  - **리스크 우선 메타**: 채택된 FAQ 문서들에서 `risk_level`(최고 심각도)·`handoff_required`(하나라도 Y면 Y) 집계 후 `metadata`에 반영 → 워크플로 이관 규칙과 정합
-  - **주제(subdomain)**: 기본 `NLU_SUBDOMAIN_SOURCE=rag`로 검색 1순위 문서의 `subdomain`을 `subdomain_pred`에 채움(의도는 KLUE, 주제는 검색)
-  - `process_query()`에서 워크플로우가 사용할 dict 반환
-- 반환 형태:
-  - 캐시 적중: `status="CACHED"` + `final_answer`
-  - 캐시 미적중: `status="REQUIRE_LLM"` + `retrieved_context`/`metadata` (질의 임베딩 벡터는 응답에 포함하지 않음; 내부에서만 사용) + `routing_signals`(리스크·이관 요약)
-  - 공통: `intent`, `timings_sec`
-
-#### `src/nlu/RAG_FAQ.csv`
-- RAG 인덱싱용 FAQ 원천 데이터
-- `aicc_core_klue.py`에서 로드하여 문서/메타데이터 생성
-- 주요 컬럼(코드 기준): `embedding_text`, `faq_id`, `domain`, `subdomain`, `intent_type`, `risk_level`, `handoff_required`
-
-#### `src/nlu/__init__.py`
-- NLU 패키지 마커 파일
-- 현재 로직은 없고 모듈 인식 용도
+- 의도/서브도메인 추론
+- RAG 검색(Hybrid: Vector + BM25)
+- Semantic Cache 조회
+- Guardrail 점수 계산 및 의사결정
+- 3단계 Workflow로 전달할 payload 구성
+- 필요 시 `HANDOFF_DIRECT` / `REJECT_DIRECT`로 워크플로우 우회
 
 ---
 
-### B. 로컬 산출물(버전관리 제외 대상)
+## 2) 파일 구조
 
-#### `src/nlu/my_aicc_nlu_model_klue/`
-- 로컬 파인튜닝 모델 아티팩트
-- 예: `model.safetensors`, `tokenizer.json`, `config.json`
-- `.gitignore`에서 제외되어 Git에 올라가지 않음
+```text
+src/nlu/
+  __init__.py
+  aicc_core_klue.py
+  schemas.py
+  service.py
+  RAG_FAQ.csv
 
-#### `src/nlu/aicc_chroma_db/`
-- 로컬 지문(fingerprint) 관리 폴더
-- Pinecone 자체 데이터는 클라우드에 저장되며, 이 폴더에는 CSV 해시 메타만 저장
-- 재생성 가능 산출물이라 `.gitignore` 제외 대상
+  intent/
+    __init__.py
+    classifier.py
 
----
+  retrieval/
+    __init__.py
+    index_manager.py
+    vector_store.py
+    selector.py
+    cache.py
 
-### C. 백업/참고 코드(`archive/`)
+  guardrail/
+    __init__.py
+    scorer.py
+    policy.py
 
-#### `src/nlu/archive/aicc_core_system.py`
-- 이전 AICC 코어 실험 버전
-- 현재 메인 경로에서 제거된 과거 코드
+  response/
+    __init__.py
+    builder.py
 
-#### `src/nlu/archive/sllm.py`
-- sLLM(Zero-shot 계열) 평가 실험 스크립트
-- 데이터셋 기반 분류 리포트 실험용
-
-#### `src/nlu/archive/classifier.py`
-- 초기 스켈레톤 NLU 인터페이스 코드 백업
-- `BaseClassifier`, `sLLMClassifier`, `DLClassifier` 계약 정의 중심
-
-#### `src/nlu/archive/Eval_Queries (2).csv`
-- 과거 실험용 질의 평가 데이터셋
-- 운영 경로에서는 사용하지 않고 백업 보관
-
----
-
-## 3) 실행 흐름(현재 기준)
-
-`AICC_NLU_Router.process_query(text)` 기준:
-
-1. 입력 텍스트의 의도 분류 (`predict_intent`; 서브도메인 KLUE는 `NLU_SUBDOMAIN_SOURCE=model`일 때만 병렬 추론)
-2. 입력 텍스트 임베딩 생성
-3. 시맨틱 캐시 유사도 검사
-4. 캐시 적중 시 즉시 반환 (`CACHED`)
-5. 미적중 시 Pinecone 벡터 검색 + (기본) BM25 검색 → RRF 병합 후 문서 채택·필터
-6. 채택 문서 메타 집계(리스크·이관) 및 `subdomain_pred`(rag 모드) 반영
-7. 검색 컨텍스트/메타데이터와 함께 `REQUIRE_LLM` 반환
-
-즉, 현재 NLU는 워크플로우 입장에서:
-- **분기 기준(intent)**
-- **검색 컨텍스트**
-- **성능 계측 정보(timings)**
-를 한번에 제공하는 전처리 라우터 역할입니다.
+  archive/
+    aicc_core_system.py
+    classifier.py
+    sllm.py
+    Eval_Queries (2).csv
+    test_bench.py
+    test_consistency.py
+```
 
 ---
 
-## 4) 초기 스켈레톤 대비 “추가된 핵심 포인트”
+## 3) 모듈별 책임
 
-초기 스켈레톤(인터페이스-only) 대비 현재 추가된 실질 로직:
+### `aicc_core_klue.py`
+- NLU Router 초기화 컨테이너
+- 모델/인덱스/설정값 로딩
+- 외부 호출 인터페이스(`process_query`) 제공
+- 실제 오케스트레이션은 `service.py`에 위임
 
-- 모델 추론 로직(Transformers 기반)
-- 임베딩 및 벡터 저장소 구축
-- 캐시 레이어(의미 유사도 기반)
-- 환경변수 로딩/검증
-- 운영 로그 및 단계별 시간 측정
-- 워크플로우 전달용 구조화 dict 반환
+### `schemas.py`
+- NLU 단계 간 데이터 계약(dataclass)
+- 코어 결과/검색 결과/가드레일 결과/최종 결과 구조 정의
+
+### `service.py`
+- NLU 전체 파이프라인 오케스트레이션
+- 분기 판단과 최종 payload 조립
+
+### `intent/classifier.py`
+- intent/subdomain 분류 함수
+- 병렬 실행 유틸(async + threadpool)
+
+### `retrieval/index_manager.py`
+- FAQ CSV 로딩 및 문서화
+- BM25 준비
+- Vector DB 연결/갱신
+- warm-up/초기 cache 준비
+
+### `retrieval/vector_store.py`
+- RAG 검색 실행 함수
+- vector 검색 개수 계산 유틸
+
+### `retrieval/selector.py`
+- vector-only 선택 로직
+- hybrid RRF 선택 로직
+- 최종 후보 문서 정렬/필터링
+
+### `retrieval/cache.py`
+- semantic cache hit 판정
+- cache 응답 반환 규격 처리
+
+### `guardrail/scorer.py`
+- 점수 기반 Guardrail 계산
+- decision(`ALLOW`/`LIMIT`/`HANDOFF`/`REJECT`) 및 사유 생성
+
+### `guardrail/policy.py`
+- Guardrail decision을 policy rule로 변환
+- `LIMIT` 상황에서 3단계에 전달할 제한 규칙 구성
+
+### `response/builder.py`
+- `HANDOFF_DIRECT` 응답 빌드
+- `REJECT_DIRECT` 응답 빌드
 
 ---
 
-## 5) 팀원 온보딩 체크리스트
+## 4) NLU 처리 순서 (실행 플로우)
 
-신규 팀원이 NLU를 로컬에서 실행하려면:
+`AICC_NLU_Router.process_query()` 기준:
 
-1. 저장소 루트에서 `.env` 준비  
-   - `cp .env.example .env`
-   - `LLM_SOLAR_API_KEY=...`, `PINECONE_API_KEY=...`, `PINECONE_INDEX_NAME=...` 입력
-2. 의존성 설치  
-   - `pip install -r requirements.txt`
-3. 로컬 모델 폴더 준비  
-   - `src/nlu/my_aicc_nlu_model_klue/` 존재 확인
-4. FAQ 데이터 확인  
-   - `src/nlu/RAG_FAQ.csv` 존재 확인
-5. 실행  
-   - `python src/nlu/aicc_core_klue.py`
+1. 입력 텍스트 정규화
+2. intent/subdomain/embedding 병렬 실행
+3. semantic cache 검사
+4. cache hit면 `CACHED` 반환
+5. cache miss면 Hybrid RAG 검색 수행
+6. 검색 결과에서 메타데이터 집계(리스크/이관 여부 등)
+7. Guardrail 점수 계산
+8. decision별 분기:
+   - `HANDOFF` -> `HANDOFF_DIRECT`
+   - `REJECT` -> `REJECT_DIRECT`
+   - `LIMIT`/`ALLOW` -> `REQUIRE_LLM` (policy_rules 포함 가능)
+9. 최종 payload 반환
 
 ---
 
-## 6) 유지보수 원칙(권장)
+## 5) Guardrail 출력 항목
 
-- `archive/`는 백업 전용으로 유지하고 운영 경로와 분리
-- 로컬 산출물(모델/DB)은 계속 `.gitignore` 유지
-- NLU 출력 스키마(`status`, `intent`, `metadata`, `timings_sec`)는 워크플로우와 계약이므로 변경 시 공유 필수
-- 의도 라벨 순서(`intent_map`)는 학습 체크포인트 라벨 인덱스와 항상 동기화
+Guardrail 계산 후 응답에는 다음 필드들이 포함될 수 있습니다.
+
+- `guardrail_decision`
+- `guardrail_score`
+- `guardrail_reasons`
+- `guardrail_components`
+- `action` (예: 이관/거절 액션)
+- `policy_rules` (`LIMIT`일 때 주로 사용)
+
+이 값들은 추적성(왜 이런 분기가 났는지)과 운영 튜닝에 사용됩니다.
+
+---
+
+## 6) 1단계(STT) / 3단계(Workflow) 연계
+
+### 1단계(STT) -> 2단계(NLU)
+- STT 텍스트를 NLU 입력으로 전달
+- 고객 컨텍스트(있다면)도 함께 전달
+
+### 2단계(NLU) -> 3단계(Workflow)
+- `status`가 `REQUIRE_LLM`이면 워크플로우 실행
+- `status`가 `HANDOFF_DIRECT` 또는 `REJECT_DIRECT`이면 워크플로우 우회 가능
+- NLU가 산출한 `metadata`, `policy_rules`, `guardrail_*` 정보는 downstream 제어 신호로 사용
+
+---
+
+## 7) 반환 계약(핵심)
+
+주요 반환 필드 예시:
+
+- 공통: `status`, `intent`, `timings_sec`
+- 검색 사용 시: `retrieved_context`, `retrieved_faq_ids`, `metadata`
+- 가드레일 사용 시: `guardrail_decision`, `guardrail_score`, `guardrail_reasons`, `policy_rules`
+- 직접 처리 시: `final_answer`, `action`
+
+`status` 기반 분기가 2-3단계 연동의 핵심 계약입니다.
+
+---
+
+## 8) archive 정책
+
+`archive/`는 운영 경로에서 제외된 파일을 보관합니다.
+
+- 현재 이동된 비핵심 테스트 스크립트:
+  - `archive/test_bench.py`
+  - `archive/test_consistency.py`
+
+운영 코드와 실험/백업 코드를 분리해 유지보수 복잡도를 낮추는 목적입니다.
 
