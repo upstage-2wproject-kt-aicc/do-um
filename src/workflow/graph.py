@@ -90,14 +90,13 @@ def _select_route_with_reason(state: WorkflowRoutingInput) -> tuple[RouteType, s
         return RouteType.SECURITY, "security_keyword_match"
 
     metadata = state.routing_info.metadata
+    # 리스크·이관 플래그 우선(방법 5): 의도 라벨만으로 상담원 이관하지 않음.
     if _is_high_risk(metadata.get("risk_level")):
         return RouteType.HANDOFF, "metadata_risk_level_high"
     if _is_handoff_required(metadata.get("handoff_required")):
         return RouteType.HANDOFF, "metadata_handoff_required"
 
     intent = state.routing_info.intent.strip()
-    if intent == "민원형":
-        return RouteType.HANDOFF, "intent_complaint"
     if intent == "절차형":
         return RouteType.PROCEDURE, "intent_procedure"
     return RouteType.FAQ, "default_faq"

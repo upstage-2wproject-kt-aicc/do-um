@@ -25,10 +25,13 @@
   - BM25 인덱스 생성 + Pinecone 벡터 저장소 연결/적재
   - CSV SHA256 지문 기반 재색인(FAQ 변경 시에만 재업로드)
   - 시맨틱 캐시 검사 후 결과 반환
+  - **하이브리드 RAG(기본 ON)**: BM25 키워드 순위와 Pinecone 벡터 순위를 RRF로 병합
+  - **리스크 우선 메타**: 채택된 FAQ 문서들에서 `risk_level`(최고 심각도)·`handoff_required`(하나라도 Y면 Y) 집계 후 `metadata`에 반영 → 워크플로 이관 규칙과 정합
+  - **주제(subdomain)**: 기본 `NLU_SUBDOMAIN_SOURCE=rag`로 검색 1순위 문서의 `subdomain`을 `subdomain_pred`에 채움(의도는 KLUE, 주제는 검색)
   - `process_query()`에서 워크플로우가 사용할 dict 반환
 - 반환 형태:
   - 캐시 적중: `status="CACHED"` + `final_answer`
-  - 캐시 미적중: `status="REQUIRE_LLM"` + `retrieved_context`/`metadata` (질의 임베딩 벡터는 응답에 포함하지 않음; 내부에서만 사용)
+  - 캐시 미적중: `status="REQUIRE_LLM"` + `retrieved_context`/`metadata` (질의 임베딩 벡터는 응답에 포함하지 않음; 내부에서만 사용) + `routing_signals`(리스크·이관 요약)
   - 공통: `intent`, `timings_sec`
 
 #### `src/nlu/RAG_FAQ.csv`
@@ -80,12 +83,13 @@
 
 `AICC_NLU_Router.process_query(text)` 기준:
 
-1. 입력 텍스트의 의도 분류 (`predict_intent`)
+1. 입력 텍스트의 의도 분류 (`predict_intent`; 서브도메인 KLUE는 `NLU_SUBDOMAIN_SOURCE=model`일 때만 병렬 추론)
 2. 입력 텍스트 임베딩 생성
 3. 시맨틱 캐시 유사도 검사
 4. 캐시 적중 시 즉시 반환 (`CACHED`)
-5. 미적중 시 Pinecone 벡터 검색
-6. 검색 컨텍스트/메타데이터와 함께 `REQUIRE_LLM` 반환
+5. 미적중 시 Pinecone 벡터 검색 + (기본) BM25 검색 → RRF 병합 후 문서 채택·필터
+6. 채택 문서 메타 집계(리스크·이관) 및 `subdomain_pred`(rag 모드) 반영
+7. 검색 컨텍스트/메타데이터와 함께 `REQUIRE_LLM` 반환
 
 즉, 현재 NLU는 워크플로우 입장에서:
 - **분기 기준(intent)**
