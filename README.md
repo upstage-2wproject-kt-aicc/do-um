@@ -94,6 +94,51 @@ HF_HOME=.hf-cache STT_PROVIDER=openai TTS_PROVIDER=openai UV_CACHE_DIR=.uv-cache
 - TTS fallback 순서: `google -> azure` (`TTS_FALLBACK_PROVIDERS`)
 - Google 경로 사용 시 ADC 필요: `GOOGLE_APPLICATION_CREDENTIALS`
 
+## 프론트 연동용 WebSocket 이벤트 규약
+- 엔드포인트: `ws://localhost:8000/ws/stt`
+- 서버는 단계별 이벤트와 최종 결과를 JSON으로 전송한다.
+
+1. 단계 이벤트 (`event = "pipeline_stage"`)
+- 공통 필드
+  - `session_id`
+  - `stage`: `stt | nlu | workflow | tts`
+  - `status`: `started | completed | chunk | skipped | failed`
+  - `started_at_ms`, `ended_at_ms`, `latency_ms`
+  - `payload` (단계별 상세 데이터)
+- 예시
+```json
+{
+  "event": "pipeline_stage",
+  "session_id": "sess_xxx",
+  "stage": "tts",
+  "status": "chunk",
+  "started_at_ms": 1714360000000,
+  "ended_at_ms": 1714360000200,
+  "latency_ms": 200,
+  "payload": {
+    "chunk_id": 3,
+    "is_last": false,
+    "size_bytes": 4096,
+    "audio_base64": "..."
+  }
+}
+```
+
+2. 최종 결과 (`event = "pipeline_result"`)
+- 공통 필드
+  - `session_id`, `transcript`, `transcript_confidence`, `transcript_timestamp_ms`
+  - `nlu_analysis`
+  - `workflow` (없을 수 있음)
+  - `saved_file` (`data/runtime/*.json` 저장 경로)
+
+## 런타임 산출물 저장
+- WebSocket 파이프라인 결과는 `data/runtime/YYMMDD_HH:MM:SS.json` 형식으로 저장된다.
+- 이 파일은 디버깅/재현용 로컬 산출물이며 Git에 커밋하지 않는다.
+
+## 스트리밍 종료 처리
+- STT 스트리밍 파이프라인은 `finalize()`를 통해 입력 종료 시점의 버퍼를 강제 flush할 수 있다.
+- 프론트에서 녹음 종료 시점을 명확히 관리하면 마지막 발화 누락을 줄일 수 있다.
+
 ## 인터페이스 우선 원칙
 - 모듈 간 I/O는 `src/common/schemas.py`의 Pydantic 모델을 기준으로 교환.
 - 모듈 직접 의존보다 계약(스키마) 기반 연결을 우선.
