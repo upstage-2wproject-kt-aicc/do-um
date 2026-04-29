@@ -65,6 +65,9 @@ class JudgeEvaluation(BaseModel):
         ..., description="Metric scores keyed by judge metric name."
     )
     summary: dict[str, Any] = Field(default_factory=dict, description="Judge summary.")
+    flags: dict[str, bool] = Field(
+        default_factory=dict, description="Boolean risk flags emitted by the judge."
+    )
     token_usage: dict[str, int] = Field(
         default_factory=dict, description="Judge model token usage."
     )
