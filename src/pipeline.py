@@ -5,7 +5,14 @@ import re
 from typing import AsyncIterator
 from common.logger import get_logger
 from common.exceptions import TTSException
-from common.schemas import AudioChunk, EvalResult, WorkflowRoutingInput, LLMResponse, TTSChunk
+from common.schemas import (
+    AudioChunk,
+    EvalResult,
+    LLMResponse,
+    TTSChunk,
+    WorkflowOutput,
+    WorkflowRoutingInput,
+)
 from tts.factory import TTSFactory
 from workflow.graph import execute_workflow_item
 
@@ -78,3 +85,38 @@ class VoiceAIPipeline:
     async def run(self, audio_chunk: AudioChunk) -> EvalResult:
         """STT, NLU, 워크플로우, 다중 LLM, TTS 및 평가 단계를 차례로 실행합니다."""
         raise NotImplementedError
+
+    async def stream_tts_for_workflow_output(
+        self, workflow_output: WorkflowOutput
+    ) -> AsyncIterator[TTSChunk]:
+        """Runs only TTS stage for an already computed workflow output."""
+        final_text = workflow_output.pre_tts_text or workflow_output.final_answer_text
+        if not final_text or workflow_output.is_handoff_decided:
+            return
+        if not KOREAN_CHAR_PATTERN.search(final_text):
+            final_text = "죄송합니다. 현재 상담사 연결을 도와드리겠습니다."
+
+        tts_input = LLMResponse(
+            session_id=workflow_output.session_id,
+            provider="workflow",
+            text=final_text,
+            latency_ms=0,
+            ttft_ms=0,
+            finish_reason="stop",
+            grounded=False,
+            error=None,
+        )
+
+        last_error: Exception | None = None
+        for provider in self.tts_providers:
+            service = TTSFactory.get_service(provider)
+            try:
+                async for chunk in service.stream(tts_input):
+                    yield chunk
+                logger.info("TTS 완료. provider={}", provider)
+                return
+            except TTSException as exc:
+                last_error = exc
+                logger.warning("TTS 실패. provider={} error={}", provider, str(exc))
+        if last_error is not None:
+            raise last_error

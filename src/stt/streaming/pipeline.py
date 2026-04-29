@@ -129,6 +129,12 @@ class StreamingPipeline:
                 wav_bytes = wav_io.getvalue()
             return self._transcribe_openai(wav_bytes)
 
+    def finalize(self) -> Transcript | None:
+        """Force-flushes buffered speech when input stream ends."""
+        result = self._flush()
+        self._reset()
+        return result
+
     def _transcribe_google_stream(self, audio_chunks: list[bytes]) -> Transcript | None:
         """Google StreamingRecognize API를 사용하여 인식 (발화 단위 스트리밍)."""
         from google.cloud import speech
