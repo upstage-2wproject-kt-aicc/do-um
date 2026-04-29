@@ -1305,15 +1305,20 @@ class AICC_NLU_Router:
         preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
         print(f"      • 본문 미리보기: {preview!r}")
 
-        should_direct, direct_reasons = self._should_direct_handoff(
+        # RAG hit(selected) 경로에서도 guardrail을 계산해야 REJECT/LIMIT/REQUIRE_LLM 분기에서 안전하게 사용할 수 있다.
+        guardrail = self._compute_guardrail(
             risk_level=str(metadata.get("risk_level", "low")).strip().lower(),
             handoff_required=str(metadata.get("handoff_required", "N")).strip().upper(),
-            keyword_hit=keyword_hit,
+            sensitive_keyword_hit=sensitive_keyword_hit,
+            abusive_keyword_hit=abusive_keyword_hit,
             missing_customer_context_reason=missing_customer_context_reason,
+            rag_miss=False,
+            query_text=stt_text,
         )
-        if should_direct:
+
+        if guardrail["decision"] == "HANDOFF":
             timings["total_sec"] = time.perf_counter() - total_t0
-            print(f"  🚨 [H] Direct handoff 발동 (reason={direct_reasons})")
+            print(f"  🚨 [H] Direct handoff 발동 (reason={guardrail['reasons']})")
             print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 우회)")
             print("=" * 72)
             return self._build_direct_handoff_response(
