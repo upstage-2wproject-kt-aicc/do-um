@@ -15,6 +15,7 @@ from src.evaluation.clients import (
 from src.evaluation.env import load_evaluation_env
 from src.evaluation.loader import load_scenarios_csv, load_scenarios_tsv
 from src.evaluation.ragas_client import RagasClient
+from src.evaluation.rubrics import JUDGE_RUBRICS, get_judge_rubric
 from src.evaluation.runner import EvaluationRunner, save_run_result
 from src.evaluation.schemas import CandidateModel, EvaluationScenario, JudgeModel
 
@@ -98,10 +99,26 @@ async def run_from_args(args: argparse.Namespace) -> None:
     if not judge_models:
         raise ValueError("평가할 judge 모델이 없습니다. --judge 또는 JUDGE_*_MODEL을 설정하세요.")
 
+    rubric = get_judge_rubric(args.judge_rubric)
+    disable_ragas = args.disable_ragas or not rubric.include_ragas
+
     runner = EvaluationRunner(
         candidate_client=CompositeCandidateClient(),
-        judge_client=CompositeJudgeClient(),
-        ragas_client=build_ragas_client(args.disable_ragas),
+        judge_client=CompositeJudgeClient(
+            prompt_path=rubric.prompt_path,
+            metric_names=rubric.metric_names,
+            score_min=rubric.score_min,
+            score_max=rubric.score_max,
+            score_scale_label=rubric.score_scale_label,
+            primary_score_source=rubric.primary_score_source,
+        ),
+        ragas_client=build_ragas_client(disable_ragas),
+        judge_metric_names=rubric.metric_names,
+        judge_score_min=rubric.score_min,
+        judge_score_max=rubric.score_max,
+        include_ragas=not disable_ragas,
+        report_normalized_scores=rubric.report_normalized_scores,
+        review_risk_metric_names=rubric.review_risk_metric_names,
     )
     result = await runner.run(
         scenarios=scenarios,
@@ -135,6 +152,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Judge model spec, e.g. openai:gpt-4o. Repeatable.",
     )
     parser.add_argument("--repeat-count", type=int, default=1)
+    parser.add_argument(
+        "--judge-rubric",
+        choices=sorted(JUDGE_RUBRICS),
+        default="legacy_5",
+        help="Judge rubric profile. comparative_10 uses v4 and disables RAGAS by default.",
+    )
     parser.add_argument(
         "--disable-ragas",
         action="store_true",

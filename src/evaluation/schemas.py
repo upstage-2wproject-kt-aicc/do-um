@@ -7,15 +7,10 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from src.common.schemas import LLMRequest
+from src.evaluation.rubrics import LEGACY_JUDGE_METRIC_NAMES
 
 
-JUDGE_METRIC_NAMES: tuple[str, ...] = (
-    "answer_accuracy",
-    "grounded_response",
-    "safety_conservativeness",
-    "handoff_judgment",
-    "user_guidance_quality",
-)
+JUDGE_METRIC_NAMES: tuple[str, ...] = LEGACY_JUDGE_METRIC_NAMES
 
 
 class EvaluationScenario(BaseModel):
@@ -58,7 +53,7 @@ class JudgeModel(BaseModel):
 class JudgeMetricScore(BaseModel):
     """One judge metric score before aggregation."""
 
-    score: int = Field(..., ge=1, le=5, description="Raw judge score.")
+    score: int = Field(..., ge=1, le=10, description="Raw judge score.")
     reason: str = Field("", description="Concise Korean judge reason.")
 
 
@@ -70,12 +65,15 @@ class JudgeEvaluation(BaseModel):
         ..., description="Metric scores keyed by judge metric name."
     )
     summary: dict[str, Any] = Field(default_factory=dict, description="Judge summary.")
+    token_usage: dict[str, int] = Field(
+        default_factory=dict, description="Judge model token usage."
+    )
 
 
 class AggregatedMetricScore(BaseModel):
     """Aggregated score for one judge metric across judge models."""
 
-    raw_median: float = Field(..., ge=1.0, le=5.0, description="Median raw score.")
+    raw_median: float = Field(..., ge=1.0, le=10.0, description="Median raw score.")
     normalized: float = Field(..., ge=0.0, le=1.0, description="0-1 normalized score.")
     disagreement: int = Field(..., ge=0, description="Max raw score minus min raw score.")
     judge_scores: dict[str, int] = Field(
@@ -115,11 +113,12 @@ class ModelEvaluationRecord(BaseModel):
     aggregated_judge: AggregatedJudgeEvaluation
     ragas: RagasEvaluation
     report_metrics: dict[str, float | None] = Field(default_factory=dict)
-    primary_score: float = Field(..., ge=0.0, le=1.0)
+    primary_score: float = Field(..., ge=0.0, le=10.0)
     review_required: bool = Field(False)
     latency_ms: int = Field(0, ge=0)
     token_usage: dict[str, int] = Field(default_factory=dict)
     finish_reason: str | None = None
+    timing_ms: dict[str, int] = Field(default_factory=dict)
     error: str | None = None
 
 

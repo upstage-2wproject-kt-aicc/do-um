@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 
 from src.common.schemas import (
     LLMBatchResponse,
@@ -18,6 +19,7 @@ PROVIDER_MODEL_ENV: dict[str, str] = {
     "gpt": "LLM_GPT_MODEL",
     "grok": "LLM_GROK_MODEL",
 }
+URL_PATTERN = re.compile(r"https?://[^\s)\]>\"']+")
 
 
 def format_workflow_output(batch: LLMBatchResponse) -> WorkflowOutput:
@@ -25,7 +27,11 @@ def format_workflow_output(batch: LLMBatchResponse) -> WorkflowOutput:
     results = [_to_provider_result(item) for item in batch.responses]
     final_answer = next((item.answer for item in results if not item.error), "")
     is_handoff = final_answer == ""
-    references = next((item.citations for item in results if not item.error), [])
+    final_answer, extracted_links = _strip_urls(final_answer)
+    references = [
+        *next((item.citations for item in results if not item.error), []),
+        *extracted_links,
+    ]
     usage = _aggregate_token_usage(results)
     return WorkflowOutput(
         session_id=batch.session_id,
@@ -76,4 +82,28 @@ def _aggregate_token_usage(results: list[ProviderResult]) -> dict[str, int]:
     for item in results:
         for key, value in item.token_usage.items():
             output[key] = output.get(key, 0) + int(value)
+    return output
+
+
+def _strip_urls(text: str) -> tuple[str, list[str]]:
+    """Removes raw URLs from TTS-facing answer text and returns extracted links."""
+    links = URL_PATTERN.findall(text)
+    if not links:
+        return text, []
+    stripped = URL_PATTERN.sub("", text)
+    stripped = re.sub(r"\[([^\]]+)\]\(\s*\)", r"\1", stripped)
+    stripped = re.sub(r"\(\s*\)", "", stripped)
+    stripped = re.sub(r"[ \t]{2,}", " ", stripped)
+    stripped = re.sub(r"\n{3,}", "\n\n", stripped)
+    return stripped.strip(), _unique_preserve_order(links)
+
+
+def _unique_preserve_order(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    output: list[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        output.append(value)
     return output

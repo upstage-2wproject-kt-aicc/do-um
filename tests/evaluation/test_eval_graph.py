@@ -11,6 +11,7 @@ def test_build_llm_request_reuses_workflow_prompt_rules() -> None:
         subdomain="대출철회권",
         retrieved_context="대출 철회권은 계약서 수령일 등 기준일로부터 정해진 기간 안에 신청합니다.",
         reference_answer="대출 철회권 신청 가능 기간과 신청 경로를 안내합니다.",
+        metadata={"source_url": "https://example.com/loan-withdrawal"},
     )
 
     request = build_llm_request(scenario)
@@ -19,9 +20,14 @@ def test_build_llm_request_reuses_workflow_prompt_rules() -> None:
     assert request.route is not None
     assert request.route.value == "procedure"
     assert "Route=PROCEDURE" in (request.system_prompt or "")
+    assert "근거 링크는 시스템이 reference_links 필드로 별도 제공" in (
+        request.system_prompt or ""
+    )
     assert "[USER_QUERY]\n대출 철회권 신청 절차를 알려주세요." in request.prompt
     assert "[INTERNAL_CONTEXT]" in request.prompt
     assert "대출 철회권은 계약서 수령일" in request.prompt
+    assert "[ROUTING_METADATA]" in request.prompt
+    assert "source_url: https://example.com/loan-withdrawal" in request.prompt
 
 
 def test_build_workflow_input_passes_metadata_for_handoff_routing() -> None:
@@ -43,3 +49,5 @@ def test_build_workflow_input_passes_metadata_for_handoff_routing() -> None:
     assert request.route is not None
     assert request.route.value == "handoff"
     assert "Route=HANDOFF" in (request.system_prompt or "")
+    assert "risk_level: 높음" in request.prompt
+    assert "handoff_required: Y" in request.prompt

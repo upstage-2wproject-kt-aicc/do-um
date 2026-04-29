@@ -39,14 +39,24 @@ def test_rag_faq_v1_contains_six_diverse_single_turn_scenarios() -> None:
         "높음",
     }
     assert sum(1 for scenario in scenarios if not scenario.retrieved_context) == 1
-    assert (
-        next(
-            scenario
-            for scenario in scenarios
-            if scenario.scenario_id == "rag_faq_context_insufficient_account_freeze"
-        ).metadata["retrieval_status"]
-        == "no_match"
+    assert all(
+        "review_note" not in scenario.metadata
+        and "customer_difficulty" not in scenario.metadata
+        and "source_name" not in scenario.metadata
+        for scenario in scenarios
     )
+    assert all(
+        scenario.metadata.get("source_url")
+        for scenario in scenarios
+        if scenario.retrieved_context
+    )
+    no_context_scenario = next(
+        scenario
+        for scenario in scenarios
+        if scenario.scenario_id == "rag_faq_context_insufficient_account_freeze"
+    )
+    assert no_context_scenario.metadata["retrieval_status"] == "no_match"
+    assert "keywords" not in no_context_scenario.metadata
     assert all(scenario.reference_answer for scenario in scenarios)
 
 

@@ -196,8 +196,8 @@ async def execute_workflow_item(payload: WorkflowRoutingInput) -> WorkflowOutput
     output = format_workflow_output(batch)
     source_url = str(payload.routing_info.metadata.get("source_url", "")).strip()
     reference_links = output.reference_links
-    if source_url and not reference_links:
-        reference_links = [source_url]
+    if source_url and source_url not in reference_links:
+        reference_links = [*reference_links, source_url]
     evidence = NLUEvidence(
         intent=payload.routing_info.intent,
         domain=payload.routing_info.domain,

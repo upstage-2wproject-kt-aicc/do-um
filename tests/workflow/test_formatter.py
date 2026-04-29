@@ -39,3 +39,26 @@ def test_format_workflow_output_selects_first_success() -> None:
     assert output.final_answer_text == "ok"
     assert output.is_handoff_decided is False
 
+
+def test_format_workflow_output_moves_urls_out_of_tts_text() -> None:
+    batch = LLMBatchResponse(
+        session_id="sess-1",
+        responses=[
+            LLMResponse(
+                session_id="sess-1",
+                provider="gpt",
+                text=(
+                    "자세한 내용은 [여기](https://example.com/doc)에서 확인해 주세요. "
+                    "상품설명서도 참고해 주세요."
+                ),
+                latency_ms=100,
+            ),
+        ],
+    )
+
+    output = format_workflow_output(batch)
+
+    assert "https://example.com/doc" not in output.final_answer_text
+    assert output.pre_tts_text == output.final_answer_text
+    assert output.reference_links == ["https://example.com/doc"]
+    assert "여기에서 확인해 주세요" in output.final_answer_text

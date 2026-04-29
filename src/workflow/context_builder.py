@@ -21,11 +21,13 @@ class ContextBuilder:
         """Merges query, chat history, internal data, and policy rules into one prompt."""
         history_block = self._format_history(payload)
         internal_block = self._format_internal(payload)
+        metadata_block = self._format_routing_metadata(payload)
         policy_block = self._format_policy(payload)
         return (
             f"[USER_QUERY]\n{payload.original_query}\n\n"
             f"[CHAT_HISTORY]\n{history_block}\n\n"
             f"[INTERNAL_CONTEXT]\n{internal_block}\n\n"
+            f"[ROUTING_METADATA]\n{metadata_block}\n\n"
             f"[POLICY_RULES]\n{policy_block}"
         )
 
@@ -54,9 +56,33 @@ class ContextBuilder:
         """Formats internal API/DB context entries."""
         if not payload.internal_context:
             return "N/A"
-        return "\n".join(
-            f"- [{item.source}] {item.content}" for item in payload.internal_context
+        lines = []
+        for item in payload.internal_context:
+            line = f"- [{item.source}] {item.content}"
+            source_url = str(item.metadata.get("source_url", "")).strip()
+            if source_url:
+                line = f"{line}\n  source_url: {source_url}"
+            lines.append(line)
+        return "\n".join(lines)
+
+    def _format_routing_metadata(self, payload: WorkflowRoutingInput) -> str:
+        """Formats routing metadata that can affect safety, handoff, and citations."""
+        metadata = payload.routing_info.metadata
+        if not metadata:
+            return "N/A"
+        allowed_keys = (
+            "risk_level",
+            "handoff_required",
+            "source_url",
+            "retrieval_status",
+            "keywords",
         )
+        lines = []
+        for key in allowed_keys:
+            value = metadata.get(key)
+            if value not in (None, "", []):
+                lines.append(f"- {key}: {value}")
+        return "\n".join(lines) if lines else "N/A"
 
     def _format_policy(self, payload: WorkflowRoutingInput) -> str:
         """Formats policy rule entries for guardrail conditioning."""
