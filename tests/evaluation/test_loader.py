@@ -51,3 +51,43 @@ def test_load_scenarios_tsv_maps_workflow_ready_fields(tmp_path: Path) -> None:
     assert scenario.metadata["faq_id"] == "1"
     assert scenario.metadata["risk_level"] == "중간"
     assert scenario.metadata["keywords"] == ["고정금리", "변동금리"]
+
+
+def test_load_scenarios_tsv_allows_empty_retrieved_context(tmp_path: Path) -> None:
+    path = tmp_path / "scenarios.tsv"
+    path.write_text(
+        "\t".join(
+            [
+                "scenario_id",
+                "question",
+                "intent",
+                "domain",
+                "subdomain",
+                "retrieved_context",
+                "context_metadata",
+                "keywords",
+                "reference_answer",
+            ]
+        )
+        + "\n"
+        + "\t".join(
+            [
+                "account_freeze_no_context",
+                "제 계좌가 왜 지급정지됐는지 알려주세요.",
+                "민원형",
+                "금융상담",
+                "계좌/지급정지",
+                "",
+                "{}",
+                "지급정지,본인확인",
+                "검색된 문서가 없으므로 사유를 단정하지 않고 본인확인 채널을 안내합니다.",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    scenario = load_scenarios_tsv(path)[0]
+
+    assert scenario.retrieved_context == ""
+    assert scenario.metadata["keywords"] == ["지급정지", "본인확인"]

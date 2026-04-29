@@ -90,6 +90,7 @@ def _select_route_with_reason(state: WorkflowRoutingInput) -> tuple[RouteType, s
         return RouteType.SECURITY, "security_keyword_match"
 
     metadata = state.routing_info.metadata
+    # 리스크·이관 플래그 우선(방법 5): 의도 라벨만으로 상담원 이관하지 않음.
     if _is_high_risk(metadata.get("risk_level")):
         return RouteType.HANDOFF, "metadata_risk_level_high"
     if _is_handoff_required(metadata.get("handoff_required")):
@@ -194,8 +195,8 @@ async def execute_workflow_item(payload: WorkflowRoutingInput) -> WorkflowOutput
     output = format_workflow_output(batch)
     source_url = str(payload.routing_info.metadata.get("source_url", "")).strip()
     reference_links = output.reference_links
-    if source_url and not reference_links:
-        reference_links = [source_url]
+    if source_url and source_url not in reference_links:
+        reference_links = [*reference_links, source_url]
     evidence = NLUEvidence(
         intent=payload.routing_info.intent,
         domain=payload.routing_info.domain,

@@ -96,6 +96,62 @@ async def test_ragas_client_returns_metric_scores_from_injected_evaluator() -> N
 
 
 @pytest.mark.asyncio
+async def test_ragas_client_handles_list_metric_values_from_evaluator() -> None:
+    def fake_evaluate(**kwargs):
+        return {"faithfulness": [0.75], "answer_relevancy": [0.5]}
+
+    client = RagasClient(
+        evaluate_fn=fake_evaluate,
+        dataset_factory=FakeDatasetFactory,
+        metrics=["faithfulness_metric", "answer_relevancy_metric"],
+    )
+
+    result = await client.evaluate(
+        EvaluationScenario(
+            scenario_id="s1",
+            user_query="질문",
+            intent="설명형",
+            retrieved_context="문서",
+        ),
+        LLMResponse(session_id="s1", provider="gpt", text="답변", latency_ms=1),
+    )
+
+    assert result.faithfulness == 0.75
+    assert result.answer_relevancy == 0.5
+
+
+@pytest.mark.asyncio
+async def test_ragas_client_skips_faithfulness_when_context_is_empty() -> None:
+    def fake_evaluate(**kwargs):
+        assert kwargs["dataset"].data["retrieved_contexts"] == [[]]
+        assert kwargs["metrics"] == ["answer_relevancy_metric"]
+        return {"answer_relevancy": 0.5}
+
+    client = RagasClient(
+        evaluate_fn=fake_evaluate,
+        dataset_factory=FakeDatasetFactory,
+        metrics=["faithfulness_metric", "answer_relevancy_metric"],
+    )
+
+    result = await client.evaluate(
+        EvaluationScenario(
+            scenario_id="s1",
+            user_query="질문",
+            intent="민원형",
+            retrieved_context="",
+        ),
+        LLMResponse(session_id="s1", provider="gpt", text="답변", latency_ms=1),
+    )
+
+    assert result.faithfulness is None
+    assert result.answer_relevancy == 0.5
+    assert result.details == {
+        "status": "ok",
+        "faithfulness_status": "not_applicable_no_context",
+    }
+
+
+@pytest.mark.asyncio
 async def test_ragas_client_records_not_configured_when_dependency_missing() -> None:
     def missing_import():
         raise ImportError("missing ragas")

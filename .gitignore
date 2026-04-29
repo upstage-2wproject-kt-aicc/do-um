@@ -31,6 +31,7 @@ share/python-wheels/
 
 logs/
 data/
+evaluation_runs/
 
 # --- 가상환경 ---
 .venv/
@@ -78,6 +79,10 @@ src/nlu/my_aicc_nlu_model_klue*
 src/nlu/my_aicc_nlu_model_klue/
 src/nlu/aicc_chroma_db/
 src/nlu/__pycache__/
+src/nlu/config.json
+src/nlu/model.safetensors
+src/nlu/tokenizer.json
+src/nlu/tokenizer_config.json
 # NLU 벤치 결과 (test_bench.py 기본 저장)
 src/nlu/reports/
 

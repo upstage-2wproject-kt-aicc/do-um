@@ -1305,23 +1305,15 @@ class AICC_NLU_Router:
         preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
         print(f"      • 본문 미리보기: {preview!r}")
 
-        guardrail = self._compute_guardrail(
+        should_direct, direct_reasons = self._should_direct_handoff(
             risk_level=str(metadata.get("risk_level", "low")).strip().lower(),
             handoff_required=str(metadata.get("handoff_required", "N")).strip().upper(),
-            sensitive_keyword_hit=sensitive_keyword_hit,
-            abusive_keyword_hit=abusive_keyword_hit,
+            keyword_hit=keyword_hit,
             missing_customer_context_reason=missing_customer_context_reason,
-            rag_miss=False,
-            query_text=stt_text,
         )
-        metadata["guardrail_decision"] = guardrail["decision"]
-        metadata["guardrail_score"] = guardrail["score"]
-        metadata["guardrail_reasons"] = guardrail["reasons"]
-        metadata["guardrail_components"] = guardrail.get("components", {})
-
-        if guardrail["decision"] == "HANDOFF":
+        if should_direct:
             timings["total_sec"] = time.perf_counter() - total_t0
-            print(f"  🚨 [H] Direct handoff 발동 (reason={guardrail['reasons']})")
+            print(f"  🚨 [H] Direct handoff 발동 (reason={direct_reasons})")
             print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (LLM 우회)")
             print("=" * 72)
             return self._build_direct_handoff_response(

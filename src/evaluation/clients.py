@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import asyncio
+import re
 import time
 from pathlib import Path
 from typing import Any, Callable, TypeAlias
@@ -13,10 +14,11 @@ import httpx
 
 from src.common.schemas import LLMRequest, LLMResponse
 from src.evaluation.env import load_evaluation_env
+from src.evaluation.graph import build_llm_request
+from src.evaluation.rubrics import LEGACY_JUDGE_METRIC_NAMES
 from src.evaluation.schemas import (
     CandidateModel,
     EvaluationScenario,
-    JUDGE_METRIC_NAMES,
     JudgeEvaluation,
     JudgeMetricScore,
     JudgeModel,
@@ -85,14 +87,16 @@ class OpenAICompatibleChatClient:
         else:
             payload["temperature"] = request.temperature
             payload["max_tokens"] = request.max_tokens
+        if isinstance(model, JudgeModel) and model.provider in {"openai", "gpt"}:
+            payload["response_format"] = {"type": "json_object"}
         headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         async with httpx.AsyncClient(timeout=self.timeout_s) as client:
-            response = await client.post(
+            response = await _post_with_retries(
+                client,
                 f"{base_url.rstrip('/')}/chat/completions",
-                json=payload,
-                headers=headers,
+                payload,
+                headers,
             )
-            response.raise_for_status()
             body = response.json()
         latency_ms = int((time.perf_counter() - started) * 1000)
         content = _openai_content(body)
@@ -147,12 +151,12 @@ class AnthropicChatClient:
             "Content-Type": "application/json",
         }
         async with httpx.AsyncClient(timeout=self.timeout_s) as client:
-            response = await client.post(
+            response = await _post_with_retries(
+                client,
                 f"{base_url.rstrip('/')}/messages",
-                json=payload,
-                headers=headers,
+                payload,
+                headers,
             )
-            response.raise_for_status()
             body = response.json()
         latency_ms = int((time.perf_counter() - started) * 1000)
         return LLMResponse(
@@ -174,11 +178,13 @@ class GoogleVertexGeminiChatClient:
         project_env: EnvName = "GOOGLE_CLOUD_PROJECT",
         location_env: EnvName = "GOOGLE_CLOUD_LOCATION",
         default_location: str = "global",
+        timeout_s: float = 20.0,
         client_factory: Callable[..., Any] | None = None,
     ) -> None:
         self.project_env = project_env
         self.location_env = location_env
         self.default_location = default_location
+        self.timeout_s = timeout_s
         self.client_factory = client_factory
 
     async def generate(
@@ -193,6 +199,7 @@ class GoogleVertexGeminiChatClient:
             location,
             model.model_id,
             request,
+            isinstance(model, JudgeModel),
         )
         latency_ms = int((time.perf_counter() - started) * 1000)
         return LLMResponse(
@@ -211,13 +218,25 @@ class GoogleVertexGeminiChatClient:
         location: str,
         model_id: str,
         request: LLMRequest,
+        json_response: bool,
     ) -> Any:
         client_factory = self.client_factory or _load_genai_client
-        client = client_factory(vertexai=True, project=project, location=location)
+        from google.genai import types
+
+        client = client_factory(
+            vertexai=True,
+            project=project,
+            location=location,
+            http_options=types.HttpOptions(timeout=int(self.timeout_s * 1000)),
+        )
         return client.models.generate_content(
             model=model_id,
             contents=request.prompt,
-            config=_build_vertex_config(request),
+            config=_build_vertex_config(
+                request,
+                json_response=json_response,
+                thinking_budget=_vertex_thinking_budget(model_id),
+            ),
         )
 
 
@@ -242,13 +261,40 @@ class CompositeCandidateClient:
 class CompositeJudgeClient:
     """Routes judge calls and parses judge JSON output."""
 
-    def __init__(self, prompt_path: str | Path | None = None) -> None:
-        self.prompt_path = prompt_path or Path(__file__).parent / "prompts" / "judge_v1.md"
-        self.openai = OpenAICompatibleChatClient()
+    def __init__(
+        self,
+        prompt_path: str | Path | None = None,
+        judge_timeout_s: float = 60.0,
+        metric_names: tuple[str, ...] = LEGACY_JUDGE_METRIC_NAMES,
+        score_min: int = 1,
+        score_max: int = 5,
+        score_scale_label: str = "1_to_5",
+        primary_score_source: str = "llm_as_a_judge_5_metrics",
+        anthropic_concurrency: int | None = None,
+        google_concurrency: int | None = None,
+    ) -> None:
+        self.prompt_path = prompt_path or Path(__file__).parent / "prompts" / "judge_v2.md"
+        self.metric_names = metric_names
+        self.score_min = score_min
+        self.score_max = score_max
+        self.score_scale_label = score_scale_label
+        self.primary_score_source = primary_score_source
+        self.openai = OpenAICompatibleChatClient(timeout_s=judge_timeout_s)
         self.anthropic = AnthropicChatClient(
-            api_key_env=("JUDGE_ANTHROPIC_API_KEY", "LLM_CLAUDE_SONNET_API_KEY")
+            api_key_env=("JUDGE_ANTHROPIC_API_KEY", "LLM_CLAUDE_SONNET_API_KEY"),
+            timeout_s=judge_timeout_s,
         )
-        self.vertex_gemini = GoogleVertexGeminiChatClient()
+        self.vertex_gemini = GoogleVertexGeminiChatClient(timeout_s=judge_timeout_s)
+        self.anthropic_semaphore = asyncio.Semaphore(
+            anthropic_concurrency
+            if anthropic_concurrency is not None
+            else _int_env("JUDGE_ANTHROPIC_CONCURRENCY", 4)
+        )
+        self.google_semaphore = asyncio.Semaphore(
+            google_concurrency
+            if google_concurrency is not None
+            else _int_env("JUDGE_GOOGLE_CONCURRENCY", 4)
+        )
 
     async def evaluate(
         self,
@@ -259,19 +305,33 @@ class CompositeJudgeClient:
         request = LLMRequest(
             session_id=scenario.scenario_id,
             system_prompt=Path(self.prompt_path).read_text(encoding="utf-8"),
-            prompt=build_judge_user_prompt(scenario, answer),
+            prompt=build_judge_user_prompt(
+                scenario,
+                answer,
+                score_scale_label=self.score_scale_label,
+                primary_score_source=self.primary_score_source,
+            ),
             temperature=0.0,
-            max_tokens=1200,
+            max_tokens=2400,
         )
         if judge.provider in {"openai", "gpt"}:
             response = await self.openai.generate(judge, request)
         elif judge.provider in {"anthropic", "claude"}:
-            response = await self.anthropic.generate(judge, request)
+            async with self.anthropic_semaphore:
+                response = await self.anthropic.generate(judge, request)
         elif judge.provider in {"google", "gemini"}:
-            response = await self.vertex_gemini.generate(judge, request)
+            async with self.google_semaphore:
+                response = await self.vertex_gemini.generate(judge, request)
         else:
             raise ValueError(f"Unsupported judge provider: {judge.provider}")
-        return parse_judge_json(judge.model_id, response.text)
+        return parse_judge_json(
+            judge.model_id,
+            response.text,
+            metric_names=self.metric_names,
+            score_min=self.score_min,
+            score_max=self.score_max,
+            token_usage=response.token_usage,
+        )
 
 
 class NullRagasClient:
@@ -288,33 +348,78 @@ class NullRagasClient:
 
 
 def build_judge_user_prompt(
-    scenario: EvaluationScenario, answer: LLMResponse
+    scenario: EvaluationScenario,
+    answer: LLMResponse,
+    score_scale_label: str = "1_to_5",
+    primary_score_source: str = "llm_as_a_judge_5_metrics",
 ) -> str:
     """Builds the user payload given to judge models."""
+    workflow_request = build_llm_request(scenario)
     payload = {
-        "user_query": scenario.user_query,
-        "context": scenario.retrieved_context,
-        "candidate_answer": answer.text,
-        "expected_route": scenario.metadata.get("expected_route", ""),
+        "evaluation_task": {
+            "type": "single_answer_grading",
+            "score_scale": score_scale_label,
+            "primary_score_source": primary_score_source,
+        },
+        "workflow_prompt_given_to_candidate": {
+            "system_message": workflow_request.system_prompt or "",
+            "user_message": workflow_request.prompt,
+            "route": workflow_request.route.value if workflow_request.route else "",
+        },
+        "scenario": {
+            "scenario_id": scenario.scenario_id,
+            "user_query": scenario.user_query,
+            "intent": scenario.intent,
+            "domain": scenario.domain,
+            "subdomain": scenario.subdomain,
+            "router_confidence": scenario.router_confidence,
+            "expected_route": scenario.metadata.get("expected_route", ""),
+        },
+        "retrieved_context": scenario.retrieved_context,
         "reference_answer": scenario.reference_answer,
         "context_metadata": scenario.metadata,
+        "candidate_reference_links": _scenario_reference_links(scenario),
+        "candidate_answer": answer.text,
     }
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
-def parse_judge_json(judge_model: str, text: str) -> JudgeEvaluation:
+def _scenario_reference_links(scenario: EvaluationScenario) -> list[str]:
+    source_url = str(scenario.metadata.get("source_url", "")).strip()
+    return [source_url] if source_url else []
+
+
+def parse_judge_json(
+    judge_model: str,
+    text: str,
+    metric_names: tuple[str, ...] = LEGACY_JUDGE_METRIC_NAMES,
+    score_min: int = 1,
+    score_max: int = 5,
+    token_usage: dict[str, int] | None = None,
+) -> JudgeEvaluation:
     """Parses judge JSON and validates the required metric keys."""
-    data = json.loads(_strip_json_fence(text))
+    data = _load_judge_json(text)
     metrics: dict[str, JudgeMetricScore] = {}
-    for metric_name in JUDGE_METRIC_NAMES:
+    for metric_name in metric_names:
         raw_metric = data.get(metric_name)
         if not isinstance(raw_metric, dict):
             raise ValueError(f"Missing judge metric: {metric_name}")
-        metrics[metric_name] = JudgeMetricScore.model_validate(raw_metric)
+        metric = JudgeMetricScore.model_validate(raw_metric)
+        if metric.score < score_min or metric.score > score_max:
+            raise ValueError(
+                f"Judge metric {metric_name} score must be between "
+                f"{score_min} and {score_max}: {metric.score}"
+            )
+        metrics[metric_name] = metric
     summary = data.get("summary", {})
     if not isinstance(summary, dict):
         summary = {}
-    return JudgeEvaluation(judge_model=judge_model, metrics=metrics, summary=summary)
+    return JudgeEvaluation(
+        judge_model=judge_model,
+        metrics=metrics,
+        summary=summary,
+        token_usage=token_usage or {},
+    )
 
 
 def _provider_env(
@@ -342,6 +447,13 @@ def _get_env(name: EnvName, default: str = "") -> str:
     return default
 
 
+def _int_env(name: str, default: int) -> int:
+    raw = os.getenv(name, "").strip()
+    if not raw:
+        return default
+    return max(int(raw), 1)
+
+
 def _env_label(name: EnvName) -> str:
     if isinstance(name, str):
         return name
@@ -359,14 +471,85 @@ def _load_genai_client(**kwargs: Any) -> Any:
     return genai.Client(**kwargs)
 
 
-def _build_vertex_config(request: LLMRequest) -> Any:
+async def _post_with_retries(
+    client: httpx.AsyncClient,
+    url: str,
+    payload: dict[str, Any],
+    headers: dict[str, str],
+    max_attempts: int = 4,
+) -> httpx.Response:
+    retry_statuses = {429, 500, 502, 503, 504}
+    retry_errors = (
+        httpx.TimeoutException,
+        httpx.NetworkError,
+        httpx.RemoteProtocolError,
+    )
+    for attempt in range(max_attempts):
+        try:
+            response = await client.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            return response
+        except httpx.HTTPStatusError as exc:
+            if (
+                exc.response.status_code not in retry_statuses
+                or attempt == max_attempts - 1
+            ):
+                raise
+            await asyncio.sleep(_retry_delay_s(attempt, exc.response))
+        except retry_errors:
+            if attempt == max_attempts - 1:
+                raise
+            await asyncio.sleep(_retry_delay_s(attempt))
+    raise RuntimeError("unreachable retry state")
+
+
+def _retry_delay_s(attempt: int, response: httpx.Response | None = None) -> float:
+    if response is not None:
+        retry_after = response.headers.get("retry-after")
+        if retry_after:
+            try:
+                return max(float(retry_after), 0.0)
+            except ValueError:
+                pass
+    return float(2 ** attempt)
+
+
+def _build_vertex_config(
+    request: LLMRequest,
+    json_response: bool = False,
+    thinking_budget: int | None = None,
+) -> Any:
     from google.genai import types
 
+    kwargs: dict[str, Any] = {
+        "system_instruction": request.system_prompt or None,
+        "temperature": request.temperature,
+        "max_output_tokens": request.max_tokens,
+    }
+    if json_response:
+        kwargs["response_mime_type"] = "application/json"
+    if thinking_budget is not None:
+        kwargs["thinking_config"] = types.ThinkingConfig(
+            thinking_budget=thinking_budget
+        )
     return types.GenerateContentConfig(
-        system_instruction=request.system_prompt or None,
-        temperature=request.temperature,
-        max_output_tokens=request.max_tokens,
+        **kwargs,
     )
+
+
+def _vertex_thinking_budget(model_id: str) -> int | None:
+    """Returns a small thinking budget for Gemini reasoning models.
+
+    Gemini 2.5+ counts hidden thinking tokens against max output tokens. Keeping
+    the budget bounded prevents short customer-facing answers from being cut off.
+    """
+    normalized = model_id.lower()
+    if not normalized.startswith(("gemini-2.5", "gemini-3")):
+        return None
+    raw = os.getenv("GOOGLE_VERTEX_THINKING_BUDGET", "128").strip().lower()
+    if raw in {"", "none", "off", "disabled"}:
+        return None
+    return int(raw)
 
 
 def _openai_content(body: dict[str, Any]) -> str:
@@ -425,9 +608,32 @@ def _strip_json_fence(text: str) -> str:
     stripped = text.strip()
     if stripped.startswith("```"):
         lines = stripped.splitlines()
-        if lines and lines[0].startswith("```"):
+        if lines and lines[0].strip().startswith("```"):
             lines = lines[1:]
-        if lines and lines[-1].startswith("```"):
+        if lines and lines[-1].strip().startswith("```"):
             lines = lines[:-1]
         return "\n".join(lines).strip()
     return stripped
+
+
+def _load_judge_json(text: str) -> dict[str, Any]:
+    stripped = _extract_json_object(_strip_json_fence(text))
+    try:
+        data = json.loads(stripped)
+    except json.JSONDecodeError:
+        data = json.loads(_remove_trailing_json_commas(stripped))
+    if not isinstance(data, dict):
+        raise ValueError("Judge response must be a JSON object.")
+    return data
+
+
+def _extract_json_object(text: str) -> str:
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end < start:
+        return text.strip()
+    return text[start : end + 1].strip()
+
+
+def _remove_trailing_json_commas(text: str) -> str:
+    return re.sub(r",\s*([}\]])", r"\1", text)

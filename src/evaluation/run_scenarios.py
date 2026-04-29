@@ -6,11 +6,13 @@ import argparse
 import asyncio
 import json
 import re
+import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from src.evaluation.clients import CompositeCandidateClient, CompositeJudgeClient
 from src.evaluation.env import load_evaluation_env
+from src.evaluation.rubrics import JUDGE_RUBRICS, get_judge_rubric
 from src.evaluation.run_evaluation import (
     build_ragas_client,
     default_candidate_models_from_env,
@@ -31,29 +33,33 @@ async def run_scenarios_one_by_one(
     runner: EvaluationRunner,
     output_dir: str | Path,
     repeat_count: int = 1,
+    timer: Callable[[], float] = time.perf_counter,
 ) -> list[dict[str, Any]]:
     """Runs each scenario independently and writes one result JSON per scenario."""
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    summaries: list[dict[str, Any]] = []
-    for scenario in scenarios:
+    async def run_one_scenario(scenario: EvaluationScenario) -> dict[str, Any]:
+        started = timer()
         result = await runner.run(
             scenarios=[scenario],
             candidate_models=candidate_models,
             judge_models=judge_models,
             repeat_count=repeat_count,
         )
+        duration_ms = int((timer() - started) * 1000)
         scenario_output_path = output_path / f"{_safe_filename(scenario.scenario_id)}.json"
         save_run_result(result, scenario_output_path)
-        summaries.append(
-            {
-                "scenario_id": scenario.scenario_id,
-                "output_path": str(scenario_output_path),
-                "record_count": len(result.records),
-            }
-        )
+        return {
+            "scenario_id": scenario.scenario_id,
+            "output_path": str(scenario_output_path),
+            "record_count": len(result.records),
+            "duration_ms": duration_ms,
+        }
 
+    summaries: list[dict[str, Any]] = []
+    for scenario in scenarios:
+        summaries.append(await run_one_scenario(scenario))
     _save_index(output_path / "index.json", summaries)
     return summaries
 
@@ -83,10 +89,27 @@ async def run_from_args(args: argparse.Namespace) -> None:
     if not judge_models:
         raise ValueError("평가할 judge 모델이 없습니다. --judge 또는 JUDGE_*_MODEL을 설정하세요.")
 
+    rubric = get_judge_rubric(args.judge_rubric)
+    prompt_path = args.judge_prompt or rubric.prompt_path
+    disable_ragas = args.disable_ragas or not rubric.include_ragas
+
     runner = EvaluationRunner(
         candidate_client=CompositeCandidateClient(),
-        judge_client=CompositeJudgeClient(),
-        ragas_client=build_ragas_client(args.disable_ragas),
+        judge_client=CompositeJudgeClient(
+            prompt_path=prompt_path,
+            metric_names=rubric.metric_names,
+            score_min=rubric.score_min,
+            score_max=rubric.score_max,
+            score_scale_label=rubric.score_scale_label,
+            primary_score_source=rubric.primary_score_source,
+        ),
+        ragas_client=build_ragas_client(disable_ragas),
+        judge_metric_names=rubric.metric_names,
+        judge_score_min=rubric.score_min,
+        judge_score_max=rubric.score_max,
+        include_ragas=not disable_ragas,
+        report_normalized_scores=rubric.report_normalized_scores,
+        review_risk_metric_names=rubric.review_risk_metric_names,
     )
     summaries = await run_scenarios_one_by_one(
         scenarios=scenarios,
@@ -131,6 +154,17 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help="Judge model spec, e.g. openai:gpt-5.5. Repeatable.",
+    )
+    parser.add_argument(
+        "--judge-prompt",
+        default=None,
+        help="Judge system prompt file path. Defaults to the selected --judge-rubric prompt.",
+    )
+    parser.add_argument(
+        "--judge-rubric",
+        choices=sorted(JUDGE_RUBRICS),
+        default="legacy_5",
+        help="Judge rubric profile. comparative_10 uses v4 and disables RAGAS by default.",
     )
     parser.add_argument("--repeat-count", type=int, default=1)
     parser.add_argument(

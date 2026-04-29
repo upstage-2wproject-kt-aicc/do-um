@@ -107,6 +107,11 @@ HF_HOME=.hf-cache STT_PROVIDER=openai TTS_PROVIDER=openai UV_CACHE_DIR=.uv-cache
 6. TTS 스트리밍 (`TTSChunk`)
 7. 평가/로그 수집
 
+## 답변/근거 링크 분리
+- TTS로 읽힐 텍스트에는 원문 URL을 직접 넣지 않는다.
+- RAG 문서의 `source_url`은 `WorkflowOutput.reference_links`에 별도로 담아 상담사 화면이나 로그에서 참조한다.
+- `final_answer_text`와 `pre_tts_text`는 음성 응답에 적합한 자연어 문장만 유지한다.
+
 ## 평가 시나리오 실행
 
 대표 RAG FAQ 평가 시나리오는 `evaluation/scenarios/rag_faq_v1.tsv`에 있다.
@@ -115,6 +120,7 @@ TSV를 사용하는 이유는 긴 한국어 답변, 쉼표가 포함된 keywords
 ### 시나리오 파일 전체를 하나씩 평가
 
 아래 명령은 TSV의 각 시나리오를 하나씩 workflow prompt에 주입하고, candidate 모델 응답을 judge/RAGAS로 평가한 결과를 시나리오별 JSON으로 저장한다.
+각 시나리오 내부에서는 candidate 모델, judge 평가, RAGAS 계산을 비동기로 실행한다.
 
 ```bash
 UV_CACHE_DIR=.uv-cache uv run --python 3.11 python -m src.evaluation.run_scenarios \
@@ -123,6 +129,7 @@ UV_CACHE_DIR=.uv-cache uv run --python 3.11 python -m src.evaluation.run_scenari
 ```
 
 결과는 `evaluation_runs/rag_faq_v1/<scenario_id>.json`에 저장되고, 전체 실행 목록은 `evaluation_runs/rag_faq_v1/index.json`에 저장된다.
+`index.json`의 각 시나리오 항목에는 candidate 생성, judge 평가, RAGAS 계산을 포함한 전체 소요 시간인 `duration_ms`가 함께 기록된다.
 
 ### 특정 시나리오만 평가
 
@@ -148,4 +155,37 @@ UV_CACHE_DIR=.uv-cache uv run --python 3.11 python -m src.evaluation.run_scenari
   --judge google:gemini-3.1-pro-preview
 ```
 
-RAGAS 연결을 잠시 제외하고 LLM-as-a-Judge 흐름만 확인하려면 `--disable-ragas`를 추가한다.
+현재 운영 평가 기준은 `comparative_10`이며, 이 모드는 RAGAS를 사용하지 않는다.
+`legacy_5`와 `--disable-ragas`는 이전 5점 체계와 회귀 확인용으로만 유지한다.
+
+### v4 비교 평가 프롬프트로 테스트
+
+`comparative_10` rubric은 `judge_v4_comparative.md`를 사용한다.
+이 모드는 모델별 응답 성향 비교를 위해 6개 judge 항목을 1~10점 원점수로 평가하며, RAGAS를 제외한다.
+`groundedness`가 Faithfulness 역할을, `intent_fit`과 `guidance_quality`가 Answer Relevancy 역할을 대신한다.
+handoff/no-context 시나리오는 RAGAS 해석이 불안정할 수 있으므로 LLM-as-a-Judge 결과를 기준으로 본다.
+한 시나리오 안에서는 candidate 4개와 judge 3개 기준 최대 12개 judge 호출이 병렬 실행되도록 provider별 judge 동시성 기본값을 4로 둔다.
+
+```bash
+UV_CACHE_DIR=.uv-cache uv run --python 3.11 python -m src.evaluation.run_scenarios \
+  --scenarios evaluation/scenarios/rag_faq_v1.tsv \
+  --scenario-id rag_faq_001_rate_explain \
+  --judge-rubric comparative_10 \
+  --output-dir evaluation_runs/rag_faq_v1_v4_single
+```
+
+결과를 사람이 읽기 좋은 Markdown으로 보려면 아래 명령을 실행한다.
+리포트에는 질문, context/metadata, 모델별 답변 전문, 6개 점수, primary score, judge 요약, 토큰 사용량 기반 비용 추정치가 함께 포함된다.
+
+```bash
+UV_CACHE_DIR=.uv-cache uv run --python 3.11 python -m src.evaluation.summarize_run \
+  --run-dir evaluation_runs/rag_faq_v1_v4_single
+```
+
+### 비용 통계 확인
+
+`summary.md` 상단의 `Model Cost / Latency Overview`는 모델별 평균 점수, 평균 전체 소요 시간, 점수 표준편차, candidate 평균 입력/출력 토큰, candidate 1회/1,000회 예상 비용, judge 평균 비용을 보여준다.
+시나리오별 섹션에도 candidate 비용과 judge 비용이 별도 표로 기록된다.
+
+비용은 `src/evaluation/pricing.py`의 가격 스냅샷을 기준으로 계산한다.
+기존 평가 결과처럼 judge 응답의 `token_usage`가 저장되지 않은 run은 judge 비용이 `N/A`로 표시되고, 새로 실행하는 평가부터 judge 비용까지 계산된다.
