@@ -70,7 +70,7 @@ def test_rag_faq_v1_routes_cover_core_workflow_paths() -> None:
         "rag_faq_001_rate_explain": "faq",
         "rag_faq_016_autopay_procedure": "procedure",
         "rag_faq_019_loan_eligibility_no_guarantee": "faq",
-        "rag_faq_015_card_dispute_no_handoff": "handoff",
+        "rag_faq_015_card_dispute_no_handoff": "faq",
         "rag_faq_context_insufficient_account_freeze": "handoff",
         "rag_faq_028_voice_phishing_handoff": "security",
     }
