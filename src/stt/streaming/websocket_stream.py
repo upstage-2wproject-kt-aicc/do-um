@@ -91,12 +91,13 @@ async def stt_websocket(websocket: WebSocket):
             }
         )
 
-    async def process_transcript(transcript) -> None:
+    async def process_transcript(transcript, stt_started_at_ms: int | None = None) -> None:
         transcript_text = transcript.text
         await send_event(
             stage="stt",
             status="completed",
             session_id=transcript.session_id,
+            started_at_ms=stt_started_at_ms,
             payload={
                 "text": transcript_text,
                 "is_final": True,
@@ -159,19 +160,13 @@ async def stt_websocket(websocket: WebSocket):
                 started_at_ms=workflow_started_at_ms,
                 payload=workflow_json,
             )
-            if workflow_output.is_handoff_decided:
-                await send_event(
-                    stage="tts",
-                    status="skipped",
-                    session_id=transcript.session_id,
-                    payload={"reason": "handoff_decided"},
-                )
-            else:
+            tts_text = (workflow_output.pre_tts_text or workflow_output.final_answer_text or "").strip()
+            if tts_text:
                 await send_event(
                     stage="tts",
                     status="started",
                     session_id=transcript.session_id,
-                    payload={"pre_tts_text": workflow_output.pre_tts_text},
+                    payload={"pre_tts_text": tts_text},
                 )
                 tts_started_at_ms = int(time.time() * 1000)
                 tts_chunks = 0
@@ -196,6 +191,13 @@ async def stt_websocket(websocket: WebSocket):
                     started_at_ms=tts_started_at_ms,
                     payload={"chunks": tts_chunks},
                 )
+            else:
+                await send_event(
+                    stage="tts",
+                    status="skipped",
+                    session_id=transcript.session_id,
+                    payload={"reason": "missing_tts_text"},
+                )
         else:
             await send_event(
                 stage="workflow",
@@ -203,6 +205,47 @@ async def stt_websocket(websocket: WebSocket):
                 session_id=transcript.session_id,
                 payload={"reason": "nlu_status_not_require_llm"},
             )
+            direct_answer = str(nlu_result.get("final_answer") or "").strip()
+            if direct_answer:
+                await send_event(
+                    stage="tts",
+                    status="started",
+                    session_id=transcript.session_id,
+                    payload={"pre_tts_text": direct_answer},
+                )
+                tts_started_at_ms = int(time.time() * 1000)
+                tts_chunks = 0
+                async for chunk in voice_pipeline.stream_tts_for_text(
+                    session_id=transcript.session_id,
+                    text=direct_answer,
+                ):
+                    tts_chunks += 1
+                    await send_event(
+                        stage="tts",
+                        status="chunk",
+                        session_id=transcript.session_id,
+                        started_at_ms=tts_started_at_ms,
+                        payload={
+                            "chunk_id": chunk.chunk_id,
+                            "is_last": chunk.is_last,
+                            "size_bytes": len(chunk.audio_bytes),
+                            "audio_base64": base64.b64encode(chunk.audio_bytes).decode("ascii"),
+                        },
+                    )
+                await send_event(
+                    stage="tts",
+                    status="completed",
+                    session_id=transcript.session_id,
+                    started_at_ms=tts_started_at_ms,
+                    payload={"chunks": tts_chunks},
+                )
+            else:
+                await send_event(
+                    stage="tts",
+                    status="skipped",
+                    session_id=transcript.session_id,
+                    payload={"reason": "missing_final_answer"},
+                )
 
         result_payload = {
             "event": "pipeline_result",
@@ -233,74 +276,15 @@ async def stt_websocket(websocket: WebSocket):
         while True:
             frame = await websocket.receive_bytes()
             stt_started_at_ms = int(time.time() * 1000)
-            await send_event(stage="stt", status="started", session_id=pipeline.session_id)
+            await send_event(
+                stage="stt",
+                status="started",
+                session_id=pipeline.session_id,
+                started_at_ms=stt_started_at_ms,
+            )
             transcript = pipeline.feed(frame)
             if transcript:
-                transcript_text = transcript.text
-                if nlu_router is None:
-                    # NLU 초기화 실패 시 STT 결과만 전송
-                    await websocket.send_json(
-                        {
-                            "session_id": transcript.session_id,
-                            "transcript": transcript_text,
-                            "is_final": True,
-                        }
-                    )
-                    continue
-
-                # NLU는 동기/무거운 작업이므로 executor에서 실행
-                loop = asyncio.get_running_loop()
-                nlu_result = await loop.run_in_executor(
-                    None, nlu_router.process_query, transcript_text
-                )
-
-                # 클라이언트 전송은 경량 필드 중심으로 제한
-                nlu_payload = {
-                    "status": nlu_result.get("status"),
-                    "intent": nlu_result.get("intent"),
-                    "final_answer": nlu_result.get("final_answer"),
-                    "metadata": nlu_result.get("metadata"),
-                    "handoff_reason": nlu_result.get("handoff_reason"),
-                    "handoff_confidence": nlu_result.get("handoff_confidence"),
-                    "guardrail_decision": nlu_result.get("guardrail_decision"),
-                    "guardrail_score": nlu_result.get("guardrail_score"),
-                    "guardrail_reasons": nlu_result.get("guardrail_reasons"),
-                    "guardrail_components": nlu_result.get("guardrail_components"),
-                    "transfer_action": nlu_result.get("transfer_action"),
-                    "action": nlu_result.get("action"),
-                    "transfer_action": nlu_result.get("transfer_action"),
-                    "timings_sec": nlu_result.get("timings_sec"),
-                }
-
-                workflow_payload = None
-                workflow_output = None
-                if nlu_result.get("status") in {"HANDOFF_DIRECT", "REJECT_DIRECT"}:
-                    workflow_output = None
-                elif nlu_result.get("status") == "REQUIRE_LLM":
-
-                    workflow_payload = workflow_input_from_nlu_dict(
-                        {
-                            "session_id": transcript.session_id,
-                            "user_query": transcript_text,
-                            **nlu_result,
-                        }
-                    )
-                    workflow_output = await execute_workflow_item(workflow_payload)
-
-                await websocket.send_json(
-                    {
-                        "session_id": transcript.session_id,
-                        "transcript": transcript_text,
-                        "is_final": True,
-                        "nlu_analysis": nlu_payload,
-                        "workflow": (
-                            workflow_output.model_dump(mode="json")
-                            if workflow_output
-                            else None
-                        ),
-                        "action": nlu_result.get("action") or nlu_result.get("transfer_action"),
-
-                    }
-                )
+                await process_transcript(transcript, stt_started_at_ms=stt_started_at_ms)
+                break
     except WebSocketDisconnect:
         pass

@@ -1259,6 +1259,10 @@ class AICC_NLU_Router:
         metadata["risk_level"] = agg_risk
         metadata["handoff_required"] = agg_ho
         metadata["rag_fusion"] = fusion_note
+        metadata["direct_handoff_keyword"] = sensitive_keyword_hit
+        metadata["abusive_keyword"] = abusive_keyword_hit
+        metadata["customer_context_present"] = customer_context_present
+        metadata["customer_context_required_keyword"] = context_required_keyword
 
         if self.subdomain_source == "rag":
             sub_topic = str(meta_top.get("subdomain", "")).strip()
@@ -1305,12 +1309,17 @@ class AICC_NLU_Router:
         preview = (retrieved_context[:120] + "…") if len(retrieved_context) > 120 else retrieved_context
         print(f"      • 본문 미리보기: {preview!r}")
 
-        should_direct, direct_reasons = self._should_direct_handoff(
+        guardrail = self._compute_guardrail(
             risk_level=str(metadata.get("risk_level", "low")).strip().lower(),
             handoff_required=str(metadata.get("handoff_required", "N")).strip().upper(),
-            keyword_hit=keyword_hit,
+            sensitive_keyword_hit=sensitive_keyword_hit,
+            abusive_keyword_hit=abusive_keyword_hit,
             missing_customer_context_reason=missing_customer_context_reason,
+            rag_miss=False,
+            query_text=stt_text,
         )
+        should_direct = guardrail["decision"] == "HANDOFF"
+        direct_reasons = guardrail["reasons"]
         if should_direct:
             timings["total_sec"] = time.perf_counter() - total_t0
             print(f"  🚨 [H] Direct handoff 발동 (reason={direct_reasons})")
