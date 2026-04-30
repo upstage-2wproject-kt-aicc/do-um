@@ -26,10 +26,7 @@
 import os
 import asyncio
 import time
-import json
 import base64
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -38,19 +35,20 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from src.nlu.aicc_core_klue import AICC_NLU_Router
 from src.pipeline import VoiceAIPipeline
 from src.workflow.graph import execute_workflow_item, workflow_input_from_nlu_dict
+from src.workflow.online_evaluation import OnlineEvaluationService
 from .pipeline import StreamingPipeline
 
 load_dotenv()
 
 router = APIRouter()
 nlu_router: AICC_NLU_Router | None = None
-RUNTIME_OUTPUT_DIR = Path("data/runtime")
-
-
 @router.on_event("startup")
 async def startup_event() -> None:
     """Loads heavy NLU resources once at service startup."""
     global nlu_router
+    if nlu_router is not None:
+        print("✅ [STT->NLU] NLU 라우터 이미 로드됨 (중복 초기화 생략)")
+        return
     try:
         nlu_router = AICC_NLU_Router()
         print("✅ [STT->NLU] NLU 라우터 로드 완료")
@@ -78,6 +76,10 @@ async def stt_websocket(websocket: WebSocket):
         payload: dict[str, Any] | None = None,
     ) -> None:
         ended_at_ms = int(time.time() * 1000)
+        print(
+            f"[WS_EVENT] session={session_id} stage={stage} status={status} "
+            f"latency_ms={(ended_at_ms - started_at_ms) if started_at_ms else None}"
+        )
         await websocket.send_json(
             {
                 "event": "pipeline_stage",
@@ -137,6 +139,8 @@ async def stt_websocket(websocket: WebSocket):
         )
 
         workflow_output = None
+        evaluation_task: asyncio.Task[dict[str, Any]] | None = None
+        evaluation_started_at_ms: int | None = None
         if nlu_result.get("status") == "REQUIRE_LLM":
             workflow_started_at_ms = int(time.time() * 1000)
             await send_event(
@@ -160,6 +164,26 @@ async def stt_websocket(websocket: WebSocket):
                 started_at_ms=workflow_started_at_ms,
                 payload=workflow_json,
             )
+            evaluation_started_at_ms = int(time.time() * 1000)
+            await send_event(
+                stage="evaluation",
+                status="started",
+                session_id=transcript.session_id,
+                started_at_ms=evaluation_started_at_ms,
+            )
+            try:
+                evaluation_task = asyncio.create_task(
+                    OnlineEvaluationService().start(workflow_payload)
+                )
+            except Exception:
+                evaluation_task = None
+                await send_event(
+                    stage="evaluation",
+                    status="failed",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                    payload={"reason": "evaluation_start_failed"},
+                )
             tts_text = (workflow_output.pre_tts_text or workflow_output.final_answer_text or "").strip()
             if tts_text:
                 await send_event(
@@ -262,15 +286,33 @@ async def stt_websocket(websocket: WebSocket):
             ),
         }
 
-        RUNTIME_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        filename = datetime.now().strftime("%y%m%d_%H:%M:%S") + ".json"
-        output_path = RUNTIME_OUTPUT_DIR / filename
-        output_path.write_text(
-            json.dumps(result_payload, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        result_payload["saved_file"] = str(output_path)
         await websocket.send_json(result_payload)
+        if evaluation_task is not None:
+            try:
+                online_run = await evaluation_task
+                if online_run.evaluation_task is not None:
+                    evaluation_payload = await online_run.evaluation_task
+                    await websocket.send_json(
+                        {
+                            "event": "evaluation_result",
+                            **evaluation_payload,
+                        }
+                    )
+                await send_event(
+                    stage="evaluation",
+                    status="completed",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                    payload={"status": "done"},
+                )
+            except Exception:
+                await send_event(
+                    stage="evaluation",
+                    status="failed",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                    payload={"reason": "evaluation_failed"},
+                )
 
     try:
         while True:
