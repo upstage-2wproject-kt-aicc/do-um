@@ -220,16 +220,16 @@ class AICC_NLU_Router:
         )
         self.guardrail_enable_keyword: bool = True
         self.guardrail_enable_ood_reject: bool = True
-        self.guardrail_score_meta_high: int = 60
-        self.guardrail_score_meta_required: int = 40
-        self.guardrail_score_keyword_sensitive: int = 50
+        self.guardrail_score_meta_high: int = 50
+        self.guardrail_score_meta_required: int = 30
+        self.guardrail_score_keyword_sensitive: int = 40
         self.guardrail_score_keyword_abusive: int = 100
-        self.guardrail_score_missing_customer_context: int = 40
-        self.guardrail_score_ood: int = 30
-        self.guardrail_meta_cap: int = 70
-        self.guardrail_handoff_threshold: int = 80
-        self.guardrail_limit_threshold: int = 50
-        self.guardrail_reject_threshold: int = 30
+        self.guardrail_score_missing_customer_context: int = 25
+        self.guardrail_score_ood: int = 25
+        self.guardrail_meta_cap: int = 60
+        self.guardrail_handoff_threshold: int = 90
+        self.guardrail_limit_threshold: int = 60
+        self.guardrail_reject_threshold: int = 35
         raw_abusive = "씨발,병신,개새끼,좆같,죽여버리,살인,테러"
         self.guardrail_abusive_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_abusive.split(",") if item.strip()
