@@ -5,13 +5,20 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 try:
     from langgraph.graph import END, StateGraph
 except ModuleNotFoundError:  # pragma: no cover - runtime dependency guard
     END = "__end__"
-    StateGraph = object  # type: ignore[assignment]
+    StateGraph = None  # type: ignore[assignment]
+
+# basedpyright는 예외 분기에서 StateGraph를 object로 잡는 상황을 싫어해
+# 타입 에러(빨간 배지)를 줄이기 위해 TYPE_CHECKING에서만 실제 타입을 가져옵니다.
+if TYPE_CHECKING:  # pragma: no cover
+    from langgraph.graph import StateGraph as _LangGraphStateGraph
+else:  # pragma: no cover
+    _LangGraphStateGraph = Any  # type: ignore[assignment]
 
 from src.common.schemas import (
     IntentResult,
@@ -102,11 +109,11 @@ def _select_route_with_reason(state: WorkflowRoutingInput) -> tuple[RouteType, s
     return RouteType.FAQ, "default_faq"
 
 
-def build_workflow_graph() -> StateGraph:
+def build_workflow_graph() -> Any:
     """Builds the LangGraph state graph skeleton."""
-    if StateGraph is object:
+    if StateGraph is None:
         raise RuntimeError("langgraph is required to build workflow graph.")
-    graph = StateGraph(WorkflowRoutingInput)
+    graph = StateGraph(WorkflowRoutingInput)  # type: ignore[operator]
     graph.add_node("router", faq_node)
     graph.add_node("faq", faq_node)
     graph.add_node("handoff", handoff_node)

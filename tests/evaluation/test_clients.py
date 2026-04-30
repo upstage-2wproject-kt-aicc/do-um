@@ -428,6 +428,7 @@ def test_parse_judge_json_supports_comparative_10_rubric() -> None:
     )
 
     assert evaluation.metrics["groundedness"].score == 9
+    assert evaluation.flags == {"unsupported_claim": False}
     assert evaluation.summary["overall_profile"] == "균형형"
 
 
