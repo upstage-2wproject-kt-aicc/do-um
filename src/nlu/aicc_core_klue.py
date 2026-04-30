@@ -235,7 +235,7 @@ class AICC_NLU_Router:
         self.guardrail_meta_cap: int = 60
         self.guardrail_handoff_threshold: int = 90
         self.guardrail_limit_threshold: int = 60
-        self.guardrail_reject_threshold: int = 35
+        self.guardrail_reject_threshold: int = 25
         raw_abusive = "씨발,병신,개새끼,좆같,죽여버리,살인,테러"
         self.guardrail_abusive_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_abusive.split(",") if item.strip()
