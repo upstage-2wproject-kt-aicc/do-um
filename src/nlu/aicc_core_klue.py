@@ -209,6 +209,12 @@ class AICC_NLU_Router:
         self.direct_handoff_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_keywords.split(",") if item.strip()
         )
+        raw_request_handoff = (
+            "상담사 연결 요청,상담사 연결,상담원 연결 요청,상담원 연결,사람 상담사 연결,사람 상담원 연결,직원 연결"
+        )
+        self.request_handoff_keywords: tuple[str, ...] = tuple(
+            item.strip().lower() for item in raw_request_handoff.split(",") if item.strip()
+        )
         self.direct_handoff_message: str = (
             "해당 문의는 개인정보 확인 또는 안전 조치가 필요하여 상담사에게 연결해 드리겠습니다."
         )
@@ -415,6 +421,15 @@ class AICC_NLU_Router:
         if not q:
             return None
         for keyword in self.direct_handoff_keywords:
+            if keyword and keyword in q:
+                return keyword
+        return None
+
+    def _find_request_handoff_keyword(self, text: str) -> str | None:
+        q = text.strip().lower()
+        if not q:
+            return None
+        for keyword in self.request_handoff_keywords:
             if keyword and keyword in q:
                 return keyword
         return None
@@ -1014,6 +1029,37 @@ class AICC_NLU_Router:
 
         print("\n" + "=" * 72)
         print(f"📥 [process_query] 고객 발화: {stt_text!r}")
+
+        request_handoff_hit = self._find_request_handoff_keyword(stt_text)
+        if request_handoff_hit:
+            timings["total_sec"] = time.perf_counter() - total_t0
+            print(f"  🚨 [0] 상담사 연결 요청 직접 감지: {request_handoff_hit!r}")
+            print(f"  ✅ 파이프라인 종료 — 총 ⏱️ {timings['total_sec']:.3f}s (DIRECT_HANDOFF)")
+            print("=" * 72)
+            return self._build_direct_handoff_response(
+                intent="상담사연결요청",
+                subdomain_pred=None,
+                metadata={
+                    "risk_level": "high",
+                    "handoff_required": "Y",
+                    "direct_handoff_keyword": request_handoff_hit,
+                    "customer_context_present": self._has_customer_context(customer_context),
+                    "routing_mode": "request_handoff_direct",
+                },
+                retrieved_context="",
+                retrieved_faq_ids=[],
+                routing_signals={
+                    "routing_mode": "request_handoff_direct",
+                    "risk_level": "high",
+                    "handoff_required": "Y",
+                    "guardrail_decision": "HANDOFF",
+                },
+                cache_max_similarity=0.0,
+                timings=timings,
+                reasons=[f"request_handoff:{request_handoff_hit}"],
+                guardrail_score=100.0,
+                guardrail_components={"meta": 0, "keyword": 100, "missing_customer_context": 0, "ood": 0},
+            )
 
         intent, subdomain_pred, query_vector, i_sec, s_sec, e_sec, wall_pe = self._run_intent_embed_parallel(
             stt_text

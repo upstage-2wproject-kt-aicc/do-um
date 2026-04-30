@@ -63,7 +63,10 @@ async def stt_websocket(websocket: WebSocket):
     await websocket.accept()
     stt_provider = os.getenv("STT_PROVIDER", "openai").strip().lower()
     pipeline = StreamingPipeline(
-        google_project_id=os.getenv("GOOGLE_PROJECT_ID", ""),
+        google_project_id=(
+            os.getenv("GOOGLE_CLOUD_PROJECT", "").strip()
+            or os.getenv("GOOGLE_PROJECT_ID", "").strip()
+        ),
         stt_provider="openai" if stt_provider == "openai" else "google",
     )
     voice_pipeline = VoiceAIPipeline()
@@ -139,39 +142,33 @@ async def stt_websocket(websocket: WebSocket):
         )
 
         workflow_output = None
+        workflow_payload = None
         evaluation_task: asyncio.Task[dict[str, Any]] | None = None
         evaluation_started_at_ms: int | None = None
-        if nlu_result.get("status") == "REQUIRE_LLM":
-            workflow_started_at_ms = int(time.time() * 1000)
-            await send_event(
-                stage="workflow",
-                status="started",
-                session_id=transcript.session_id,
-            )
-            workflow_payload = workflow_input_from_nlu_dict(
-                {
-                    "session_id": transcript.session_id,
-                    "user_query": transcript_text,
-                    **nlu_result,
-                }
-            )
-            workflow_output = await execute_workflow_item(workflow_payload)
-            workflow_json = workflow_output.model_dump(mode="json")
-            await send_event(
-                stage="workflow",
-                status="completed",
-                session_id=transcript.session_id,
-                started_at_ms=workflow_started_at_ms,
-                payload=workflow_json,
-            )
-            evaluation_started_at_ms = int(time.time() * 1000)
-            await send_event(
-                stage="evaluation",
-                status="started",
-                session_id=transcript.session_id,
-                started_at_ms=evaluation_started_at_ms,
-            )
+
+        # Force evaluation regardless of NLU route so front can always receive evaluation latency/result.
+        force_evaluation = os.getenv("FORCE_EVALUATION", "1").strip().lower() not in {
+            "0",
+            "false",
+            "off",
+            "no",
+        }
+        if force_evaluation:
             try:
+                workflow_payload = workflow_input_from_nlu_dict(
+                    {
+                        "session_id": transcript.session_id,
+                        "user_query": transcript_text,
+                        **nlu_result,
+                    }
+                )
+                evaluation_started_at_ms = int(time.time() * 1000)
+                await send_event(
+                    stage="evaluation",
+                    status="started",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                )
                 evaluation_task = asyncio.create_task(
                     OnlineEvaluationService().start(workflow_payload)
                 )
@@ -184,6 +181,31 @@ async def stt_websocket(websocket: WebSocket):
                     started_at_ms=evaluation_started_at_ms,
                     payload={"reason": "evaluation_start_failed"},
                 )
+
+        if nlu_result.get("status") == "REQUIRE_LLM":
+            workflow_started_at_ms = int(time.time() * 1000)
+            await send_event(
+                stage="workflow",
+                status="started",
+                session_id=transcript.session_id,
+            )
+            if workflow_payload is None:
+                workflow_payload = workflow_input_from_nlu_dict(
+                    {
+                        "session_id": transcript.session_id,
+                        "user_query": transcript_text,
+                        **nlu_result,
+                    }
+                )
+            workflow_output = await execute_workflow_item(workflow_payload)
+            workflow_json = workflow_output.model_dump(mode="json")
+            await send_event(
+                stage="workflow",
+                status="completed",
+                session_id=transcript.session_id,
+                started_at_ms=workflow_started_at_ms,
+                payload=workflow_json,
+            )
             tts_text = (workflow_output.pre_tts_text or workflow_output.final_answer_text or "").strip()
             if tts_text:
                 await send_event(
@@ -229,7 +251,14 @@ async def stt_websocket(websocket: WebSocket):
                 session_id=transcript.session_id,
                 payload={"reason": "nlu_status_not_require_llm"},
             )
-            direct_answer = str(nlu_result.get("final_answer") or "").strip()
+            nlu_status = str(nlu_result.get("status") or "").strip().upper()
+            if nlu_status == "REJECT_DIRECT":
+                direct_answer = str(
+                    nlu_result.get("final_answer")
+                    or "금융 관련 문의에 한해 답변드릴 수 있습니다. 금융 상담 질문으로 다시 요청해 주세요."
+                ).strip()
+            else:
+                direct_answer = str(nlu_result.get("final_answer") or "").strip()
             if direct_answer:
                 await send_event(
                     stage="tts",
