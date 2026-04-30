@@ -91,13 +91,48 @@ class VoiceAIPipeline:
     ) -> AsyncIterator[TTSChunk]:
         """Runs only TTS stage for an already computed workflow output."""
         final_text = workflow_output.pre_tts_text or workflow_output.final_answer_text
-        if not final_text or workflow_output.is_handoff_decided:
+        if not final_text:
             return
         if not KOREAN_CHAR_PATTERN.search(final_text):
             final_text = "죄송합니다. 현재 상담사 연결을 도와드리겠습니다."
 
         tts_input = LLMResponse(
             session_id=workflow_output.session_id,
+            provider="workflow",
+            text=final_text,
+            latency_ms=0,
+            ttft_ms=0,
+            finish_reason="stop",
+            grounded=False,
+            error=None,
+        )
+
+        last_error: Exception | None = None
+        for provider in self.tts_providers:
+            service = TTSFactory.get_service(provider)
+            try:
+                async for chunk in service.stream(tts_input):
+                    yield chunk
+                logger.info("TTS 완료. provider={}", provider)
+                return
+            except TTSException as exc:
+                last_error = exc
+                logger.warning("TTS 실패. provider={} error={}", provider, str(exc))
+        if last_error is not None:
+            raise last_error
+
+    async def stream_tts_for_text(
+        self,
+        *,
+        session_id: str,
+        text: str,
+    ) -> AsyncIterator[TTSChunk]:
+        final_text = (text or "").strip()
+        if not final_text:
+            return
+
+        tts_input = LLMResponse(
+            session_id=session_id,
             provider="workflow",
             text=final_text,
             latency_ms=0,

@@ -26,10 +26,7 @@
 import os
 import asyncio
 import time
-import json
 import base64
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -38,23 +35,20 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from src.nlu.aicc_core_klue import AICC_NLU_Router
 from src.pipeline import VoiceAIPipeline
 from src.workflow.graph import execute_workflow_item, workflow_input_from_nlu_dict
-from src.workflow.online_evaluation import (
-    OnlineEvaluationService,
-    build_workflow_result_event,
-)
+from src.workflow.online_evaluation import OnlineEvaluationService
 from .pipeline import StreamingPipeline
 
 load_dotenv()
 
 router = APIRouter()
 nlu_router: AICC_NLU_Router | None = None
-RUNTIME_OUTPUT_DIR = Path("data/runtime")
-
-
 @router.on_event("startup")
 async def startup_event() -> None:
     """Loads heavy NLU resources once at service startup."""
     global nlu_router
+    if nlu_router is not None:
+        print("✅ [STT->NLU] NLU 라우터 이미 로드됨 (중복 초기화 생략)")
+        return
     try:
         nlu_router = AICC_NLU_Router()
         print("✅ [STT->NLU] NLU 라우터 로드 완료")
@@ -82,6 +76,10 @@ async def stt_websocket(websocket: WebSocket):
         payload: dict[str, Any] | None = None,
     ) -> None:
         ended_at_ms = int(time.time() * 1000)
+        print(
+            f"[WS_EVENT] session={session_id} stage={stage} status={status} "
+            f"latency_ms={(ended_at_ms - started_at_ms) if started_at_ms else None}"
+        )
         await websocket.send_json(
             {
                 "event": "pipeline_stage",
@@ -95,12 +93,13 @@ async def stt_websocket(websocket: WebSocket):
             }
         )
 
-    async def process_transcript(transcript) -> None:
+    async def process_transcript(transcript, stt_started_at_ms: int | None = None) -> None:
         transcript_text = transcript.text
         await send_event(
             stage="stt",
             status="completed",
             session_id=transcript.session_id,
+            started_at_ms=stt_started_at_ms,
             payload={
                 "text": transcript_text,
                 "is_final": True,
@@ -140,6 +139,8 @@ async def stt_websocket(websocket: WebSocket):
         )
 
         workflow_output = None
+        evaluation_task: asyncio.Task[dict[str, Any]] | None = None
+        evaluation_started_at_ms: int | None = None
         if nlu_result.get("status") == "REQUIRE_LLM":
             workflow_started_at_ms = int(time.time() * 1000)
             await send_event(
@@ -163,19 +164,33 @@ async def stt_websocket(websocket: WebSocket):
                 started_at_ms=workflow_started_at_ms,
                 payload=workflow_json,
             )
-            if workflow_output.is_handoff_decided:
-                await send_event(
-                    stage="tts",
-                    status="skipped",
-                    session_id=transcript.session_id,
-                    payload={"reason": "handoff_decided"},
+            evaluation_started_at_ms = int(time.time() * 1000)
+            await send_event(
+                stage="evaluation",
+                status="started",
+                session_id=transcript.session_id,
+                started_at_ms=evaluation_started_at_ms,
+            )
+            try:
+                evaluation_task = asyncio.create_task(
+                    OnlineEvaluationService().start(workflow_payload)
                 )
-            else:
+            except Exception:
+                evaluation_task = None
+                await send_event(
+                    stage="evaluation",
+                    status="failed",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                    payload={"reason": "evaluation_start_failed"},
+                )
+            tts_text = (workflow_output.pre_tts_text or workflow_output.final_answer_text or "").strip()
+            if tts_text:
                 await send_event(
                     stage="tts",
                     status="started",
                     session_id=transcript.session_id,
-                    payload={"pre_tts_text": workflow_output.pre_tts_text},
+                    payload={"pre_tts_text": tts_text},
                 )
                 tts_started_at_ms = int(time.time() * 1000)
                 tts_chunks = 0
@@ -200,6 +215,13 @@ async def stt_websocket(websocket: WebSocket):
                     started_at_ms=tts_started_at_ms,
                     payload={"chunks": tts_chunks},
                 )
+            else:
+                await send_event(
+                    stage="tts",
+                    status="skipped",
+                    session_id=transcript.session_id,
+                    payload={"reason": "missing_tts_text"},
+                )
         else:
             await send_event(
                 stage="workflow",
@@ -207,6 +229,47 @@ async def stt_websocket(websocket: WebSocket):
                 session_id=transcript.session_id,
                 payload={"reason": "nlu_status_not_require_llm"},
             )
+            direct_answer = str(nlu_result.get("final_answer") or "").strip()
+            if direct_answer:
+                await send_event(
+                    stage="tts",
+                    status="started",
+                    session_id=transcript.session_id,
+                    payload={"pre_tts_text": direct_answer},
+                )
+                tts_started_at_ms = int(time.time() * 1000)
+                tts_chunks = 0
+                async for chunk in voice_pipeline.stream_tts_for_text(
+                    session_id=transcript.session_id,
+                    text=direct_answer,
+                ):
+                    tts_chunks += 1
+                    await send_event(
+                        stage="tts",
+                        status="chunk",
+                        session_id=transcript.session_id,
+                        started_at_ms=tts_started_at_ms,
+                        payload={
+                            "chunk_id": chunk.chunk_id,
+                            "is_last": chunk.is_last,
+                            "size_bytes": len(chunk.audio_bytes),
+                            "audio_base64": base64.b64encode(chunk.audio_bytes).decode("ascii"),
+                        },
+                    )
+                await send_event(
+                    stage="tts",
+                    status="completed",
+                    session_id=transcript.session_id,
+                    started_at_ms=tts_started_at_ms,
+                    payload={"chunks": tts_chunks},
+                )
+            else:
+                await send_event(
+                    stage="tts",
+                    status="skipped",
+                    session_id=transcript.session_id,
+                    payload={"reason": "missing_final_answer"},
+                )
 
         result_payload = {
             "event": "pipeline_result",
@@ -223,110 +286,47 @@ async def stt_websocket(websocket: WebSocket):
             ),
         }
 
-        RUNTIME_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        filename = datetime.now().strftime("%y%m%d_%H:%M:%S") + ".json"
-        output_path = RUNTIME_OUTPUT_DIR / filename
-        output_path.write_text(
-            json.dumps(result_payload, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        result_payload["saved_file"] = str(output_path)
         await websocket.send_json(result_payload)
+        if evaluation_task is not None:
+            try:
+                online_run = await evaluation_task
+                if online_run.evaluation_task is not None:
+                    evaluation_payload = await online_run.evaluation_task
+                    await websocket.send_json(
+                        {
+                            "event": "evaluation_result",
+                            **evaluation_payload,
+                        }
+                    )
+                await send_event(
+                    stage="evaluation",
+                    status="completed",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                    payload={"status": "done"},
+                )
+            except Exception:
+                await send_event(
+                    stage="evaluation",
+                    status="failed",
+                    session_id=transcript.session_id,
+                    started_at_ms=evaluation_started_at_ms,
+                    payload={"reason": "evaluation_failed"},
+                )
 
     try:
         while True:
             frame = await websocket.receive_bytes()
             stt_started_at_ms = int(time.time() * 1000)
-            await send_event(stage="stt", status="started", session_id=pipeline.session_id)
+            await send_event(
+                stage="stt",
+                status="started",
+                session_id=pipeline.session_id,
+                started_at_ms=stt_started_at_ms,
+            )
             transcript = pipeline.feed(frame)
             if transcript:
-                transcript_text = transcript.text
-                if nlu_router is None:
-                    # NLU 초기화 실패 시 STT 결과만 전송
-                    await websocket.send_json(
-                        {
-                            "session_id": transcript.session_id,
-                            "transcript": transcript_text,
-                            "is_final": True,
-                        }
-                    )
-                    continue
-
-                # NLU는 동기/무거운 작업이므로 executor에서 실행
-                loop = asyncio.get_running_loop()
-                nlu_result = await loop.run_in_executor(
-                    None, nlu_router.process_query, transcript_text
-                )
-
-                # 클라이언트 전송은 경량 필드 중심으로 제한
-                nlu_payload = {
-                    "status": nlu_result.get("status"),
-                    "intent": nlu_result.get("intent"),
-                    "final_answer": nlu_result.get("final_answer"),
-                    "metadata": nlu_result.get("metadata"),
-                    "handoff_reason": nlu_result.get("handoff_reason"),
-                    "handoff_confidence": nlu_result.get("handoff_confidence"),
-                    "guardrail_decision": nlu_result.get("guardrail_decision"),
-                    "guardrail_score": nlu_result.get("guardrail_score"),
-                    "guardrail_reasons": nlu_result.get("guardrail_reasons"),
-                    "guardrail_components": nlu_result.get("guardrail_components"),
-                    "transfer_action": nlu_result.get("transfer_action"),
-                    "action": nlu_result.get("action"),
-                    "timings_sec": nlu_result.get("timings_sec"),
-                }
-
-                workflow_output = None
-                evaluation_task = None
-                evaluation_status = "skipped"
-                if nlu_result.get("status") in {"HANDOFF_DIRECT", "REJECT_DIRECT"}:
-                    workflow_output = None
-                elif nlu_result.get("status") == "REQUIRE_LLM":
-
-                    workflow_payload = workflow_input_from_nlu_dict(
-                        {
-                            "session_id": transcript.session_id,
-                            "user_query": transcript_text,
-                            **nlu_result,
-                        }
-                    )
-                    if _online_evaluation_enabled():
-                        try:
-                            online_run = await OnlineEvaluationService().start(workflow_payload)
-                            workflow_output = online_run.workflow_output
-                            evaluation_task = online_run.evaluation_task
-                            evaluation_status = "running"
-                        except Exception as exc:
-                            print(f"⚠️ [OnlineEvaluation] 시작 실패, 기존 workflow로 대체: {exc}")
-                            workflow_output = await execute_workflow_item(workflow_payload)
-                            evaluation_status = "unavailable"
-                    else:
-                        workflow_output = await execute_workflow_item(workflow_payload)
-
-                await websocket.send_json(
-                    build_workflow_result_event(
-                        session_id=transcript.session_id,
-                        transcript_text=transcript_text,
-                        nlu_payload=nlu_payload,
-                        workflow_output=workflow_output,
-                        action=nlu_result.get("action") or nlu_result.get("transfer_action"),
-                        evaluation_status=evaluation_status,
-                    )
-                )
-                if evaluation_task is not None:
-                    try:
-                        await websocket.send_json(await evaluation_task)
-                    except Exception as exc:
-                        await websocket.send_json(
-                            {
-                                "type": "evaluation_error",
-                                "session_id": transcript.session_id,
-                                "error": exc.__class__.__name__,
-                            }
-                        )
+                await process_transcript(transcript, stt_started_at_ms=stt_started_at_ms)
+                break
     except WebSocketDisconnect:
         pass
-
-
-def _online_evaluation_enabled() -> bool:
-    value = os.getenv("ONLINE_EVALUATION_ENABLED", "1").strip().lower()
-    return value not in {"0", "false", "no", "off"}
