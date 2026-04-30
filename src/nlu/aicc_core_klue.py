@@ -201,85 +201,47 @@ class AICC_NLU_Router:
         self.rrf_k: int = max(1, int(os.getenv("NLU_RAG_RRF_K", "60")))
         self.rag_fusion_pool_mult: int = max(1, int(os.getenv("NLU_RAG_FUSION_POOL_MULT", "2")))
         self.subdomain_source: str = os.getenv("NLU_SUBDOMAIN_SOURCE", "rag").strip().lower()
-        self.direct_handoff_on_high_risk: bool = os.getenv(
-            "NLU_DIRECT_HANDOFF_ON_HIGH_RISK", "1"
-        ).strip().lower() not in ("0", "false", "no", "off")
-        self.direct_handoff_on_required: bool = os.getenv(
-            "NLU_DIRECT_HANDOFF_ON_REQUIRED", "1"
-        ).strip().lower() not in ("0", "false", "no", "off")
-        raw_keywords = os.getenv(
-            "NLU_GUARDRAIL_SENSITIVE_KEYWORDS",
-            os.getenv(
-                "NLU_DIRECT_HANDOFF_KEYWORDS",
-                "보이스피싱,피싱,사기,명의도용,해킹,도난,분실,신고,긴급,112",
-            ),
-        ).strip()
+        # NOTE: 가드레일 정책은 당분간 코드 고정값으로 운영합니다.
+        # (API 키/인덱스 정보와 달리 운영 비밀값이 아니므로 .env 의존 제거)
+        self.direct_handoff_on_high_risk: bool = True
+        self.direct_handoff_on_required: bool = True
+        raw_keywords = "보이스피싱,피싱,사기,명의도용,해킹,도난,분실,신고,긴급,112"
         self.direct_handoff_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_keywords.split(",") if item.strip()
         )
-        self.direct_handoff_message: str = os.getenv(
-            "NLU_DIRECT_HANDOFF_MESSAGE",
-            "해당 문의는 개인정보 확인 또는 안전 조치가 필요하여 상담사에게 연결해 드리겠습니다.",
-        ).strip()
-        self.guardrail_limit_message: str = os.getenv(
-            "NLU_GUARDRAIL_LIMIT_MESSAGE",
-            "개인별 조건 확인이 필요한 문의일 수 있어 확정 답변을 피하고, 약관/공식 채널 확인을 안내하세요.",
-        ).strip()
-        self.guardrail_reject_message: str = os.getenv(
-            "NLU_GUARDRAIL_REJECT_MESSAGE",
-            "금융 관련 문의에 한해 답변드릴 수 있습니다. 금융 상담 질문으로 다시 요청해 주세요.",
-        ).strip()
-        self.guardrail_enable_keyword: bool = os.getenv(
-            "NLU_GUARDRAIL_ENABLE_KEYWORD", "1"
-        ).strip().lower() not in ("0", "false", "no", "off")
-        self.guardrail_enable_ood_reject: bool = os.getenv(
-            "NLU_GUARDRAIL_ENABLE_OOD_REJECT", "1"
-        ).strip().lower() not in ("0", "false", "no", "off")
-        self.guardrail_score_meta_high: int = int(os.getenv("NLU_GUARDRAIL_SCORE_META_HIGH", "60"))
-        self.guardrail_score_meta_required: int = int(
-            os.getenv("NLU_GUARDRAIL_SCORE_META_REQUIRED", "40")
+        self.direct_handoff_message: str = (
+            "해당 문의는 개인정보 확인 또는 안전 조치가 필요하여 상담사에게 연결해 드리겠습니다."
         )
-        self.guardrail_score_keyword_sensitive: int = int(
-            os.getenv("NLU_GUARDRAIL_SCORE_KEYWORD_SENSITIVE", "50")
+        self.guardrail_limit_message: str = (
+            "개인별 조건 확인이 필요한 문의일 수 있어 확정 답변을 피하고, 약관/공식 채널 확인을 안내하세요."
         )
-        self.guardrail_score_keyword_abusive: int = int(
-            os.getenv("NLU_GUARDRAIL_SCORE_KEYWORD_ABUSIVE", "100")
+        self.guardrail_reject_message: str = (
+            "금융 관련 문의에 한해 답변드릴 수 있습니다. 금융 상담 질문으로 다시 요청해 주세요."
         )
-        self.guardrail_score_missing_customer_context: int = int(
-            os.getenv("NLU_GUARDRAIL_SCORE_MISSING_CUSTOMER_CONTEXT", "40")
-        )
-        self.guardrail_score_ood: int = int(os.getenv("NLU_GUARDRAIL_SCORE_OOD", "30"))
-        self.guardrail_meta_cap: int = int(os.getenv("NLU_GUARDRAIL_META_CAP", "70"))
-        self.guardrail_handoff_threshold: int = int(
-            os.getenv("NLU_GUARDRAIL_HANDOFF_THRESHOLD", "80")
-        )
-        self.guardrail_limit_threshold: int = int(
-            os.getenv("NLU_GUARDRAIL_LIMIT_THRESHOLD", "50")
-        )
-        self.guardrail_reject_threshold: int = int(
-            os.getenv("NLU_GUARDRAIL_REJECT_THRESHOLD", "30")
-        )
-        raw_abusive = os.getenv(
-            "NLU_GUARDRAIL_ABUSIVE_KEYWORDS",
-            "씨발,병신,개새끼,좆같,죽여버리,살인,테러",
-        ).strip()
+        self.guardrail_enable_keyword: bool = True
+        self.guardrail_enable_ood_reject: bool = True
+        self.guardrail_score_meta_high: int = 60
+        self.guardrail_score_meta_required: int = 40
+        self.guardrail_score_keyword_sensitive: int = 50
+        self.guardrail_score_keyword_abusive: int = 100
+        self.guardrail_score_missing_customer_context: int = 40
+        self.guardrail_score_ood: int = 30
+        self.guardrail_meta_cap: int = 70
+        self.guardrail_handoff_threshold: int = 80
+        self.guardrail_limit_threshold: int = 50
+        self.guardrail_reject_threshold: int = 30
+        raw_abusive = "씨발,병신,개새끼,좆같,죽여버리,살인,테러"
         self.guardrail_abusive_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_abusive.split(",") if item.strip()
         )
-        raw_finance = os.getenv(
-            "NLU_FINANCE_DOMAIN_KEYWORDS",
-            "금융,대출,금리,이자,카드,계좌,예금,적금,환불,수수료,보이스피싱,명의도용,상담",
-        ).strip()
+        raw_finance = "금융,대출,금리,이자,카드,계좌,예금,적금,환불,수수료,보이스피싱,명의도용,상담"
         self.finance_domain_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_finance.split(",") if item.strip()
         )
-        self.direct_handoff_on_missing_customer_context: bool = os.getenv(
-            "NLU_DIRECT_HANDOFF_ON_MISSING_CUSTOMER_CONTEXT", "1"
-        ).strip().lower() not in ("0", "false", "no", "off")
-        raw_ctx_keywords = os.getenv(
-            "NLU_CUSTOMER_CONTEXT_REQUIRED_KEYWORDS",
-            "내 명의,내 계좌,내 카드,내 대출,거래내역,조회해,확인해,환불,승인 결과,한도 조회",
-        ).strip()
+        self.direct_handoff_on_missing_customer_context: bool = True
+        raw_ctx_keywords = (
+            "내 명의,내 계좌,내 카드,내 대출,거래내역,조회해,확인해,환불,승인 결과,한도 조회"
+        )
         self.customer_context_required_keywords: tuple[str, ...] = tuple(
             item.strip().lower() for item in raw_ctx_keywords.split(",") if item.strip()
         )
