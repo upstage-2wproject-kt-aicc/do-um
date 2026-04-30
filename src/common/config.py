@@ -33,7 +33,13 @@ class NaverTTSConfig(BaseModel):
 
 class GoogleTTSConfig(BaseModel):
     """Google Cloud TTS 설정"""
-    project_id: str = Field(default_factory=lambda: os.environ.get("GOOGLE_PROJECT_ID", ""), description="Google Cloud 프로젝트 ID")
+    project_id: str = Field(
+        default_factory=lambda: (
+            os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+            or os.environ.get("GOOGLE_PROJECT_ID", "")
+        ),
+        description="Google Cloud 프로젝트 ID",
+    )
     voice: str = Field("ko-KR-Wavenet-A", description="Google 음성 모델")
     language_code: str = Field("ko-KR")
 

@@ -175,7 +175,7 @@ class GoogleVertexGeminiChatClient:
 
     def __init__(
         self,
-        project_env: EnvName = "GOOGLE_CLOUD_PROJECT",
+        project_env: EnvName = ("GOOGLE_CLOUD_PROJECT", "GOOGLE_PROJECT_ID"),
         location_env: EnvName = "GOOGLE_CLOUD_LOCATION",
         default_location: str = "global",
         timeout_s: float = 20.0,
